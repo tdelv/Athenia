@@ -2,14 +2,18 @@
 
 # term-project
 
-## Application Description
+## Application Idea Descriptions
+
+Note: any reference to "app" means a form of web app, not a phone app (although will be structured to allow extensibility into a phone app in the future).
 
 ### Language: 
  - Overview: self-note taking app — algorithm during review mode (for each section, pages need for most review)
- - PROS: cool algorithm — generates which pages to review
+ - PROS: 
+   - cool algorithm — generates which pages to review
    - user-built experience (input supplied by user)
    - interface can be pretty basic
- - CONS: heavy content-based (guide)
+ - CONS: 
+   - heavy content-based (guide)
    - languages
    - translation in both directions
    - data for human-based interaction
@@ -30,10 +34,17 @@
    - demo: presented in English (intended for english audience for the demo)
 ### Hand-Me-Down:
  - Overview: connect students to pass down old or unused items
-   - PROS: demo, filtering (clothes, furniture, books, stationary), sustainability oriented, promoting reuse of different things
-   - CONS: content-based, security
+   - PROS:
+     - demo
+     - filtering (clothes, furniture, books, stationary)
+     - sustainability oriented
+     - promoting reuse of different things
+   - CONS: 
+     - content-based
+     - security
      - sleaziness or deceit may be an issue
-   - IDEAS: use google, facebook, id sign-in
+   - IDEAS: 
+     - use google, facebook, id sign-in
      - filtering system - user sustained input
      - search functionality for specialization
      - request system?
@@ -55,16 +66,19 @@
      - post-transaction page (confirmation page)
 ### Anxiety: 
  - Overview: organized system (wikipedia?) — simple to use, user-contribution — authentication by those with authority, detailed / summarized explanations
-   - PROS: people add own data
+   - PROS: 
+     - people add own data
      - crowd-sourced
      - reward system for exploration and growth
        - Reward system also serves to show developers data on what’s working and what isn’t
        - sharing with friends
-   - CONS: content-based (guide)
+   - CONS: 
+     - content-based (guide)
      - setting a level-of-quality
      - incentivization
      - marketing towards a very focused and specific audience
-   - IDEAS: game (fidget game)
+   - IDEAS: 
+     - game (fidget game)
      - report functionality — survey-esque
        - flagging — cw’s
      - generic & specific
@@ -139,3 +153,40 @@
    - Weaknesses
      - Backend 
      - UI Coding (enjoy but don’t have a ton of experience)
+
+## TODO
+ - Deadlines
+   - [x] Project Outline (March 4)
+     - [x] List out 3 project ideas and descriptions
+       - [x] Generate ideas
+       - [x] Generate descriptions
+     - [x] List out individual strengths and weaknesses
+   - [ ] Project Specifications, Mockup, and Design (March 15)
+     - [ ] Specifications
+     - [ ] Mockup
+     - [ ] Design Presentation
+ - Meetings
+   - [x] Project Outline Meeting (March 3)
+     - [x] Determine project ideas
+     - [x] Discuss strengths and weaknesses
+     - [x] Plan for future meetings
+     - [x] Finalize details about meeting
+   - [ ] Project Specifications, Mockup, and Design Meeting 1 (March 11)
+     - [ ] Discuss design choices
+     - [ ] Decide on project descriptions
+     - [ ] Delegate labor
+     - [ ] Finalize details about meeting
+   - [ ] Project Specifications, Mockup, and Design Meeting 2 (March 14)
+     - [ ] Finalize design choices
+     - [ ] Submit for March 15 deadline
+ - Other
+   - [ ] Fill out TODO!
+ - Individual
+   - Jason
+     - [x] Be awesome!
+   - Mia
+     - [x] Be awesome!
+   - Thomas
+     - [x] Be awesome!
+   - Makayla
+     - [x] Be awesome!
