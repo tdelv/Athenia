@@ -101,92 +101,92 @@ Note: any reference to "app" means a form of web app, not a phone app (although 
 
 ## Strengths and Weaknesses
 
- - Jason
-   - Strengths
-     - Commenting
-     - I really like GUIs :) — front end?
-     - Human-interaction?
-     - Note-taking
-   - Weaknesses
-     - Screams a lot
-     - Goes to bed late
-     - Algorithms
-     - Generics
-     - Time / space complexities
-     - Servers & databases
-     - Back-end
- - Mia
-   - Strengths
-     - Documentation
-     - Front end
-     - Organization
-     - Data Structures
-     - Nice
-   - Weaknesses
-     - Spelling
-     - Goes to bed early
-     - Nice
-     - Servers
-     - Back end
-     - Anal
- - Thomas
-   - Strengths
-     - Algorithms
-     - Data structures
-     - Code organization
-     - Backend design
-     - Design consistency
-   - Weaknesses
-     - Visual design
-     - Human interaction
-     - Leading discussion
-     - Making decisions
-     - Hardware
-     - Probably too anal
-     - Spelling
- - Makayla
-   - Strengths
-     - Product Management
-     - Design
-     - Data Structures
-     - Group Organization
-   - Weaknesses
-     - Backend 
-     - UI Coding (enjoy but don’t have a ton of experience)
+- Jason
+ - Strengths
+   - Commenting
+   - I really like GUIs :) — front end?
+   - Human-interaction?
+   - Note-taking
+ - Weaknesses
+   - Screams a lot
+   - Goes to bed late
+   - Algorithms
+   - Generics
+   - Time / space complexities
+   - Servers & databases
+   - Back-end
+- Mia
+ - Strengths
+   - Documentation
+   - Front end
+   - Organization
+   - Data Structures
+   - Nice
+ - Weaknesses
+   - Spelling
+   - Goes to bed early
+   - Nice
+   - Servers
+   - Back end
+   - Anal
+- Thomas
+ - Strengths
+   - Algorithms
+   - Data structures
+   - Code organization
+   - Backend design
+   - Design consistency
+ - Weaknesses
+   - Visual design
+   - Human interaction
+   - Leading discussion
+   - Making decisions
+   - Hardware
+   - Probably too anal
+   - Spelling
+- Makayla
+ - Strengths
+   - Product Management
+   - Design
+   - Data Structures
+   - Group Organization
+ - Weaknesses
+   - Backend 
+   - UI Coding (enjoy but don’t have a ton of experience)
 
 ## TODO
- - Deadlines
-   - [x] Project Outline (March 4)
-     - [x] List out 3 project ideas and descriptions
-       - [x] Generate ideas
-       - [x] Generate descriptions
-     - [x] List out individual strengths and weaknesses
-   - [ ] Project Specifications, Mockup, and Design (March 15)
-     - [ ] Specifications
-     - [ ] Mockup
-     - [ ] Design Presentation
- - Meetings
-   - [x] Project Outline Meeting (March 3)
-     - [x] Determine project ideas
-     - [x] Discuss strengths and weaknesses
-     - [x] Plan for future meetings
-     - [x] Finalize details about meeting
-   - [ ] Project Specifications, Mockup, and Design Meeting 1 (March 11)
-     - [ ] Discuss design choices
-     - [ ] Decide on project descriptions
-     - [ ] Delegate labor
-     - [ ] Finalize details about meeting
-   - [ ] Project Specifications, Mockup, and Design Meeting 2 (March 14)
-     - [ ] Finalize design choices
-     - [ ] Submit for March 15 deadline
- - Other
-   - [ ] Fill out TODO!
- - Individual
-   - Jason
-     - [x] Be awesome!
-   - Mia
-     - [x] Be awesome!
-   - Thomas
-     - [x] Be awesome!
-   - Makayla
-     - [x] Be awesome!
+### Deadlines
+ - [x] Project Outline (March 4)
+   - [x] List out 3 project ideas and descriptions
+     - [x] Generate ideas
+     - [x] Generate descriptions
+   - [x] List out individual strengths and weaknesses
+ - [ ] Project Specifications, Mockup, and Design (March 15)
+   - [ ] Specifications
+   - [ ] Mockup
+   - [ ] Design Presentation
+### Meetings
+ - [x] Project Outline Meeting (March 3)
+   - [x] Determine project ideas
+   - [x] Discuss strengths and weaknesses
+   - [x] Plan for future meetings
+   - [x] Finalize details about meeting
+ - [ ] Project Specifications, Mockup, and Design Meeting 1 (March 11)
+   - [ ] Discuss design choices
+   - [ ] Decide on project descriptions
+   - [ ] Delegate labor
+   - [ ] Finalize details about meeting
+ - [ ] Project Specifications, Mockup, and Design Meeting 2 (March 14)
+   - [ ] Finalize design choices
+   - [ ] Submit for March 15 deadline
+### Other
+ - [ ] Fill out TODO!
+### Individual
+ - Jason
+   - [x] Be awesome!
+ - Mia
+   - [x] Be awesome!
+ - Thomas
+   - [x] Be awesome!
+ - Makayla
+   - [x] Be awesome!
