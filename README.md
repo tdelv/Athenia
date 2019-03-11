@@ -171,11 +171,16 @@ Note: any reference to "app" means a form of web app, not a phone app (although 
    - [x] Discuss strengths and weaknesses
    - [x] Plan for future meetings
    - [x] Finalize details about meeting
- - [ ] Project Specifications, Mockup, and Design Meeting 1 (March 11)
-   - [ ] Discuss design choices
-   - [ ] Decide on project descriptions
-   - [ ] Delegate labor
-   - [ ] Finalize details about meeting
+ - [x] Project Specifications, Mockup, and Design Meeting 1 (March 11)
+   - [x] Discuss design choices
+   - [ ] ~~Decide on project descriptions~~
+   - [ ] ~~Delegate labor~~
+   - [x] Finalize details about meeting
+ - [ ] Project Specifications, Mockup, and Design Meeting 1.5 (March 13)
+   - [ ] Go over individual designs
+   - [ ] Deside on group design
+   - [ ] Finalize design
+   - [ ] Draft specifications
  - [ ] Project Specifications, Mockup, and Design Meeting 2 (March 14)
    - [ ] Finalize design choices
    - [ ] Submit for March 15 deadline
