@@ -2,6 +2,11 @@
 
 # term-project
 
+## Project Specification, Mockup, and Design
+ - [Specifications (Google Docs)](https://docs.google.com/document/d/11DEoQ-FvDwlQHYFCPXcI013ueQ5YGhWYVdIvYNJGd0E/edit?usp=sharing)
+ - [Mockup (Balsamiq Cloud)](https://balsamiq.cloud/s7awshi/pmql4np)
+ - [Design Presentation (Google Slides)](https://docs.google.com/presentation/d/1wG1z1jlDUaAITiRI3tXOKnVw3Rln7X5BTkGOY1YhBu8/edit?usp=sharing)
+
 ## Application Idea Descriptions
 
 Note: any reference to "app" means a form of web app, not a phone app (although will be structured to allow extensibility into a phone app in the future).
