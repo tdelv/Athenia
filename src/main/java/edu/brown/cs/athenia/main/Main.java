@@ -8,7 +8,7 @@ public class Main {
      * Main function for Athenia project. Sets up Drive API and server.
      * @param args the args passed in from command line.
      */
-    public static void main(String[] args){
+    public static void main(String... args){
         try {
             DriveQuickstart.setup();
         } catch (Exception e) {
