@@ -5,6 +5,10 @@
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
 
+plugins {
+    id "ru.myweek-end.freemarker" version "0.0.0.6"
+}
+
 apply plugin: 'java'
 apply plugin: 'application'
 
@@ -15,16 +19,10 @@ version = '1.0'
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://plugins.gradle.org/m2/"
-    }
 }
 
 dependencies {
     compile 'com.google.api-client:google-api-client:1.23.0'
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
     compile 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'
-    //classpath "gradle.plugin.ru.myweek-end.gradle:freemarker:0.0.0.6"
 }
-
-//apply plugin: "ru.myweek-end.freemarker"
