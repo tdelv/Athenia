@@ -1,18 +1,39 @@
 package edu.brown.cs.athenia.main;
 
-import edu.brown.cs.athenia.driveapi.DriveQuickstart;
+//import joptsimple.OptionParser;
+
+import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 
 public class Main {
 
+    private static final int DEFAULT_PORT = 4567;
+
     /**
-     * Main function for Athenia project. Sets up Drive API and server.
-     * @param args the args passed in from command line.
+     * The initial method called when execution begins.
+     * @param args
+     *          An array of command line arguments
      */
-    public static void main(String... args){
+    public static void main(String[] args) {
+        new Main(args).run();
+    }
+
+    private String[] args;
+
+    private Main(String[] args) {
+        this.args = args;
+    }
+
+    /**
+     * The main logic flow of the program.
+     */
+    private void run() {
+        //runSparkServer(DEFAULT_PORT);
         try {
-            DriveQuickstart.setup();
+            GoogleDriveApi.setup();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
+
+
 }
