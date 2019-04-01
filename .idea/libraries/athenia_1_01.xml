@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="athenia-1.01">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/libs/athenia-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
