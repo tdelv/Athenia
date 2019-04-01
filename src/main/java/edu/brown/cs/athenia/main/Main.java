@@ -15,6 +15,11 @@ import spark.Response;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 
+/**
+ * Main class.
+ * @author makaylamurphy
+ *
+ */
 public class Main {
 
   private static final int DEFAULT_PORT = 4567;
