@@ -11,4 +11,10 @@ import edu.brown.cs.athenia.review.Reviewable;
  */
 public class Tag extends Module implements Reviewable {
 
+  public int getRating() {
+    return 0;
+  }
+
+  public void review() {
+  }
 }
