@@ -62,6 +62,7 @@ public class GoogleDriveApi {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
+        /*
         // Add a file to our thingy :)
         File fileMetadata = new File();
         fileMetadata.setName("credentials.json");
@@ -72,6 +73,7 @@ public class GoogleDriveApi {
                 .setFields("id")
                 .execute();
         System.out.println("File ID: " + myFile.getId());
+        */
 
         // Print the names and IDs for up to 10 files.
         FileList files = service.files().list()
