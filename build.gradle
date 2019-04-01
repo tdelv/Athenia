@@ -25,4 +25,9 @@ dependencies {
     compile 'com.google.api-client:google-api-client:1.23.0'
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
     compile 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'
+
+    // Sparkjava and FreeMarker
+    compile "com.sparkjava:spark-core:2.5"
+    compile 'com.sparkjava:spark-debug-tools:0.5'
+    compile group: 'com.sparkjava', name: 'spark-template-freemarker', version: '2.3'
 }
