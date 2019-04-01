@@ -2,6 +2,13 @@
 
 # term-project
 
+## Who's working on what files?
+- Jason
+- Makayla
+- Mia
+- Thomas
+  - GoogleDriveApi.java
+
 ## Project Specification, Mockup, and Design
  - [Specifications (Google Docs)](https://docs.google.com/document/d/11DEoQ-FvDwlQHYFCPXcI013ueQ5YGhWYVdIvYNJGd0E/edit?usp=sharing)
  - [Mockup (Balsamiq Cloud)](https://balsamiq.cloud/s7awshi/pmql4np)
