@@ -14,18 +14,22 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GoogleDriveApi {
     private static final String APPLICATION_NAME = "Quickstart";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final Map<String, Drive> services = new HashMap<>();
 
     /**
      * Global instance of the scopes required by this quickstart.
@@ -55,12 +59,35 @@ public class GoogleDriveApi {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public static void setup() throws IOException, GeneralSecurityException {
+    /**
+     * Grabs the drive service (if one exists) or generates a new service, requesting user authentication.
+     * @param userAuth
+     *          The random key representing the user.
+     * @return the service.
+     */
+    public static Drive setup(String userAuth) throws IOException, GeneralSecurityException {
+        if (services.containsKey(userAuth)) {
+            return services.get(userAuth);
+        }
+
+        Drive drive = setup();
+        services.put(userAuth, drive);
+        return drive;
+    }
+
+    /**
+     * Setup a new Drive service.
+     * @return the service.
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    private static Drive setup() throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
+        return service;
 
         /*
         // Add a file to our thingy :)
@@ -75,6 +102,7 @@ public class GoogleDriveApi {
         System.out.println("File ID: " + myFile.getId());
         */
 
+        /*
         // Print the names and IDs for up to 10 files.
         FileList files = service.files().list()
                 .setSpaces("appDataFolder")
@@ -85,5 +113,6 @@ public class GoogleDriveApi {
             System.out.printf("Found file: %s (%s)\n",
                     file.getName(), file.getId());
         }
+         */
     }
 }

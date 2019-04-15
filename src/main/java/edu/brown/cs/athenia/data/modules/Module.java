@@ -1,4 +1,4 @@
-package edu.brown.cs.athenia.modules;
+package edu.brown.cs.athenia.data.modules;
 
 /**
  * Module is an abstract class that stipulates all modules have a set of tags,

@@ -1,6 +1,6 @@
-package edu.brown.cs.athenia.modules.module;
+package edu.brown.cs.athenia.data.modules.module;
 
-import edu.brown.cs.athenia.modules.Module;
+import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.review.Reviewable;
 
 /**

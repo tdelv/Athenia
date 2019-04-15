@@ -1,4 +1,4 @@
-package edu.brown.cs.athenia.modules;
+package edu.brown.cs.athenia.data.modules;
 
 /**
  * FreeNote represents our FreeNodes, which have modules, tags, and a state of
