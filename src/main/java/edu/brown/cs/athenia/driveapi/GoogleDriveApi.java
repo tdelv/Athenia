@@ -12,6 +12,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -27,7 +28,7 @@ public class GoogleDriveApi {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final Map<String, Credential> CREDENTIAL_MAP = new HashMap<>();
-    private static final Map<String, File> FILE_MAP = new HashMap<>();
+    private static final Map<String, java.io.File> FILE_MAP = new HashMap<>();
 
     /**
      * Global instance of the scopes required by this quickstart.
@@ -80,7 +81,7 @@ public class GoogleDriveApi {
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    private static Drive setup(String userAuth) throws IOException, GeneralSecurityException {
+    private static Drive getService(String userAuth) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, userAuth))
@@ -89,17 +90,29 @@ public class GoogleDriveApi {
         return service;
     }
 
-    public static File getDataBase(String userAuth) throws DriveApiException {
+    private static void setupDriveFile(Drive service) throws IOException {
+        File metaData = new File()
+                .setName("userData.sqlite3")
+                .setId("userData.sqlite3");
+
+        service.files().create(metaData);
+    }
+
+    public static java.io.File getDataBase(String userAuth) throws DriveApiException {
         if (FILE_MAP.containsKey(userAuth)) {
             return FILE_MAP.get(userAuth);
         }
 
         try {
-            File file = new File("/userData/" + userAuth + ".sqlite3");
-            OutputStream outputStream = new FileOutputStream(file);
+            java.io.File file = new java.io.File("/userData/" + userAuth + ".sqlite3");
 
-            Drive service = setup(userAuth);
-            service.files().get("userData.sqlite3").executeMediaAndDownloadTo(outputStream);
+            Drive service = getService(userAuth);
+            if (service.files().list().containsKey("userData.sqlite3")) {
+                OutputStream outputStream = new FileOutputStream(file);
+                service.files().get("userData.sqlite3").executeMediaAndDownloadTo(outputStream);
+            } else {
+                setupDriveFile(service);
+            }
 
             return FILE_MAP.put(userAuth, file);
         } catch (IOException | GeneralSecurityException e) {
@@ -107,9 +120,24 @@ public class GoogleDriveApi {
         }
     }
 
-    public static void setDataBase(String userAuth, File dataBase) throws DriveApiException {
+    public static void setDataBase(String userAuth, java.io.File dataBase) throws DriveApiException {
         FILE_MAP.put(userAuth, dataBase);
 
+        try {
+            Drive service = getService(userAuth);
+
+            if (!service.files().list().containsKey("userData.sqlite3")) {
+                setupDriveFile(service);
+            }
+
+            File driveFile = service.files().get("userData.sqlite3").execute();
+
+            FileContent fileContent = new FileContent("application/x-sqlite3", dataBase);
+
+            service.files().update("userData.sqlite3", driveFile, fileContent);
+        } catch (IOException | GeneralSecurityException e) {
+            throw new DriveApiException(e);
+        }
 
     }
 }
