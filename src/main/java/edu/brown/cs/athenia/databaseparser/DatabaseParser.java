@@ -11,9 +11,11 @@ import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,18 +30,29 @@ public class DatabaseParser {
     private static final Map<String, User> USER_MAP = new HashMap<>();
 
     private static Connection loadConnection(String userAuth) throws DatabaseParserException, SQLException {
-        File dataBaseFile;
+        File file;
         try {
-            dataBaseFile = GoogleDriveApi.getDataBase(userAuth);
+            file = GoogleDriveApi.getDataBase(userAuth);
         } catch (DriveApiException e) {
             throw new DatabaseParserException(e);
         }
 
-        return DriverManager.getConnection(dataBaseFile.getPath());
+        if (!file.exists()) {
+            try {
+                setup(userAuth, file);
+            } catch (IOException e) {
+                throw new DatabaseParserException(e);
+            }
+        }
+
+        return DriverManager.getConnection(file.getPath());
     }
 
-    private static void setup(String userAuth) {
-
+    private static void setup(String userAuth, File file) throws IOException, DatabaseParserException, SQLException {
+        file.createNewFile();
+        try (Connection conn = DriverManager.getConnection(file.getPath());
+                Statement stmt = conn.createStatement()) {
+        }
     }
 
     public static User getUser(String userAuth) throws DatabaseParserException {
