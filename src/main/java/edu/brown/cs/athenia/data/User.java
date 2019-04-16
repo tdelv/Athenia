@@ -71,23 +71,23 @@ public class User {
      * Adders
      */
 
-    public void addFreeNoteList(FreeNote freeNote) {
+    public void addFreeNote(FreeNote freeNote) {
         this.freeNoteList.add(freeNote);
     }
 
-    public void addConjugationList(Conjugation conjugation) {
+    public void addConjugation(Conjugation conjugation) {
         this.conjugationList.add(conjugation);
     }
 
-    public void addNoteList(Note note) {
+    public void addNote(Note note) {
         this.noteList.add(note);
     }
 
-    public void addTagList(Tag tag) {
+    public void addTag(Tag tag) {
         this.tagList.add(tag);
     }
 
-    public void addVocabList(Vocab vocab) {
+    public void addVocab(Vocab vocab) {
         this.vocabList.add(vocab);
     }
 }

@@ -89,33 +89,27 @@ public class GoogleDriveApi {
         return service;
     }
 
-    public static File getDataBase(String userAuth) throws IOException, GeneralSecurityException {
+    public static File getDataBase(String userAuth) throws DriveApiException {
         if (FILE_MAP.containsKey(userAuth)) {
             return FILE_MAP.get(userAuth);
         }
 
-        File file = new File("/userData/" + userAuth + ".sqlite3");
-        OutputStream outputStream = new FileOutputStream(file);
+        try {
+            File file = new File("/userData/" + userAuth + ".sqlite3");
+            OutputStream outputStream = new FileOutputStream(file);
 
-        Drive service = setup(userAuth);
-        service.files().get("userData.sqlite3").executeMediaAndDownloadTo(outputStream);
+            Drive service = setup(userAuth);
+            service.files().get("userData.sqlite3").executeMediaAndDownloadTo(outputStream);
 
-        return file;
+            return FILE_MAP.put(userAuth, file);
+        } catch (IOException | GeneralSecurityException e) {
+            throw new DriveApiException(e);
+        }
     }
 
-    public static void setDataBase(String userAuth, File dataBase) {
-        /*
-        // Add a file to our thingy :)
-        File fileMetadata = new File();
-        fileMetadata.setName("credentials.json");
-        fileMetadata.setParents(Collections.singletonList("appDataFolder"));
-        java.io.File filePath = new java.io.File("src/main/resources/credentials.json");
-        FileContent mediaContent = new FileContent("application/json", filePath);
-        File myFile = service.files().create(fileMetadata, mediaContent)
-                .setFields("id")
-                .execute();
-        System.out.println("File ID: " + myFile.getId());
-        */
+    public static void setDataBase(String userAuth, File dataBase) throws DriveApiException {
+        FILE_MAP.put(userAuth, dataBase);
+
 
     }
 }
