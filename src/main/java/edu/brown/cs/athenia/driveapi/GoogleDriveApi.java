@@ -29,7 +29,7 @@ public class GoogleDriveApi {
     private static final String APPLICATION_NAME = "Quickstart";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
-    private static final Map<String, Drive> services = new HashMap<>();
+    private static final Map<String, Credential> CREDENTIAL_MAP = new HashMap<>();
 
     /**
      * Global instance of the scopes required by this quickstart.
@@ -53,6 +53,7 @@ public class GoogleDriveApi {
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setAccessType("offline")
+                .setApprovalPrompt("force")
                 .build();
 
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
@@ -60,31 +61,31 @@ public class GoogleDriveApi {
     }
 
     /**
-     * Grabs the drive service (if one exists) or generates a new service, requesting user authentication.
-     * @param userAuth
-     *          The random key representing the user.
-     * @return the service.
+     * Get stored credentials if already received, otherwise prompt user for authorization.
+     * @param HTTP_TRANSPORT The network HTTP Transport.
+     * @param userAuth The user that we want credentials from.
+     * @return An authorized Credential object.
+     * @throws IOException If the credentials.json file cannot be found.
      */
-    public static Drive setup(String userAuth) throws IOException, GeneralSecurityException {
-        if (services.containsKey(userAuth)) {
-            return services.get(userAuth);
+    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String userAuth) throws IOException {
+        if (CREDENTIAL_MAP.containsKey(userAuth)) {
+            return CREDENTIAL_MAP.get(userAuth);
         }
 
-        Drive drive = setup();
-        services.put(userAuth, drive);
-        return drive;
+        return CREDENTIAL_MAP.put(userAuth, getCredentials(HTTP_TRANSPORT));
     }
 
     /**
      * Setup a new Drive service.
+     * @param userAuth The user that we want credentials from.
      * @return the service.
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    private static Drive setup() throws IOException, GeneralSecurityException {
+    private static Drive setup(String userAuth) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, userAuth))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
         return service;
@@ -115,4 +116,6 @@ public class GoogleDriveApi {
         }
          */
     }
+
+
 }
