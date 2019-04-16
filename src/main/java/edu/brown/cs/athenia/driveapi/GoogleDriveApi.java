@@ -12,13 +12,10 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +27,7 @@ public class GoogleDriveApi {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final Map<String, Credential> CREDENTIAL_MAP = new HashMap<>();
+    private static final Map<String, File> FILE_MAP = new HashMap<>();
 
     /**
      * Global instance of the scopes required by this quickstart.
@@ -89,7 +87,23 @@ public class GoogleDriveApi {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
         return service;
+    }
 
+    public static File getDataBase(String userAuth) throws IOException, GeneralSecurityException {
+        if (FILE_MAP.containsKey(userAuth)) {
+            return FILE_MAP.get(userAuth);
+        }
+
+        File file = new File("/userData/" + userAuth + ".sqlite3");
+        OutputStream outputStream = new FileOutputStream(file);
+
+        Drive service = setup(userAuth);
+        service.files().get("userData.sqlite3").executeMediaAndDownloadTo(outputStream);
+
+        return file;
+    }
+
+    public static void setDataBase(String userAuth, File dataBase) {
         /*
         // Add a file to our thingy :)
         File fileMetadata = new File();
@@ -103,19 +117,5 @@ public class GoogleDriveApi {
         System.out.println("File ID: " + myFile.getId());
         */
 
-        /*
-        // Print the names and IDs for up to 10 files.
-        FileList files = service.files().list()
-                .setSpaces("appDataFolder")
-                .setFields("nextPageToken, files(id, name)")
-                .setPageSize(10)
-                .execute();
-        for (File file : files.getFiles()) {
-            System.out.printf("Found file: %s (%s)\n",
-                    file.getName(), file.getId());
-        }
-         */
     }
-
-
 }
