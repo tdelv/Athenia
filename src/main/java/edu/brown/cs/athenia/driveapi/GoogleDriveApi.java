@@ -2,6 +2,7 @@ package edu.brown.cs.athenia.driveapi;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -55,23 +56,43 @@ public class GoogleDriveApi {
                 .setApprovalPrompt("force")
                 .build();
 
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+        VerificationCodeReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
     /**
+     * Sets up a server for the user to login and authorize credentials.
+     * @param cookie the user to log in.
+     */
+    public static void login(String cookie) throws GeneralSecurityException, IOException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Credential credential = getCredentials(HTTP_TRANSPORT);
+        CREDENTIAL_MAP.put(cookie, credential);
+    }
+
+    /**
+     * Checks if a given user is authenticated.
+     * @param cookie the user to be checked.
+     * @return whether they are authenticated.
+     */
+    public static boolean isAuthenticated(String cookie) {
+        return CREDENTIAL_MAP.containsKey(cookie);
+    }
+
+    /**
      * Get stored credentials if already received, otherwise prompt user for authorization.
-     * @param HTTP_TRANSPORT The network HTTP Transport.
      * @param userAuth The user that we want credentials from.
      * @return An authorized Credential object.
      * @throws IOException If the credentials.json file cannot be found.
+     * @throws UnauthenticatedUserException If the user does not have loaded credentials.
      */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String userAuth) throws IOException {
-        if (CREDENTIAL_MAP.containsKey(userAuth)) {
-            return CREDENTIAL_MAP.get(userAuth);
+    private static Credential getCredentials(String userAuth)
+            throws IOException, UnauthenticatedUserException {
+        if (!CREDENTIAL_MAP.containsKey(userAuth)) {
+            throw new UnauthenticatedUserException();
         }
 
-        return CREDENTIAL_MAP.put(userAuth, getCredentials(HTTP_TRANSPORT));
+        return CREDENTIAL_MAP.get(userAuth);
     }
 
     /**
@@ -81,10 +102,11 @@ public class GoogleDriveApi {
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    private static Drive getService(String userAuth) throws IOException, GeneralSecurityException {
+    private static Drive getService(String userAuth)
+            throws IOException, GeneralSecurityException, UnauthenticatedUserException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, userAuth))
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(userAuth))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
         return service;
