@@ -44,11 +44,13 @@ public class Main {
    */
   private void run() {
     // runSparkServer(DEFAULT_PORT);
+    /*
     try {
       GoogleDriveApi.setup();
     } catch (Exception e) {
       e.printStackTrace();
     }
+     */
   }
 
   // Adding GUI
