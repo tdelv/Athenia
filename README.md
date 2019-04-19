@@ -6,6 +6,7 @@
 - Jason
 - Makayla
 - Mia
+  - resources folder files
 - Thomas
   - GoogleDriveApi.java
 
