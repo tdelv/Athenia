@@ -10,10 +10,16 @@ import edu.brown.cs.athenia.review.Reviewable;
  */
 public class Vocab extends Module implements Reviewable {
 
-  public int getRating() {
-    return 0;
+  private String[] vocab;
+
+  public void review(String term, String definition) {
+    vocab = new String[2];
+    vocab[0] = term;
+    vocab[1] = definition;
   }
 
-  public void review() {
+  public String[] getContent() {
+    return vocab;
   }
+
 }

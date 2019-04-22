@@ -1,7 +1,6 @@
 package edu.brown.cs.athenia.data.modules.module;
 
 import edu.brown.cs.athenia.data.modules.Module;
-import edu.brown.cs.athenia.review.Reviewable;
 
 /**
  * Tag is a module that is a small text associated with another modules. A
@@ -9,12 +8,15 @@ import edu.brown.cs.athenia.review.Reviewable;
  * @author makaylamurphy
  *
  */
-public class Tag extends Module implements Reviewable {
+public class Tag extends Module {
 
-  public int getRating() {
-    return 0;
+  private String tag;
+
+  public Tag(String t) {
+    tag = t;
   }
 
-  public void review() {
+  public String getContent() {
+    return tag;
   }
 }
