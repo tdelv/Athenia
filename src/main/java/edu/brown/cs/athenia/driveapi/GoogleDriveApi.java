@@ -57,10 +57,10 @@ public class GoogleDriveApi {
                 .build();
 
         VerificationCodeReceiver receiver = new LocalServerReceiver.Builder()
-                .setPort(1000)
-                .setHost("herokuapp.com")
-                .setLandingPages(null, null)
-                .setCallbackPath(null)
+                .setPort(4567)
+                //.setHost("herokuapp.com")
+                //.setLandingPages(null, null)
+                //.setCallbackPath(null)
                 .build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }

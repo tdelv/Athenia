@@ -13,6 +13,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 mainClassName = 'edu.brown.cs.athenia.main.Main'
+applicationName = 'athenia'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 version = '1.0'
@@ -32,3 +33,6 @@ dependencies {
     compile group: 'com.sparkjava', name: 'spark-template-freemarker', version: '2.3'
     implementation 'com.google.code.gson:gson:2.8.5'
 }
+
+defaultTasks = ['clean']
+task stage(dependsOn: ['clean', 'installApp'])
