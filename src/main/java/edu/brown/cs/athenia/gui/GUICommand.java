@@ -347,4 +347,52 @@ public class GUICommand {
       return GSON.toJson(variables);
     }
   }
+
+  /**
+   * GET request handler for the Review landing page which pulls all of the
+   * tags the user has created from the database and backend and formats this
+   * information to send to the front-end for the user to choose from the
+   * different options that they want to review. Information pulled includes
+   * the tag names, the date they were created, the date they were edited,
+   * and their rating.
+   */
+  public class ReviewModeLandingHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      // TODO: grab all tags and format to send to front end
+      Map<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>()
+              .put("...", "...").build();
+      // TODO: grab all tags, their date created/started, date edited
+      //        format to send to front end
+      return new ModelAndView(variables, "...");
+    }
+  }
+
+  /**
+   * GET request handler for an individual Review page which pulls all of
+   * the information of the modules and tags the user has chosen to review,
+   * packages it, and formats it to send to the front-end to display to the
+   * user. Retrieves all information including content, type, and rating.
+   * Sends all of this info to the front-end which then decides how to
+   * present using the ratings.
+   */
+  public class ReviewModeIndividualHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      // TODO: parse out the options the user has chosen to review
+      Map<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>()
+              .put("...", "...").build();
+      // TODO: pull out this information from the backend and format
+      //        to send to the user to review
+      //        > sends all of this info to the front end which then decides
+      //          how to present this info according to the ratings of the
+      //          modules
+      return new ModelAndView(variables, "...");
+    }
+  }
+
 }
