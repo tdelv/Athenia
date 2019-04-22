@@ -14,8 +14,8 @@ apply plugin: 'application'
 
 mainClassName = 'edu.brown.cs.athenia.main.Main'
 applicationName = 'athenia'
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 version = '1.0'
 
 repositories {
@@ -35,4 +35,12 @@ dependencies {
 }
 
 defaultTasks = ['clean']
-task stage(dependsOn: ['clean', 'installApp'])
+task stage {
+    dependsOn build
+}
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from(configurations.compile)
+}
+stage.dependsOn(copyToLib)

@@ -54,7 +54,7 @@ public class Main {
     }
     */
 
-    /*
+
     ProcessBuilder process = new ProcessBuilder();
     Integer port;
     if (process.environment().get("PORT") != null) {
@@ -62,7 +62,9 @@ public class Main {
     } else {
       port = DEFAULT_PORT;
     }
-
+    Spark.port(port);
+    Spark.get("/hello", (req, res) -> "Hellooo, World!");
+    /*
     runSparkServer(port);
     */
 
