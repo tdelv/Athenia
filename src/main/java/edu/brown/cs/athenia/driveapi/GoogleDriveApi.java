@@ -62,9 +62,9 @@ public class GoogleDriveApi {
                 .setApprovalPrompt("force")
                 .build();
 
-        VerificationCodeReceiver receiver = new LocalServerReceiver.Builder()
+        VerificationCodeReceiver receiver = new MyServerReceiver.Builder()
                 .setPort(port)
-                //.setHost("https://athenia.herokuapp.com")
+                .setHost("https://athenia.herokuapp.com")
                 .setLandingPages("athenia.herokuapp.com/hello", null)
                 .setCallbackPath("/hello")
                 .build();

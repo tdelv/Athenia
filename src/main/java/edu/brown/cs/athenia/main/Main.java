@@ -98,7 +98,7 @@ public class Main {
     FreeMarkerEngine freeMarker = createEngine();
 
     // A test route
-    Spark.get("/hello", (req, res) -> "Hello World!");
+    Spark.post("/hello", (req, res) -> "Hello World!");
 
     // Setup Spark Routes
     // Spark.get("/stars", new StarsHandlers.FrontHandler(), freeMarker);
