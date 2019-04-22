@@ -9,6 +9,8 @@ public interface Reviewable {
 
   public int getRating(); // gets rating
 
-  public void review(); // generates reviewable content
+  // will be List<ArrayList<String>> for Conjugation, String for Note, String
+  // for Tag, and String[] for Vocab.
+  public Object getContent(); // generates reviewable content
 
 }
