@@ -45,16 +45,6 @@ public class Main {
    * The main logic flow of the program.
    */
   private void run() {
-    /*
-    try {
-      GoogleDriveApi.login("");
-    } catch (GeneralSecurityException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    */
-
     ProcessBuilder process = new ProcessBuilder();
     Integer port;
     if (process.environment().get("PORT") != null) {
@@ -64,6 +54,15 @@ public class Main {
     }
 
     runSparkServer(port);
+    GoogleDriveApi.setPort(port);
+
+    try {
+      GoogleDriveApi.login("");
+    } catch (GeneralSecurityException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   // Adding GUI

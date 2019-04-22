@@ -38,6 +38,12 @@ public class GoogleDriveApi {
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_APPDATA);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
+    private static int port = 5000;
+
+    public static void setPort(int newPort) {
+        port = newPort;
+    }
+
     /**
      * Creates an authorized Credential object.
      * @param HTTP_TRANSPORT The network HTTP Transport.
@@ -57,10 +63,10 @@ public class GoogleDriveApi {
                 .build();
 
         VerificationCodeReceiver receiver = new LocalServerReceiver.Builder()
-                .setPort(4567)
-                .setHost("athenia.herokuapp.com")
+                .setPort(port)
+                //.setHost("https://athenia.herokuapp.com")
                 .setLandingPages("athenia.herokuapp.com/hello", null)
-                //.setCallbackPath(null)
+                .setCallbackPath("/hello")
                 .build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
