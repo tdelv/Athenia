@@ -375,8 +375,8 @@ public class GUICommand {
    * the information of the modules and tags the user has chosen to review,
    * packages it, and formats it to send to the front-end to display to the
    * user. Retrieves all information including content, type, and rating.
-   * Sends all of this info to the front-end which then decides how to
-   * present using the ratings.
+   * Sends all of this info to the front-end in the ordered rating
+   * according to the algorithm.
    */
   public class ReviewModeIndividualHandler implements TemplateViewRoute {
     @Override
