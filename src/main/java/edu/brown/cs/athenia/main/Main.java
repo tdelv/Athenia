@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 //import joptsimple.OptionParser;
 
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
+import edu.brown.cs.athenia.gui.GUICommand;
 import freemarker.template.Configuration;
 import spark.ExceptionHandler;
 import spark.Request;
@@ -23,7 +24,7 @@ import spark.template.freemarker.FreeMarkerEngine;
  */
 public class Main {
 
-  private static final int DEFAULT_PORT = 4567;
+  private static final int DEFAULT_PORT = 4568;
 
   /**
    * The initial method called when execution begins.
@@ -63,11 +64,14 @@ public class Main {
       port = DEFAULT_PORT;
     }
     Spark.port(port);
-    Spark.get("/hello", (req, res) -> "Hellooo, World!");
+    Spark.externalStaticFileLocation("src/main/resources/static");
+    Spark.exception(Exception.class, new ExceptionPrinter());
+
+    FreeMarkerEngine freeMarker = createEngine();
+    Spark.get("/hello", (req, res) -> "Hello World!");
     /*
     runSparkServer(port);
     */
-
   }
 
   // Adding GUI

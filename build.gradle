@@ -27,11 +27,12 @@ dependencies {
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
     compile 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'
 
-    // Sparkjava and FreeMarker
+    // Sparkjava and FreeMarker`
     compile "com.sparkjava:spark-core:2.5"
     compile 'com.sparkjava:spark-debug-tools:0.5'
     compile group: 'com.sparkjava', name: 'spark-template-freemarker', version: '2.3'
     implementation 'com.google.code.gson:gson:2.8.5'
+    compile 'org.slf4j:slf4j-simple:1.7.21'
 }
 
 defaultTasks = ['clean']
