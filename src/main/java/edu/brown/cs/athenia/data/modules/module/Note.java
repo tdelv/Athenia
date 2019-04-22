@@ -11,10 +11,13 @@ import edu.brown.cs.athenia.review.Reviewable;
  */
 public class Note extends Module implements Reviewable {
 
-  public int getRating() {
-    return 0;
+  private String note;
+
+  public Note(String n) {
+    note = n;
   }
 
-  public void review() {
+  public String getContent() {
+    return note;
   }
 }
