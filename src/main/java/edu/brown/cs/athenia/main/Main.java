@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.GeneralSecurityException;
 
 //import joptsimple.OptionParser;
 
@@ -43,6 +44,13 @@ public class Main {
    * The main logic flow of the program.
    */
   private void run() {
+    try {
+      GoogleDriveApi.login("");
+    } catch (GeneralSecurityException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     // runSparkServer(DEFAULT_PORT);
     /*
     try {
