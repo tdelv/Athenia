@@ -55,7 +55,6 @@ public class Main {
     }
     */
 
-
     ProcessBuilder process = new ProcessBuilder();
     Integer port;
     if (process.environment().get("PORT") != null) {
@@ -63,15 +62,8 @@ public class Main {
     } else {
       port = DEFAULT_PORT;
     }
-    Spark.port(port);
-    Spark.externalStaticFileLocation("src/main/resources/static");
-    Spark.exception(Exception.class, new ExceptionPrinter());
 
-    FreeMarkerEngine freeMarker = createEngine();
-    Spark.get("/hello", (req, res) -> "Hello World!");
-    /*
     runSparkServer(port);
-    */
   }
 
   // Adding GUI
@@ -105,6 +97,9 @@ public class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
 
     FreeMarkerEngine freeMarker = createEngine();
+
+    // A test route
+    Spark.get("/hello", (req, res) -> "Hello World!");
 
     // Setup Spark Routes
     // Spark.get("/stars", new StarsHandlers.FrontHandler(), freeMarker);
