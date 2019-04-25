@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class User {
+public class Language {
     private List<FreeNote> freeNoteList;
     private List<Conjugation> conjugationList;
     private List<Note> noteList;
@@ -21,7 +21,7 @@ public class User {
      * Constructors
      */
 
-    public User() {
+    public Language() {
         this.freeNoteList = new ArrayList<>();
         this.conjugationList = new ArrayList<>();
         this.noteList = new ArrayList<>();
@@ -29,7 +29,7 @@ public class User {
         this.vocabList = new ArrayList<>();
     }
 
-    public User(
+    public Language(
             List<FreeNote> freeNoteList,
             List<Conjugation> conjugationList,
             List<Note> noteList,

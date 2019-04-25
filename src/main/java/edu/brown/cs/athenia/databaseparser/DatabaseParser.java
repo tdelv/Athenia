@@ -1,7 +1,7 @@
 package edu.brown.cs.athenia.databaseparser;
 
 import com.google.common.collect.ImmutableList;
-import edu.brown.cs.athenia.data.User;
+import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.FreeNote;
 import edu.brown.cs.athenia.data.modules.module.Conjugation;
 import edu.brown.cs.athenia.data.modules.module.Note;
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class DatabaseParser {
 
-    private static final Map<String, User> USER_MAP = new HashMap<>();
+    private static final Map<String, Language> USER_MAP = new HashMap<>();
 
     private static Connection loadConnection(String userAuth) throws DatabaseParserException, SQLException {
         File file;
@@ -55,12 +55,12 @@ public class DatabaseParser {
         }
     }
 
-    public static User getUser(String userAuth) throws DatabaseParserException {
+    public static Language getUser(String userAuth) throws DatabaseParserException {
         if (USER_MAP.containsKey(userAuth)) {
             return USER_MAP.get(userAuth);
         }
 
-        User user;
+        Language user;
 
         try (Connection conn = loadConnection(userAuth)){
             List<FreeNote> freeNoteList = loadFreeNoteList(conn);
@@ -68,7 +68,7 @@ public class DatabaseParser {
             List<Note> noteList = loadNoteList(conn);
             List<Tag> tagList = loadTagList(conn);
             List<Vocab> vocabList = loadVocabList(conn);
-            user = new User(freeNoteList, conjugationList, noteList, tagList, vocabList);
+            user = new Language(freeNoteList, conjugationList, noteList, tagList, vocabList);
         } catch (SQLException e) {
             throw new DatabaseParserException(e);
         }
