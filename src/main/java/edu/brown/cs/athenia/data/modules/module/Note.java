@@ -1,7 +1,6 @@
 package edu.brown.cs.athenia.data.modules.module;
 
-import edu.brown.cs.athenia.data.modules.Module;
-import edu.brown.cs.athenia.review.Reviewable;
+import edu.brown.cs.athenia.review.ReviewableModule;
 
 /**
  * Note represents a note module, which is Reviewable. A note is a free text
@@ -9,7 +8,7 @@ import edu.brown.cs.athenia.review.Reviewable;
  * @author makaylamurphy
  *
  */
-public class Note extends Module implements Reviewable {
+public class Note extends ReviewableModule {
 
   private String note;
 
@@ -17,7 +16,8 @@ public class Note extends Module implements Reviewable {
     note = n;
   }
 
-  public String getContent() {
-    return note;
+  public void update(Object newNote) {
+    note = (String) newNote;
   }
+
 }

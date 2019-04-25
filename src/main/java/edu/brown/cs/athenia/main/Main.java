@@ -97,6 +97,9 @@ public class Main {
       e.printStackTrace();
     }
     Spark.get("/home", (req, res) -> "Welcome home.");
+
+    // Setup Spark Routes
+    //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
   }
 
   /**

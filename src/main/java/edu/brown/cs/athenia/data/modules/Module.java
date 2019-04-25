@@ -9,31 +9,17 @@ import java.util.HashSet;
  * @author makaylamurphy
  *
  */
-public class Module {
+public abstract class Module {
 
-  // rating is originally set to 1 (medium).
-  private int rating;
   private HashSet<String> tags;
   private Date created;
   private Date dateModified;
 
   public Module() {
-    rating = 1;
+
     created = new Date();
     dateModified = created;
     tags = new HashSet<String>();
-  }
-
-  /**
-   * Getter for the rating from 0 (easy) to 2 (hard).
-   * @return Returns int rating.
-   */
-  public int getRating() {
-    return this.rating;
-  }
-
-  public void setRating(int r) {
-    this.rating = r;
   }
 
   /**
@@ -86,5 +72,7 @@ public class Module {
   public Date getDateModified() {
     return dateModified;
   }
+
+  public abstract void update(Object update);
 
 }
