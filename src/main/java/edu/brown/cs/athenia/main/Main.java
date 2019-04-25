@@ -93,10 +93,10 @@ public class Main {
     Spark.get("/hello", (req, res) -> "Hello World!");
     try {
       Spark.get("/login", new GUICommand.LoginHandler());
+      Spark.get("/validate", new GUICommand.ValidateHandler());
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/validate", (req, res) -> "Hello World!");
     Spark.get("/home", (req, res) -> "");
   }
 
