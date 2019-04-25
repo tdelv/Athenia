@@ -96,7 +96,7 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/home", (req, res) -> req.queryMap().value("user_id"));
+    Spark.get("/home", (req, res) -> "User Id: " + req.queryMap().value("user_id"));
 
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
