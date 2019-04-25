@@ -54,7 +54,6 @@ public class Main {
     }
 
     runSparkServer(port);
-    GoogleDriveApi.setPort(port);
   }
 
   // Adding GUI
@@ -97,8 +96,7 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/home", (req, res) ->
-            req.attribute("token") + Boolean.toString(GoogleDriveApi.isAuthenticated(req.attribute("token"))));
+    Spark.get("/home", (req, res) -> "Welcome home.");
   }
 
   /**

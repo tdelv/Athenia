@@ -19,6 +19,7 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.DriveScopes;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -58,59 +59,44 @@ public class GUICommand {
     }
   }
 
+  /**
+   * Handles initial login request, redirecting user to
+   * Google Authenication page if not already logged in.
+   */
   public static class LoginHandler implements Route {
-    private final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private final String CREDENTIALS_FILE_PATH = "/credentials.json";
-    private final List<String> SCOPES = Collections
-            .singletonList(DriveScopes.DRIVE_APPDATA);
-
-    public LoginHandler() throws GeneralSecurityException, IOException {
-    }
 
     @Override
-    public ModelAndView handle(Request req, Response res) throws IOException {
-      String state = new BigInteger(130, new SecureRandom()).toString(32);  // prevent request forgery
-      req.session().attribute("state", state);
-
+    public ModelAndView handle(Request req, Response res) throws IOException, GeneralSecurityException {
+      // Set destination to go after login
       if (req.attribute("loginDestination") != null) {
         req.session().attribute("loginDestination", (String) req.attribute("loginDestination"));
       } else {
         req.session().attribute("loginDestination", "/home");
       }
 
-      InputStream in = GoogleDriveApi.class
-              .getResourceAsStream(CREDENTIALS_FILE_PATH);
-      GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-              new InputStreamReader(in));
+      // Check if user token already loaded
+      if (GoogleDriveApi.isLoggedIn(req.session().attribute("user_id"))) {
+        res.redirect(req.session().attribute("loginDestination"));
+      }
 
-      GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-              HTTP_TRANSPORT,
-              JSON_FACTORY,
-              clientSecrets,
-              SCOPES)
-              .build();
+      // Create secure state to prevent request forgery
+      String state = new BigInteger(130, new SecureRandom()).toString(32);
+      req.session().attribute("state", state);
 
-      // Callback url should be the one registered in Google Developers Console
-      String url =
-              flow.newAuthorizationUrl()
-                      .setRedirectUri("https://athenia.herokuapp.com/validate")
-                      .setState(state)            // Prevent request forgery
-                      .build();
+      // Create callback url for authentication
+      String url = GoogleDriveApi.getUrl(state);
+
+      // Redirect to Google authentication page
       res.redirect(url);
       return null;
     }
   }
 
+  /**
+   * Handles the redirect from Google Authentication,
+   * storing credentials and redirecting user to correct url.
+   */
   public static class ValidateHandler implements Route {
-    private final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private final String CREDENTIALS_FILE_PATH = "/credentials.json";
-    private final List<String> SCOPES = Collections
-            .singletonList(DriveScopes.DRIVE_APPDATA);
-
-    public ValidateHandler() throws GeneralSecurityException, IOException {
-    }
 
     @Override
     public Object handle(Request req, Response res) throws Exception {
@@ -123,34 +109,16 @@ public class GUICommand {
         return null;
       }
 
-      req.session().attribute("state");     // Remove one-time use state.
+      // Remove one-time use state.
+      req.session().attribute("state");
 
+      // Create credential and store it with user_id
+      String userId = new BigInteger(130, new SecureRandom()).toString(32);
+      req.session().attribute("user_id", userId);
+      GoogleDriveApi.createCredential(userId, qm.value("code"));
 
-      InputStream in = GoogleDriveApi.class
-              .getResourceAsStream(CREDENTIALS_FILE_PATH);
-      GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-              new InputStreamReader(in));
-
-      GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-              HTTP_TRANSPORT,
-              JSON_FACTORY,
-              clientSecrets,
-              SCOPES)
-              .build();
-
-      final TokenResponse tokenResponse =
-              flow.newTokenRequest(qm.value("code"))
-                      .setRedirectUri("https://athenia.herokuapp.com/validate")
-                      .execute();
-
-
-      req.session().attribute("token", tokenResponse.toString()); // Keep track of the token.
-      final Credential credential = flow.createAndStoreCredential(tokenResponse, null);
-
-      GoogleDriveApi.setCredential(tokenResponse.toString(), credential);
-
+      // Send user to correct destination after login
       res.redirect(req.session().attribute("loginDestination"));
-
       return null;
     }
   }

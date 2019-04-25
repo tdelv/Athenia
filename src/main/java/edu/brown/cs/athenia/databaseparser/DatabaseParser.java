@@ -29,17 +29,17 @@ public class DatabaseParser {
 
     private static final Map<String, User> USER_MAP = new HashMap<>();
 
-    private static Connection loadConnection(String userAuth) throws DatabaseParserException, SQLException {
+    private static Connection loadConnection(String userId) throws DatabaseParserException, SQLException {
         File file;
         try {
-            file = GoogleDriveApi.getDataBase(userAuth);
+            file = GoogleDriveApi.getDataBase(userId);
         } catch (DriveApiException e) {
             throw new DatabaseParserException(e);
         }
 
         if (!file.exists()) {
             try {
-                setup(userAuth, file);
+                setup(userId, file);
             } catch (IOException e) {
                 throw new DatabaseParserException(e);
             }
@@ -55,14 +55,14 @@ public class DatabaseParser {
         }
     }
 
-    public static User getUser(String userAuth) throws DatabaseParserException {
-        if (USER_MAP.containsKey(userAuth)) {
-            return USER_MAP.get(userAuth);
+    public static User getUser(String userId) throws DatabaseParserException {
+        if (USER_MAP.containsKey(userId)) {
+            return USER_MAP.get(userId);
         }
 
         User user;
 
-        try (Connection conn = loadConnection(userAuth)){
+        try (Connection conn = loadConnection(userId)){
             List<FreeNote> freeNoteList = loadFreeNoteList(conn);
             List<Conjugation> conjugationList = loadConjugationList(conn);
             List<Note> noteList = loadNoteList(conn);
@@ -73,7 +73,7 @@ public class DatabaseParser {
             throw new DatabaseParserException(e);
         }
 
-        return USER_MAP.put(userAuth, user);
+        return USER_MAP.put(userId, user);
     }
 
     private static List<FreeNote> loadFreeNoteList(Connection conn) throws SQLException {
