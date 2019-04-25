@@ -104,9 +104,7 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/validate", new GUICommand.ValidateHandler());
-    // Setup Spark Routes
-    // Spark.get("/stars", new StarsHandlers.FrontHandler(), freeMarker);
+    Spark.post("/validate", new GUICommand.ValidateHandler());
   }
 
   /**
