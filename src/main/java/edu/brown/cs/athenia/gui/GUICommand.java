@@ -45,7 +45,7 @@ public class GUICommand {
       // c. use this info to prompt the user to change the language
       // s. use this info to set the user info and go to home
       // 2. regular home page
-      return new ModelAndView(variables, "...");
+      return new ModelAndView(variables, "landing.ftl");
     }
   }
 

@@ -101,7 +101,7 @@ public class Main {
     Spark.get("/hello", (req, res) -> "Hello World!");
 
     // Setup Spark Routes
-    // Spark.get("/stars", new StarsHandlers.FrontHandler(), freeMarker);
+    Spark.get("/landing", new GUICommand.SignInHandler(), freeMarker);
   }
 
   /**
