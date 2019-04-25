@@ -143,6 +143,7 @@ public class GUICommand {
                       .setRedirectUri("https://athenia.herokuapp.com/validate")
                       .execute();
 
+
       req.session().attribute("token", tokenResponse.toString()); // Keep track of the token.
       final Credential credential = flow.createAndStoreCredential(tokenResponse, null);
 
