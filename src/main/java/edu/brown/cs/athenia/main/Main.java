@@ -104,7 +104,7 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.post("/validate", new GUICommand.ValidateHandler());
+    Spark.post("/validate", (req, res) -> "Hello World!");
   }
 
   /**
