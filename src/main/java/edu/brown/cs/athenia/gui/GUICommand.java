@@ -1,17 +1,22 @@
 package edu.brown.cs.athenia.gui;
 
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 import edu.brown.cs.athenia.data.User;
+import edu.brown.cs.athenia.data.modules.*;
+import edu.brown.cs.athenia.data.modules.module.*;
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.TemplateViewRoute;
+
 
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
@@ -22,11 +27,8 @@ import spark.TemplateViewRoute;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
-  private final User USER;
 
-  public GUICommand(User user) {
-    this.USER = user;
-  }
+  private GUICommand() { }
 
   /**
    * GET request handler for the sign-in page of Athenia. Prompts the user to
@@ -68,6 +70,7 @@ public class GUICommand {
     }
   }
 
+
   /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
@@ -76,12 +79,25 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
+
+      // count for each module type
+      // TODO: get these counts from either the User/Athenia object
+      //          and/or from the
+      int vocabCount = 0;
+      int noteCount = 0;
+      int conjugationCount = 0;
+
+      List<Map<String, Object>> recentList = new ArrayList<>();
+      // inner list: id, name, date, taglist
+
+      // NOTE: somehow get the recent activity from the athenia object
+      //      > also get count for each module
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: pull the following information
-      // 1. pull the recent activity of the user from the database or user
-      // object
-      // 2. parse the information and format to send to the front end
+              .put("vocabCount", vocabCount)
+              .put("noteCount", noteCount)
+              .put("conjugationCount", conjugationCount)
+              .put("recent", recentList).build();
+
       return new ModelAndView(variables, "...");
     }
   }
@@ -94,6 +110,16 @@ public class GUICommand {
   public class VocabularyLandingPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) {
+
+
+      // have tags as a certain part of frontend
+      // --- use data-* thing for storing, filtering tags
+
+      //
+
+
+
+
       QueryParamsMap qm = req.queryMap();
       // TODO: pull the information from the user
       // 1. not much here... just know that the user is on the vocab page
@@ -384,5 +410,53 @@ public class GUICommand {
       return new ModelAndView(variables, "...");
     }
   }
+
+  //--- Class to JSON info methods -------------------------------------------
+
+  /**
+   * Converts a FreeNote into a data map for JSON.
+   * @param note the FreeNote object to convert
+   * @return a map of data from the FreeNote object
+   */
+  private static Map<String, Object> toData(FreeNote note) {
+
+    // TODO: get the id, name/title, dates, tags associate with this
+    return ImmutableMap.of("...", "...");
+  }
+
+  /**
+   * Converts a Vocab module into a data map for JSON.
+   * @param vocab the Vocab object to convert
+   * @return a map of data from the Vocab object
+   */
+  private static Map<String, Object> toData(Vocab vocab) {
+    // TODO: get vocab content (getContent())
+    // TODO
+
+
+    // return
+    return ImmutableMap.of("...", "...");
+  }
+
+  /**
+   * Converts a Conjugation module into a data map for JSON.
+   * @param conjugation the Conjugation module to convert
+   * @return a map of data from the FreeNote object
+   */
+  private static Map<String, Object> toData(Conjugation conjugation) {
+    return ImmutableMap.of("...", "...");
+  }
+
+  /**
+   * Converts a Tag module into a data map for JSON.
+   * @param tag the Tag module to convert
+   * @return a map of data from the Tag object
+   */
+  private static Map<String, Object> toData(Tag tag) {
+    return ImmutableMap.of("...", "...");
+  }
+
+  // TODO some way to add information from a module in generic way?
+
 
 }

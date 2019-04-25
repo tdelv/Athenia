@@ -95,4 +95,5 @@ public class DatabaseParser {
     private static List<Vocab> loadVocabList(Connection conn) throws SQLException {
         return null;
     }
+
 }

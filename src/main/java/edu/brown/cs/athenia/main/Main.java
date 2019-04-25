@@ -96,12 +96,13 @@ public class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
 
     FreeMarkerEngine freeMarker = createEngine();
+    GUICommand commander = new GUICommand();
 
     // A test route
     Spark.get("/hello", (req, res) -> "Hello World!");
 
     // Setup Spark Routes
-    Spark.get("/landing", new GUICommand.SignInHandler(), freeMarker);
+    Spark.get("/landing", commander.new SignInHandler(), freeMarker);
   }
 
   /**
