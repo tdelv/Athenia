@@ -1,9 +1,9 @@
 package edu.brown.cs.athenia.main;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.data.Language;
 
 /**
  * Athenia is our object class that calls on everything. Has ReviewMode and
@@ -13,14 +13,36 @@ import edu.brown.cs.athenia.data.modules.Module;
  */
 public class Athenia {
 
-  private List<Module> allModules;
+  private Map<String, Language> languages;
+  private Language currLang;
 
   public Athenia() {
-    allModules = new ArrayList<Module>();
+    languages = new HashMap<String, Language>();
   }
 
-  public List<Module> getAllModules() {
-    return allModules;
+  public void setCurrLang(String lang) {
+    if (languages.containsKey(lang)) {
+      currLang = languages.get(lang);
+    } else {
+      currLang = this.addLanguage(lang);
+    }
   }
+
+  public Language addLanguage(String lang) {
+    Language language = new Language();
+    languages.put(lang, language);
+    return language;
+  }
+
+  public Language getCurrLanguage() {
+    return currLang;
+  }
+  /*
+   * public List<Object> review(Date startDateCreated, Date endDateCreated) {
+   * ReviewMode review = new ReviewMode(this, currLang.getTagList(),
+   * startDateCreated, endDateCreated);
+   * 
+   * }
+   */
 
 }
