@@ -131,6 +131,8 @@ public class GUICommand {
       GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
               new InputStreamReader(in));
 
+      System.out.println(clientSecrets.getDetails().getClientId() + ", " + clientSecrets.getDetails().getClientSecret());
+
       GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
               HTTP_TRANSPORT,
               JSON_FACTORY,
