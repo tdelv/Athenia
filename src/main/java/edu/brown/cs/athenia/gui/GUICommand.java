@@ -140,7 +140,7 @@ public class GUICommand {
 
       final TokenResponse tokenResponse =
               flow.newTokenRequest(qm.value("code"))
-                      // .setRedirectUri(getServletContext().getInitParameter("bookshelf.callback"))
+                      .setRedirectUri("https://athenia.herokuapp.com/validate")
                       .execute();
 
       req.session().attribute("token", tokenResponse.toString()); // Keep track of the token.
