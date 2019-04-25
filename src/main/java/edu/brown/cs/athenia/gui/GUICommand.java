@@ -1,17 +1,31 @@
 package edu.brown.cs.athenia.gui;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponse;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.drive.DriveScopes;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 import edu.brown.cs.athenia.data.User;
-import spark.ModelAndView;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.TemplateViewRoute;
+import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
+import spark.*;
 
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
@@ -22,17 +36,12 @@ import spark.TemplateViewRoute;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
-  private final User USER;
-
-  public GUICommand(User user) {
-    this.USER = user;
-  }
 
   /**
    * GET request handler for the sign-in page of Athenia. Prompts the user to
    * sign-in via the Google API.
    */
-  public class SignInHandler implements TemplateViewRoute {
+  public class SignInPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
@@ -46,6 +55,60 @@ public class GUICommand {
       // s. use this info to set the user info and go to home
       // 2. regular home page
       return new ModelAndView(variables, "...");
+    }
+  }
+
+  public static class LoginHandler implements Route {
+    private final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    private final List<String> SCOPES = Collections
+            .singletonList(DriveScopes.DRIVE_APPDATA);
+
+    public LoginHandler() throws GeneralSecurityException, IOException {
+    }
+
+    @Override
+    public ModelAndView handle(Request req, Response res) throws IOException {
+      String state = new BigInteger(130, new SecureRandom()).toString(32);  // prevent request forgery
+      req.session().attribute("state", state);
+
+      if (req.attribute("loginDestination") != null) {
+        req.session().attribute("loginDestination", (String) req.attribute("loginDestination"));
+      } else {
+        req.session().attribute("loginDestination", "/home");
+      }
+
+      InputStream in = GoogleDriveApi.class
+              .getResourceAsStream(CREDENTIALS_FILE_PATH);
+      GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+              new InputStreamReader(in));
+
+      GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+              HTTP_TRANSPORT,
+              JSON_FACTORY,
+              clientSecrets,
+              SCOPES)
+              .build();
+
+      // Callback url should be the one registered in Google Developers Console
+      String url =
+              flow.newAuthorizationUrl()
+                      .setRedirectUri("https://athenia.herokuapp.com/validate")
+                      .setState(state)            // Prevent request forgery
+                      .build();
+      res.redirect(url);
+      return null;
+    }
+  }
+
+  public static class ValidateHandler implements Route {
+
+
+    @Override
+    public Object handle(Request request, Response response) throws Exception {
+      System.out.println("test");
+      return null;
     }
   }
 

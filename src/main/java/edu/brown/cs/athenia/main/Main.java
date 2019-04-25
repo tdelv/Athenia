@@ -99,7 +99,12 @@ public class Main {
 
     // A test route
     Spark.get("/hello", (req, res) -> "Hello World!");
-
+    try {
+      Spark.get("/login", new GUICommand.LoginHandler());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    Spark.get("/validate", new GUICommand.ValidateHandler());
     // Setup Spark Routes
     // Spark.get("/stars", new StarsHandlers.FrontHandler(), freeMarker);
   }
