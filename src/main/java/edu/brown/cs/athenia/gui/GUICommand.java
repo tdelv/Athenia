@@ -103,11 +103,51 @@ public class GUICommand {
   }
 
   public static class ValidateHandler implements Route {
+    private final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    private final List<String> SCOPES = Collections
+            .singletonList(DriveScopes.DRIVE_APPDATA);
 
+    public ValidateHandler() throws GeneralSecurityException, IOException {
+    }
 
     @Override
-    public Object handle(Request request, Response response) throws Exception {
-      System.out.println("test");
+    public Object handle(Request req, Response res) throws Exception {
+      QueryParamsMap qm = req.queryMap();
+      // Ensure that this is no request forgery going on, and that the user
+      // sending us this connect request is the user that was supposed to.
+      if (req.session().attribute("state") == null
+              || !qm.value("state").equals((String) req.session().attribute("state"))) {
+        res.redirect("/login");
+        return null;
+      }
+
+      req.session().attribute("state");     // Remove one-time use state.
+
+
+      InputStream in = GoogleDriveApi.class
+              .getResourceAsStream(CREDENTIALS_FILE_PATH);
+      GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+              new InputStreamReader(in));
+
+      GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+              HTTP_TRANSPORT,
+              JSON_FACTORY,
+              clientSecrets,
+              SCOPES)
+              .build();
+
+      final TokenResponse tokenResponse =
+              flow.newTokenRequest(qm.value("code"))
+                      // .setRedirectUri(getServletContext().getInitParameter("bookshelf.callback"))
+                      .execute();
+
+      req.session().attribute("token", tokenResponse.toString()); // Keep track of the token.
+      final Credential credential = flow.createAndStoreCredential(tokenResponse, null);
+
+      res.redirect(req.session().attribute("loginDestination"));
+
       return null;
     }
   }

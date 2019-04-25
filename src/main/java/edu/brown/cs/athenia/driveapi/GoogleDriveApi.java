@@ -47,62 +47,24 @@ public class GoogleDriveApi {
     port = newPort;
   }
 
-  /**
-   * Creates an authorized Credential object.
-   * @param HTTP_TRANSPORT
-   *          The network HTTP Transport.
-   * @return An authorized Credential object.
-   * @throws IOException
-   *           If the credentials.json file cannot be found.
-   */
-  private static Credential getCredentials(
-      final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-    // Load client secrets.
-    InputStream in = GoogleDriveApi.class
-        .getResourceAsStream(CREDENTIALS_FILE_PATH);
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-        new InputStreamReader(in));
-
-    // Build flow and trigger user authorization request.
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-            .setAccessType("offline").setApprovalPrompt("force").build();
-
-    VerificationCodeReceiver receiver = new MyServerReceiver.Builder()
-        .setPort(port)
-        // .setHost("https://athenia.herokuapp.com")
-        .setLandingPages("athenia.herokuapp.com/hello", null)
-        .setCallbackPath("/hello").build();
-    return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-  }
-
-  /**
-   * Sets up a server for the user to login and authorize credentials.
-   * @param cookie
-   *          the user to log in.
-   */
-  public static void login(String cookie)
-      throws GeneralSecurityException, IOException {
-    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport
-        .newTrustedTransport();
-    Credential credential = getCredentials(HTTP_TRANSPORT);
-    CREDENTIAL_MAP.put(cookie, credential);
+  public static void setCredential(String token, Credential credential) {
+    CREDENTIAL_MAP.put(token, credential);
   }
 
   /**
    * Checks if a given user is authenticated.
-   * @param cookie
+   * @param token
    *          the user to be checked.
    * @return whether they are authenticated.
    */
-  public static boolean isAuthenticated(String cookie) {
-    return CREDENTIAL_MAP.containsKey(cookie);
+  public static boolean isAuthenticated(String token) {
+    return CREDENTIAL_MAP.containsKey(token);
   }
 
   /**
    * Get stored credentials if already received, otherwise prompt user for
    * authorization.
-   * @param userAuth
+   * @param token
    *          The user that we want credentials from.
    * @return An authorized Credential object.
    * @throws IOException
@@ -110,30 +72,30 @@ public class GoogleDriveApi {
    * @throws UnauthenticatedUserException
    *           If the user does not have loaded credentials.
    */
-  private static Credential getCredentials(String userAuth)
+  private static Credential getCredentials(String token)
       throws IOException, UnauthenticatedUserException {
-    if (!CREDENTIAL_MAP.containsKey(userAuth)) {
+    if (!CREDENTIAL_MAP.containsKey(token)) {
       throw new UnauthenticatedUserException();
     }
 
-    return CREDENTIAL_MAP.get(userAuth);
+    return CREDENTIAL_MAP.get(token);
   }
 
   /**
    * Setup a new Drive service.
-   * @param userAuth
+   * @param token
    *          The user that we want credentials from.
    * @return the service.
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  private static Drive getService(String userAuth) throws IOException,
+  private static Drive getService(String token) throws IOException,
       GeneralSecurityException, UnauthenticatedUserException {
     // Build a new authorized API client service.
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport
         .newTrustedTransport();
     Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-        getCredentials(userAuth)).setApplicationName(APPLICATION_NAME).build();
+        getCredentials(token)).setApplicationName(APPLICATION_NAME).build();
     return service;
   }
 

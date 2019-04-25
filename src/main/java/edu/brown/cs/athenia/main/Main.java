@@ -55,14 +55,6 @@ public class Main {
 
     runSparkServer(port);
     GoogleDriveApi.setPort(port);
-
-    try {
-      GoogleDriveApi.login("");
-    } catch (GeneralSecurityException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   // Adding GUI
@@ -105,6 +97,7 @@ public class Main {
       e.printStackTrace();
     }
     Spark.get("/validate", (req, res) -> "Hello World!");
+    Spark.get("/home", (req, res) -> "");
   }
 
   /**
