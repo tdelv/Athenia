@@ -131,8 +131,6 @@ public class GUICommand {
       GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
               new InputStreamReader(in));
 
-      System.out.println(clientSecrets.getDetails().getClientId() + ", " + clientSecrets.getDetails().getClientSecret());
-
       GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
               HTTP_TRANSPORT,
               JSON_FACTORY,
@@ -148,6 +146,8 @@ public class GUICommand {
 
       req.session().attribute("token", tokenResponse.toString()); // Keep track of the token.
       final Credential credential = flow.createAndStoreCredential(tokenResponse, null);
+
+      GoogleDriveApi.setCredential(tokenResponse.toString(), credential);
 
       res.redirect(req.session().attribute("loginDestination"));
 

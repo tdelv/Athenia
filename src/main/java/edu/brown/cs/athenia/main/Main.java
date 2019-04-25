@@ -97,7 +97,8 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/home", (req, res) -> "");
+    Spark.get("/home", (req, res) ->
+            req.attribute("token") + Boolean.toString(GoogleDriveApi.isAuthenticated(req.attribute("token"))));
   }
 
   /**
