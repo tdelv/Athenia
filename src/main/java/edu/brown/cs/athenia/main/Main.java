@@ -104,7 +104,7 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.post("/validate", (req, res) -> "Hello World!");
+    Spark.get("/validate", (req, res) -> "Hello World!");
   }
 
   /**
