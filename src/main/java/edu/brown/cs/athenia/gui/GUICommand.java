@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
-import edu.brown.cs.athenia.data.User;
 import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
 import spark.ModelAndView;
