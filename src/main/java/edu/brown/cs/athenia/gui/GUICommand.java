@@ -1,12 +1,16 @@
 package edu.brown.cs.athenia.gui;
 
-import java.util.Map;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
+import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
 import spark.ModelAndView;
@@ -33,7 +37,7 @@ public class GUICommand {
    * GET request handler for the sign-in page of Athenia. Prompts the user to
    * sign-in via the Google API.
    */
-  public class SignInHandler implements TemplateViewRoute {
+  public class SignInPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
@@ -47,6 +51,70 @@ public class GUICommand {
       // s. use this info to set the user info and go to home
       // 2. regular home page
       return new ModelAndView(variables, "landing.ftl");
+    }
+  }
+
+  /**
+   * Handles initial login request, redirecting user to
+   * Google Authenication page if not already logged in.
+   */
+  public static class LoginHandler implements Route {
+
+    @Override
+    public ModelAndView handle(Request req, Response res) throws IOException, GeneralSecurityException {
+      // Set destination to go after login
+      if (req.attribute("loginDestination") != null) {
+        req.session().attribute("loginDestination", (String) req.attribute("loginDestination"));
+      } else {
+        req.session().attribute("loginDestination", "/home");
+      }
+
+      // Check if user token already loaded
+      if (GoogleDriveApi.isLoggedIn(req.session().attribute("user_id"))) {
+        res.redirect(req.session().attribute("loginDestination"));
+      }
+
+      // Create secure state to prevent request forgery
+      String state = new BigInteger(130, new SecureRandom()).toString(32);
+      req.session().attribute("state", state);
+
+      // Create callback url for authentication
+      String url = GoogleDriveApi.getUrl(state);
+
+      // Redirect to Google authentication page
+      res.redirect(url);
+      return null;
+    }
+  }
+
+  /**
+   * Handles the redirect from Google Authentication,
+   * storing credentials and redirecting user to correct url.
+   */
+  public static class ValidateHandler implements Route {
+
+    @Override
+    public Object handle(Request req, Response res) throws Exception {
+      QueryParamsMap qm = req.queryMap();
+      // Ensure that this is no request forgery going on, and that the user
+      // sending us this connect request is the user that was supposed to.
+      if (req.session().attribute("state") == null
+              || !qm.value("state").equals((String) req.session().attribute("state"))) {
+        res.redirect("/login");
+        return null;
+      }
+
+      // Remove one-time use state.
+      req.session().attribute("state");
+
+      // Create credential and store it with user_id
+      String userId = new BigInteger(130, new SecureRandom()).toString(32);
+      req.session().attribute("user_id", userId);
+      GoogleDriveApi.createCredential(userId, qm.value("code"));
+
+      // Send user to correct destination after login
+      res.redirect(req.session().attribute("loginDestination"));
+      return null;
     }
   }
 

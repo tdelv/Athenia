@@ -54,15 +54,6 @@ public class Main {
     }
 
     runSparkServer(port);
-    GoogleDriveApi.setPort(port);
-
-    try {
-      GoogleDriveApi.login("");
-    } catch (GeneralSecurityException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   // Adding GUI
@@ -96,13 +87,19 @@ public class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
 
     FreeMarkerEngine freeMarker = createEngine();
-    GUICommand commander = new GUICommand();
 
     // A test route
     Spark.get("/hello", (req, res) -> "Hello World!");
+    try {
+      Spark.get("/login", new GUICommand.LoginHandler());
+      Spark.get("/validate", new GUICommand.ValidateHandler());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
 
     // Setup Spark Routes
-    Spark.get("/landing", commander.new SignInHandler(), freeMarker);
+    //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
   }
 
   /**
