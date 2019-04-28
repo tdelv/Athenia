@@ -92,86 +92,6 @@ public class GoogleDriveApi {
   }
 
 
-  // Internal helper methods for connecting with Google API.
-
-  private static NetHttpTransport HTTP_TRANSPORT;
-  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-  private static final String TOKENS_DIRECTORY_PATH = "tokens";
-  private static final List<String> SCOPES = Collections
-          .singletonList(DriveScopes.DRIVE_APPDATA);
-  private static final String APPLICATION_NAME = "Athenia";
-
-  /**
-   * Generates a flow for use with Google API.
-   * @return The authorization flow.
-   * @throws IOException when credentials.json can't be loaded.
-   * @throws GeneralSecurityException for other reasons.
-   */
-  private static GoogleAuthorizationCodeFlow getFlow() throws IOException, GeneralSecurityException {
-    // Generate transport
-    HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-
-    // Generate credentials
-    InputStream in = GoogleDriveApi.class
-            .getResourceAsStream(CREDENTIALS_FILE_PATH);
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-            new InputStreamReader(in));
-
-    // Create flow for Google
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-            HTTP_TRANSPORT,
-            JSON_FACTORY,
-            clientSecrets,
-            SCOPES)
-            .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-            .setAccessType("offline")
-            .build();
-
-    return flow;
-  }
-
-  /**
-   * Loads the credentials of the given userId. Returns null if no token.
-   * @param userId the user to load credentials for.
-   * @return the credentials, or null if no token.
-   * @throws IOException when unable to read client secrets from file.
-   * @throws GeneralSecurityException when something goes wrong with creating a new Trusted Transport.
-   */
-  private static Credential getCredential(String userId) throws IOException, GeneralSecurityException {
-    return getFlow().loadCredential(userId);
-  }
-
-  /**
-   * Setup a new Drive service.
-   * @param userId The user's id.
-   * @return the service for the user.
-   * @throws IOException when unable to read client secrets from file.
-   * @throws GeneralSecurityException when something goes wrong with creating a new Trusted Transport.
-   */
-  private static Drive getService(String userId) throws IOException,
-      GeneralSecurityException {
-    // Build a new authorized API client service.
-    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport
-        .newTrustedTransport();
-    Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-        getCredential(userId)).setApplicationName(APPLICATION_NAME).build();
-    return service;
-  }
-
-  /**
-   * Creates a new file on Drive for the user's database.
-   * @param service the Drive service through which the new Drive file is created.
-   * @throws IOException when something goes wrong creating the database file.
-   */
-  private static void setupDriveFile(Drive service) throws IOException {
-    File metaData = new File().setName("userData.sqlite3")
-            .setId("userData.sqlite3");
-
-    service.files().create(metaData);
-  }
-
-
   // Loading and updating of database file
 
   private static final Map<String, java.io.File> FILE_MAP = new HashMap<>();
@@ -234,5 +154,84 @@ public class GoogleDriveApi {
       throw new DriveApiException(e);
     }
 
+  }
+  
+
+  // Internal helper methods for connecting with Google API.
+  
+  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+  private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+  private static final String TOKENS_DIRECTORY_PATH = "tokens";
+  private static final List<String> SCOPES = Collections
+          .singletonList(DriveScopes.DRIVE_APPDATA);
+  private static final String APPLICATION_NAME = "Athenia";
+
+  /**
+   * Generates a flow for use with Google API.
+   * @return The authorization flow.
+   * @throws IOException when credentials.json can't be loaded.
+   * @throws GeneralSecurityException for other reasons.
+   */
+  private static GoogleAuthorizationCodeFlow getFlow() throws IOException, GeneralSecurityException {
+    // Generate transport
+    NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+    // Generate credentials
+    InputStream in = GoogleDriveApi.class
+            .getResourceAsStream(CREDENTIALS_FILE_PATH);
+    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+            new InputStreamReader(in));
+
+    // Create flow for Google
+    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+            HTTP_TRANSPORT,
+            JSON_FACTORY,
+            clientSecrets,
+            SCOPES)
+            .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+            .setAccessType("offline")
+            .build();
+
+    return flow;
+  }
+
+  /**
+   * Loads the credentials of the given userId. Returns null if no token.
+   * @param userId the user to load credentials for.
+   * @return the credentials, or null if no token.
+   * @throws IOException when unable to read client secrets from file.
+   * @throws GeneralSecurityException when something goes wrong with creating a new Trusted Transport.
+   */
+  private static Credential getCredential(String userId) throws IOException, GeneralSecurityException {
+    return getFlow().loadCredential(userId);
+  }
+
+  /**
+   * Setup a new Drive service.
+   * @param userId The user's id.
+   * @return the service for the user.
+   * @throws IOException when unable to read client secrets from file.
+   * @throws GeneralSecurityException when something goes wrong with creating a new Trusted Transport.
+   */
+  private static Drive getService(String userId) throws IOException,
+      GeneralSecurityException {
+    // Build a new authorized API client service.
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport
+        .newTrustedTransport();
+    Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+        getCredential(userId)).setApplicationName(APPLICATION_NAME).build();
+    return service;
+  }
+
+  /**
+   * Creates a new file on Drive for the user's database.
+   * @param service the Drive service through which the new Drive file is created.
+   * @throws IOException when something goes wrong creating the database file.
+   */
+  private static void setupDriveFile(Drive service) throws IOException {
+    File metaData = new File().setName("userData.sqlite3")
+            .setId("userData.sqlite3");
+
+    service.files().create(metaData);
   }
 }
