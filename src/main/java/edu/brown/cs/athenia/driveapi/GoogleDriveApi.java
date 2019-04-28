@@ -25,6 +25,14 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 
+/**
+ * A class for interacting with the Google Drive API. Has external interactions allowing:
+ *  - Checking if a given user is logged in;
+ *  - Setting up and getting the url of an authentication page for a user to log in on;
+ *  - Creating and storing a new credential for a user after authentication;
+ *  - Retrieving and updating of a user's database file on their Drive.
+ * @author Thomas Del Vecchio
+ */
 public class GoogleDriveApi {
 
   // External interactions with other parts of project.
