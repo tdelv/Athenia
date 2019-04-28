@@ -13,4 +13,8 @@ public class Tag {
   public Tag(String t) {
     tag = t;
   }
+
+  public String getContent() {
+    return tag;
+  }
 }

@@ -17,6 +17,9 @@ public class Language {
     private List<Tag> tagList;
     private List<Vocab> vocabList;
 
+    // TODO: some sort of recent list storing the most recent
+    //              free notes according to some date value
+
     /**
      * Constructors
      */
@@ -67,6 +70,23 @@ public class Language {
         return new ArrayList<Vocab>(vocabList);
     }
 
+    public int getVocabCount() {
+        return vocabList.size();
+    }
+
+    public int getNoteCount() {
+        return freeNoteList.size();
+    }
+
+    public int getConjugationCount() {
+        return conjugationList.size();
+    }
+
+    // TODO : a getter for retrieving the most recent FreeNotes
+    public List<FreeNote> getRecentFreeNotes() {
+        return null;
+    }
+
     /**
      * Adders
      */
@@ -88,6 +108,45 @@ public class Language {
     }
 
     public void addVocab(Vocab vocab) {
+        // TODO update the vocab table in database
         this.vocabList.add(vocab);
     }
+
+
+    /**
+     * Updaters
+     * TODO : an update method for each type of module with key of map
+     *          linking to the ID of that module in the database
+     *          and the value being that object itself
+     */
+
+    public void updateVocabulary(String id) {
+        // TODO : update the vocabulary module in both object and database?
+        //          this or just a method to get the module itself and
+        //           call update on it where that method then updates
+        //          the database and this
+        //          > parameters still to be determined
+    }
+
+    public void updateTag(String id) {
+        // TODO : update the tag information accordingly (the parameters
+        //          are still to be determined)
+    }
+
+    /**
+     * Deleters
+     * TODO : a delete method for each type of module with key of map
+     *          being ID of module to delete and key being the object itself
+     */
+
+    public void deleteVocabulary(String id) {
+        // TODO : delete the vocab object in list/map and in database
+    }
+
+    public void deleteTag(String id) {
+        // TODO : delete the Tag from this object, the database, and
+        //              and all modules that have this tag?
+    }
+
+
 }

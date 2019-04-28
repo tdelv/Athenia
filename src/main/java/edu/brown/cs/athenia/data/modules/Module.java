@@ -22,6 +22,8 @@ public abstract class Module {
     tags = new HashSet<String>();
   }
 
+  // TODO: an id field and getters / setters for it?
+
   /**
    * Getter for list of tags.
    * @return Returns the HashSet of String tags.

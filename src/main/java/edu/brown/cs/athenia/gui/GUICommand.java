@@ -13,6 +13,8 @@ import com.google.gson.Gson;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
+import edu.brown.cs.athenia.data.Language;
+import edu.brown.cs.athenia.main.Athenia;
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -30,29 +32,10 @@ import spark.TemplateViewRoute;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
+  private static Language language = null;
+  private static Athenia athenia = new Athenia();
 
   private GUICommand() { }
-
-  /**
-   * GET request handler for the sign-in page of Athenia. Prompts the user to
-   * sign-in via the Google API.
-   */
-  public class SignInPageHandler implements TemplateViewRoute {
-    @Override
-    public ModelAndView handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("title", "Athenia").build();
-      // TODO figure out what landing area they should face
-      // 1. google sign in
-      // a. prompt the user to sign-in, pull their info
-      // b. load in this information to the backend (database stuff)
-      // c. use this info to prompt the user to change the language
-      // s. use this info to set the user info and go to home
-      // 2. regular home page
-      return new ModelAndView(variables, "landing.ftl");
-    }
-  }
 
   /**
    * Handles initial login request, redirecting user to
@@ -126,46 +109,64 @@ public class GUICommand {
   public class LanguagePromptHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) {
-      QueryParamsMap qm = req.queryMap();
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: pull and handle the following information
-      // 1. pull out all of the languages the user has worked in
-      // 2. use their choice to load in the appropriate databases
-      // into the backend
+          .put("type", "Languages")
+          .put("content", athenia.getLanguages()).build();
+
+      // TODO : CONSIDER WHETHER ADDING NEW LANGUAGE OR NOT
+
       return new ModelAndView(variables, "...");
     }
   }
-
 
   /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
    */
-  public class HomePageHandler implements TemplateViewRoute {
+  public static class HomePageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
+      String type = qm.value("type");
+      String lang = qm.value("language");
+
+      System.out.println("WHAT?");
+
+      if (type.equals("new")) {
+        athenia.addLanguage(lang);
+        athenia.setCurrLang(lang);
+      } else if (type.equals("existing")) {
+        athenia.setCurrLang(lang);
+      } else {
+        // TODO : THROW ERROR
+      }
+
+      language = athenia.getCurrLanguage();
 
       // count for each module type
-      // TODO: get these counts from either the User/Athenia object
-      //          and/or from the
       int vocabCount = 0;
       int noteCount = 0;
       int conjugationCount = 0;
 
       List<Map<String, Object>> recentList = new ArrayList<>();
-      // inner list: id, name, date, taglist
 
-      // NOTE: somehow get the recent activity from the athenia object
-      //      > also get count for each module
+      // if language has been determined, get all of the information
+      if (language != null) {
+        vocabCount = language.getVocabCount();
+        noteCount = language.getNoteCount();
+        conjugationCount = language.getConjugationCount();
+        for (FreeNote note : language.getRecentFreeNotes()) {
+          recentList.add(toData(note));
+        }
+      }
+
+      // create the JSON for the front-end to use
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
               .put("vocabCount", vocabCount)
               .put("noteCount", noteCount)
               .put("conjugationCount", conjugationCount)
               .put("recent", recentList).build();
-
-      return new ModelAndView(variables, "...");
+      return new ModelAndView(variables, "/landing.ftl");
     }
   }
 
@@ -178,24 +179,24 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res) {
 
-
       // have tags as a certain part of frontend
       // --- use data-* thing for storing, filtering tags
-
-      //
-
-
-
 
       QueryParamsMap qm = req.queryMap();
       // TODO: pull the information from the user
       // 1. not much here... just know that the user is on the vocab page
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: parse the info and present to front end
-      // 1. pull out all of the vocabulary information from the backend
-      // and format appropriately for the front end to use
-      return new ModelAndView(variables, "...");
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      // get all vocab information and convert to JSON
+      List<Map<String, Object>> vocabList = new ArrayList<>();
+      if (language != null) {
+        for (Vocab vocab : language.getVocabList()) {
+          vocabList.add(toData(vocab));
+        }
+      }
+      variables.put("content", vocabList);
+      return new ModelAndView(variables.build(), "...");
     }
   }
 
@@ -208,11 +209,22 @@ public class GUICommand {
     @Override
     public String handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      // TODO: pull out the information of the vocabulary module and act
-      // according to the following:
-      // 1. adding new vocab module
-      // 2. update old vocab module
-      // 3. deleting old vocab module
+      String type = qm.value("type");
+      if (type.equals("add")) {
+        Vocab vocab = null;
+        // TODO: create information of the vocab and create object
+        language.addVocab(vocab);
+      } else if (type.equals("update")) {
+        // TODO: get ID of vocab module
+        String id = "...";
+        language.updateVocabulary(id);
+      } else if (type.equals("delete")) {
+        // TODO: get ID of vocab module
+        String id = "...";
+        language.deleteVocabulary(id);
+      } else {
+        // TODO: throw some type of error that vocab doesn't exist
+      }
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
           .put("...", "...").build();
       // TODO execute the appropriate operation:
@@ -236,12 +248,17 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       // TODO: parse out the tag label the user wishes to view (tag ID, tag
       // Name)
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: pull out all of the modules for the given tab
-      // 1. format this information to send to the front end to display
-      // on the generated "Tag" page
-      return new ModelAndView(variables, "...");
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+      // pull all tag information
+      List<Map<String, Object>> tags = new ArrayList<>();
+      for (Tag tag : language.getTagList()) {
+        tags.add(toData(tag));
+      }
+      // prepare tag info to present to front-end
+      variables.put("content", tags);
+      return new ModelAndView(variables.build(), "...");
     }
   }
 
@@ -257,10 +274,20 @@ public class GUICommand {
     @Override
     public String handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      // TODO: pull out the information of the specific tag being changed:
-      // 1. adding new tag (tag ID, tag name)
-      // 2. updating previous tag (tag ID, tag name)
-      // 3. deleting previous tag (tag ID, tag name)
+      String type = qm.value("type");
+      if (type.equals("add")) {
+        Tag tag = null; // TODO: generate a new tag object and add to database
+        language.addTag(tag);
+      } else if (type.equals("update")) {
+        String id = "..."; // TODO: get ID of tag to update (aka to change name or add element to?)
+        language.updateTag(id);
+      } else if (type.equals("delete")) {
+        String id = "..."; // TODO: get ID of tag to delete from everything
+        language.deleteTag(id);
+      } else {
+        // TODO: throw an error message that tag doesn't exist
+      }
+
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
           .put("...", "...").build();
       // TODO: execute the appropriate operation to insert, update, or delete
@@ -284,6 +311,19 @@ public class GUICommand {
     @Override
     public String handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
+      String type = qm.value("type");
+
+      if (language != null) {
+        if (type.equals("add")) {
+
+        } else if (type.equals("update")) {
+
+        } else if (type.equals("delete")) {
+
+        } else {
+          // TODO: throw error
+        }
+      }
       // TODO pull in the information of the module, the tag, and the operation
       // wanted:
       // 1. add tag to the module
@@ -478,7 +518,7 @@ public class GUICommand {
     }
   }
 
-  //--- Class to JSON info methods -------------------------------------------
+  //--- Class info to JSON methods -------------------------------------------
 
   /**
    * Converts a FreeNote into a data map for JSON.
@@ -488,7 +528,26 @@ public class GUICommand {
   private static Map<String, Object> toData(FreeNote note) {
 
     // TODO: get the id, name/title, dates, tags associate with this
-    return ImmutableMap.of("...", "...");
+    ImmutableMap.Builder<String, Object> noteData =
+            new ImmutableMap.Builder<String, Object>();
+    noteData.put("type", "FreeNote");
+    noteData.put("title", note.getTitle());
+
+    // add all module data
+    List<Map<String, Object>> modulesList = new ArrayList<>();
+    for (Module m : note.getModules()) {
+      if (m instanceof Vocab) {
+        Vocab vocab = (Vocab) m;
+        modulesList.add(toData(vocab));
+      } else if (m instanceof Conjugation) {
+        Conjugation conjugation = (Conjugation) m;
+        modulesList.add(toData(conjugation));
+      }
+    }
+
+    // put module data into map
+    noteData.put("content", modulesList);
+    return noteData.build();
   }
 
   /**
@@ -499,10 +558,13 @@ public class GUICommand {
   private static Map<String, Object> toData(Vocab vocab) {
     // TODO: get vocab content (getContent())
     // TODO
-
-
-    // return
-    return ImmutableMap.of("...", "...");
+    ImmutableMap.Builder<String, Object> vocabData =
+            new ImmutableMap.Builder<String, Object>();
+    // pull information of vocab
+    vocabData.put("type", "Vocab");
+    toData(vocab, vocabData);
+    vocabData.put("content", vocab.getContent());
+    return vocabData.build();
   }
 
   /**
@@ -511,7 +573,13 @@ public class GUICommand {
    * @return a map of data from the FreeNote object
    */
   private static Map<String, Object> toData(Conjugation conjugation) {
-    return ImmutableMap.of("...", "...");
+    ImmutableMap.Builder<String, Object> conjugationData =
+            new ImmutableMap.Builder<String, Object>();
+    // pull information of conjugation table
+    conjugationData.put("type", "Conjugation");
+    toData(conjugation, conjugationData);
+    conjugationData.put("content", conjugation.getContent());
+    return conjugationData.build();
   }
 
   /**
@@ -520,10 +588,20 @@ public class GUICommand {
    * @return a map of data from the Tag object
    */
   private static Map<String, Object> toData(Tag tag) {
-    return ImmutableMap.of("...", "...");
+    ImmutableMap.Builder<String, Object> tagData =
+            new ImmutableMap.Builder<String, Object>();
+    tagData.put("type", "tag");
+    tagData.put("content", tag.getContent());
+    return tagData.build();
   }
 
   // TODO some way to add information from a module in generic way?
-
+  private static void toData(Module module,
+                             ImmutableMap.Builder<String, Object> map) {
+    map.put("id", "..."); //TODO get the module id
+    map.put("dateCreated", module.getDateCreated());
+    map.put("dateModified", module.getDateModified());
+    map.put("tags", module.getTags());
+  }
 
 }

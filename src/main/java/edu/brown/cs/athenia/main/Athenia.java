@@ -2,6 +2,8 @@ package edu.brown.cs.athenia.main;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import edu.brown.cs.athenia.data.Language;
 
@@ -44,5 +46,12 @@ public class Athenia {
    * 
    * }
    */
+
+  // TODO : public method for getting a list of languages for the user to
+  //          choose from (of the one's they have -- used for the language landing page)
+
+  public List<String> getLanguages() {
+    return new ArrayList<String>(languages.keySet());
+  }
 
 }

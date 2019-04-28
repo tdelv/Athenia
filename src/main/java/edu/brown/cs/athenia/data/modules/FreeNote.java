@@ -18,7 +18,8 @@ public class FreeNote {
   //      for the front end
 
   // TODO: some type of way to store tags and dates for these FreeNote
-  //        > stores the date created, edited, accessed?
+  //        > stores the date created, edited, accessed for this specifically
+
 
   public FreeNote(String t) {
     modules = new ArrayList<Module>();
@@ -31,6 +32,11 @@ public class FreeNote {
    */
   public List<Module> getModules() {
     return modules;
+  }
+
+  // TODO : updater method for a specific module in the freenote
+  public void updateModule(Module module) {
+    // update the appropriate module if it exists in the module list
   }
 
   // TODO : method for getting a list of all tags in the sub modules
