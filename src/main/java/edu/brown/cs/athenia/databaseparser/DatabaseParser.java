@@ -29,6 +29,11 @@ public class DatabaseParser {
 
     private static final Map<String, Language> USER_MAP = new HashMap<>();
 
+    // TODO: how are users being stored now? here it says the user map
+    //          is just the user id to the language, but then the
+    //          Athenia class has a list of strings to languages
+    //      > which one is which?
+
     private static Connection loadConnection(String userId) throws DatabaseParserException, SQLException {
         File file;
         try {
