@@ -19,7 +19,11 @@ function addNewLanguage() {
         // DONE: Make a POST request to the "/validate" endpoint with the word information
         $.post("/addNewLanguage", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
-            document.location.reload(true);
+            if (responseObject.successful) {
+                document.location.reload(true);
+            } else {
+                console.log("message: " + message);
+            }
         });
 
     }
