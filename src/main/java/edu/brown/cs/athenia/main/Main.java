@@ -90,13 +90,13 @@ public class Main {
 
     FreeMarkerEngine freeMarker = createEngine();
 
-    final Set<String> noForceLogin = ImmutableSet.<String>builder()
+    final Set<String> NO_FORCE_LOGIN = ImmutableSet.<String>builder()
             .add("/login")
             .add("/validate")
             .build();
     Spark.before((req, res) -> {
       String userId = req.session().attribute("user_id");
-      if (!noForceLogin.contains(req.pathInfo())
+      if (!NO_FORCE_LOGIN.contains(req.pathInfo())
               && !GoogleDriveApi.isLoggedIn(userId)) {
         req.session().attribute("loginDestination", req.pathInfo());
         res.redirect("/login");
@@ -116,8 +116,6 @@ public class Main {
     Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
 
     Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
-    // Setup Spark Routes
-    //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
   }
 
   /**
