@@ -1,9 +1,12 @@
 package edu.brown.cs.athenia.review;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import edu.brown.cs.athenia.data.Language;
+import edu.brown.cs.athenia.data.modules.FreeNote;
+import edu.brown.cs.athenia.data.modules.module.Conjugation;
 import edu.brown.cs.athenia.data.modules.module.Tag;
 import edu.brown.cs.athenia.main.Athenia;
 
@@ -19,6 +22,9 @@ public class ReviewMode {
   public ReviewMode(Athenia project, List<Tag> tags, Date startDateCreated,
       Date endDateCreated) {
     Language currLang = project.getCurrLanguage();
+    Collection<Conjugation> conjugations = currLang.getConjugationMap()
+        .values();
+    Collection<FreeNote> freeNotes = currLang.getFreeNoteMap().values();
 
   }
 

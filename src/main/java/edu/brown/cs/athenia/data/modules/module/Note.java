@@ -20,4 +20,8 @@ public class Note extends ReviewableModule {
     note = (String) newNote;
   }
 
+  public String getContent() {
+    return note;
+  }
+
 }
