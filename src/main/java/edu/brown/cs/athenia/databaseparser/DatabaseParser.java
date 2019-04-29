@@ -69,8 +69,9 @@ public class DatabaseParser {
             return USER_MAP_UPDATED.get(userId);
         } else {
             Athenia user = new Athenia(userId);
-            // TODO : create a new athenia object
-            return USER_MAP_UPDATED.put(userId, user);
+            // TODO : create a new athenia object - languages?
+            USER_MAP_UPDATED.put(userId, user);
+            return user;
         }
     }
 

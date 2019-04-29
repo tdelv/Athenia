@@ -22,6 +22,7 @@ public class Athenia {
   public Athenia(String userId) {
     this.userId = userId;
     this.languages = new HashMap<String, Language>();
+    this.currLang = new Language("test");
   }
 
   public void setCurrLang(String lang) {
@@ -41,6 +42,7 @@ public class Athenia {
   public Language getCurrLanguage() {
     return currLang;
   }
+
   /*
    * public List<Object> review(Date startDateCreated, Date endDateCreated) {
    * ReviewMode review = new ReviewMode(this, currLang.getTagList(),

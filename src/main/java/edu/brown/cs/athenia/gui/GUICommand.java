@@ -142,6 +142,7 @@ public class GUICommand {
         // else send an error message that user not found
         message = "User not found in database";
       }
+      variables.put("title", "Select Language");
       variables.put("successful", successful);
       variables.put("message", message);
 
@@ -193,46 +194,53 @@ public class GUICommand {
   public static class HomePageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String type = qm.value("type");
-      String lang = qm.value("language");
 
-      if (type.equals("new")) {
-//        athenia.addLanguage(lang);
-//        athenia.setCurrLang(lang);
-      } else if (type.equals("existing")) {
-//        athenia.setCurrLang(lang);
-      } else {
-        // TODO : THROW ERROR
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          // get information about lang to present on home
+          int vocabCount = lang.getVocabCount();
+          int noteCount = lang.getNoteCount();
+          int conjugationCount = lang.getConjugationCount();
+
+          List<Map<String, Object>> recentList = new ArrayList<>();
+          // pull all recent notes from language
+          for (FreeNote note : lang.getRecentFreeNotes()) {
+            recentList.add(toData(note));
+          }
+
+          // add this info to the map
+          variables.put("vocabCount", vocabCount);
+          variables.put("noteCount", noteCount);
+          variables.put("conjugationCount", conjugationCount);
+          variables.put("recent", recentList);
+
+          message = "successful";
+          successful = true;
+        } else {
+          message = "current language null";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
       }
 
-//      language = athenia.getCurrLanguage();
+      variables.put("title", "Home");
+      variables.put("successful", successful);
+      variables.put("message", message);
 
-      // count for each module type
-      int vocabCount = 0;
-      int noteCount = 0;
-      int conjugationCount = 0;
-
-      List<Map<String, Object>> recentList = new ArrayList<>();
-
-      // if language has been determined, get all of the information
-//      if (language != null) {
-//        vocabCount = language.getVocabCount();
-//        noteCount = language.getNoteCount();
-//        conjugationCount = language.getConjugationCount();
-//        for (FreeNote note : language.getRecentFreeNotes()) {
-//          recentList.add(toData(note));
-//        }
-//      }
-
-      // create the JSON for the front-end to use
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-              .put("vocabCount", vocabCount)
-              .put("noteCount", noteCount)
-              .put("conjugationCount", conjugationCount)
-              .put("recent", recentList).build();
-
-      return new ModelAndView(variables, "home.ftl");
+      return new ModelAndView(variables.build(), "home.ftl");
     }
   }
 
@@ -246,21 +254,41 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       // have tags as a certain part of frontend
       // --- use data-* thing for storing, filtering tags
-
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      // TODO: pull the information from the user
-      // 1. not much here... just know that the user is on the vocab page
+
+      boolean successful = false;
+      String message = "";
+
       ImmutableMap.Builder<String, Object> variables =
               new ImmutableMap.Builder<String, Object>();
 
-      // get all vocab information and convert to JSON
-      List<Map<String, Object>> vocabList = new ArrayList<>();
-//      if (language != null) {
-//        for (Map.Entry<String, Vocab> vocab : language.getVocabMap().entrySet()) {
-//          vocabList.add(toData(vocab.getValue()));
-//        }
-//      }
-      variables.put("content", vocabList);
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+          Map<String, Vocab> vocabMap = lang.getVocabMap();
+          List<Map<String, Object>> vocabList = new ArrayList<>();
+
+          // translate vocab objects to JSON
+          for (Map.Entry<String, Vocab> vocab : vocabMap.entrySet()) {
+            vocabList.add(toData(vocab.getValue()));
+          }
+
+          // edit success messages
+          successful = true;
+          message = "successful";
+        } else {
+          message = "current language null";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("title", "Vocabulary");
+      variables.put("successful", successful);
+      variables.put("message", message);
       return new ModelAndView(variables.build(), "...");
     }
   }
@@ -273,6 +301,7 @@ public class GUICommand {
   public class UpdateVocabularyHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
       if (type.equals("add")) {
@@ -310,12 +339,26 @@ public class GUICommand {
   public class TagLandingPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      // TODO: parse out the tag label the user wishes to view (tag ID, tag
-      // Name)
+
+      boolean successful = false;
+      String message = "";
 
       ImmutableMap.Builder<String, Object> variables =
               new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+
       // pull all tag information
       List<Map<String, Object>> tags = new ArrayList<>();
 //      for (Map.Entry<String, Tag> tag : language.getTagMap().entrySet()) {
