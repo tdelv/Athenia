@@ -113,9 +113,13 @@ public class Main {
       e.printStackTrace();
     }
 
-    Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
+    // Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
 
     Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
+    Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
+    // Setup Spark Routes
+    //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
+
   }
 
   /**
