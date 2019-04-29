@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
+import java.util.Set;
 
 //import joptsimple.OptionParser;
 
+import com.google.common.collect.ImmutableSet;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.gui.GUICommand;
 import freemarker.template.Configuration;
@@ -88,6 +90,19 @@ public class Main {
 
     FreeMarkerEngine freeMarker = createEngine();
 
+    final Set<String> NO_FORCE_LOGIN = ImmutableSet.<String>builder()
+            .add("/login")
+            .add("/validate")
+            .build();
+    Spark.before((req, res) -> {
+      String userId = req.session().attribute("user_id");
+      if (!NO_FORCE_LOGIN.contains(req.pathInfo())
+              && !GoogleDriveApi.isLoggedIn(userId)) {
+        req.session().attribute("loginDestination", req.pathInfo());
+        res.redirect("/login");
+      }
+    });
+
     // A test route
     Spark.get("/hello", (req, res) -> "Hello World!");
 
@@ -104,6 +119,7 @@ public class Main {
     Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
+
   }
 
   /**
