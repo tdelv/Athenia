@@ -48,6 +48,7 @@ public class GUICommand {
   private static String checkLoggedIn(Request req, Response res) throws DriveApiException {
     String userId = req.session().attribute("user_id");
     if (!GoogleDriveApi.isLoggedIn(userId)) {
+      req.session().attribute("loginDestination", req.pathInfo());
       res.redirect("/login");
     }
     return userId;
@@ -62,9 +63,7 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       // Set destination to go after login
-      if (req.attribute("loginDestination") != null) {
-        req.session().attribute("loginDestination", (String) req.attribute("loginDestination"));
-      } else {
+      if (req.session().attribute("loginDestination") == null) {
         req.session().attribute("loginDestination", "/home");
       }
 
@@ -78,7 +77,11 @@ public class GUICommand {
       req.session().attribute("state", state);
 
       // Create callback url for authentication
-      String url = GoogleDriveApi.getUrl(state);
+      String host = req.host();
+      if (!host.startsWith("http")) {
+        host = "http://" + host;
+      }
+      String url = GoogleDriveApi.getUrl(state, host + "/validate");
 
       // Redirect to Google authentication page
       res.redirect(url);
@@ -109,10 +112,17 @@ public class GUICommand {
       // Create credential and store it with user_id
       String userId = new BigInteger(130, new SecureRandom()).toString(32);
       req.session().attribute("user_id", userId);
-      GoogleDriveApi.createCredential(userId, qm.value("code"));
+
+      String host = req.host();
+      if (!host.startsWith("http")) {
+        host = "http://" + host;
+      }
+      GoogleDriveApi.createCredential(userId, qm.value("code"), host + "/validate");
 
       // Send user to correct destination after login
-      res.redirect(req.session().attribute("loginDestination"));
+      String redirect = req.session().attribute("loginDestination");
+      req.session().attribute("loginDestination", null);
+      res.redirect(redirect);
       return null;
     }
   }
