@@ -92,11 +92,8 @@ public class GUICommand {
       req.session().attribute("state", state);
 
       // Create callback url for authentication
-      String host = req.host();
-      if (!host.startsWith("http")) {
-        host = "http://" + host;
-      }
-      String url = GoogleDriveApi.getUrl(state, host + "/validate");
+      String host = req.url().replace(req.pathInfo(), "/validate");
+      String url = GoogleDriveApi.getUrl(state, host);
 
       // Redirect to Google authentication page
       res.redirect(url);
@@ -128,11 +125,8 @@ public class GUICommand {
       String userId = new BigInteger(130, new SecureRandom()).toString(32);
       req.session().attribute("user_id", userId);
 
-      String host = req.host();
-      if (!host.startsWith("http")) {
-        host = "http://" + host;
-      }
-      GoogleDriveApi.createCredential(userId, qm.value("code"), host + "/validate");
+      String host = req.url().replace(req.pathInfo(), "/validate");
+      GoogleDriveApi.createCredential(userId, qm.value("code"), host);
 
       // Send user to correct destination after login
       String redirect = req.session().attribute("loginDestination");
