@@ -210,9 +210,9 @@ public class GUICommand {
         if (lang != null) {
 
           // get information about lang to present on home
-          int vocabCount = lang.getVocabCount();
-          int noteCount = lang.getNoteCount();
-          int conjugationCount = lang.getConjugationCount();
+          int vocabCount = lang.getModuleCount(StorageType.VOCAB);
+          int noteCount = lang.getModuleCount(StorageType.NOTE);
+          int conjugationCount = lang.getModuleCount(StorageType.CONJUGATION);
 
           List<Map<String, Object>> recentList = new ArrayList<>();
           // pull all recent notes from language
@@ -268,12 +268,12 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-          Map<String, Vocab> vocabMap = lang.getVocabMap();
+          Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
           List<Map<String, Object>> vocabList = new ArrayList<>();
 
           // translate vocab objects to JSON
-          for (Map.Entry<String, Vocab> vocab : vocabMap.entrySet()) {
-            vocabList.add(toData(vocab.getValue()));
+          for (Map.Entry<String, Module> vocab : vocabMap.entrySet()) {
+            vocabList.add(toData((Vocab) vocab.getValue()));
           }
 
           // edit success messages

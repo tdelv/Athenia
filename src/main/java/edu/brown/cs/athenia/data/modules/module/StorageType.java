@@ -1,11 +1,11 @@
 package edu.brown.cs.athenia.data.modules.module;
 
 public enum StorageType {
-    FreeNote,
-    Note,
-    Vocab,
-    Conjugation,
-    AlertExclamation,
-    Question,
-    Tag;
+    FREE_NOTE,
+    NOTE,
+    VOCAB,
+    CONJUGATION,
+    ALERT_EXCLAMATION,
+    QUESTION,
+    TAG;
 }
