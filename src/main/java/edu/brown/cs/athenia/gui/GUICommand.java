@@ -55,6 +55,21 @@ public class GUICommand {
   }
 
   /**
+   *
+   */
+  public static class LandingPageHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>().build();
+
+      System.out.println("landing page");
+
+      return new ModelAndView(variables, "./landing");
+    }
+  }
+
+  /**
    * Handles initial login request, redirecting user to
    * Google Authenication page if not already logged in.
    */

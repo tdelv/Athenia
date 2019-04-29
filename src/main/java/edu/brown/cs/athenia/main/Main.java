@@ -24,7 +24,7 @@ import spark.template.freemarker.FreeMarkerEngine;
  */
 public class Main {
 
-  private static final int DEFAULT_PORT = 4569;
+  private static final int DEFAULT_PORT = 6969;
 
   /**
    * The initial method called when execution begins.
@@ -90,6 +90,7 @@ public class Main {
 
     // A test route
     Spark.get("/hello", (req, res) -> "Hello World!");
+
     try {
       Spark.get("/login", new GUICommand.LoginHandler());
       Spark.get("/validate", new GUICommand.ValidateHandler());
@@ -97,9 +98,10 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
-//    Spark.get("/landing", new GUICommand.HomePageHandler(), freeMarker);
 
+    Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
+
+    Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
   }
