@@ -127,7 +127,7 @@ public class GUICommand {
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
               .put("title", "Languages")
               .put("type", "Languages")
-              .put("content", athenia.getLanguages()).build();
+              .put("languages", athenia.getLanguages()).build();
 
       // TODO : CONSIDER WHETHER ADDING NEW LANGUAGE OR NOT
 
