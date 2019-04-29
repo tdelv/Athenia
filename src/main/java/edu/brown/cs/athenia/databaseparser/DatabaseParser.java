@@ -1,6 +1,7 @@
 package edu.brown.cs.athenia.databaseparser;
 
 import com.google.common.collect.ImmutableList;
+import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.FreeNote;
 import edu.brown.cs.athenia.data.modules.module.Conjugation;
@@ -27,7 +28,10 @@ import java.util.Map;
  */
 public class DatabaseParser {
 
+    // TODO: can you change this to athenia because a user can have multiple languages
+    //          but only have one athenia?
     private static final Map<String, Language> USER_MAP = new HashMap<>();
+    private static final Map<String, Athenia> USER_MAP_UPDATED = new HashMap<>();
 
     // TODO: how are users being stored now? here it says the user map
     //          is just the user id to the language, but then the
@@ -60,27 +64,43 @@ public class DatabaseParser {
         }
     }
 
-    public static Language getUser(String userId) throws DatabaseParserException {
-        if (USER_MAP.containsKey(userId)) {
-            return USER_MAP.get(userId);
+    public static Athenia getUser(String userId) throws DatabaseParserException {
+        if (USER_MAP_UPDATED.containsKey(userId)) {
+            return USER_MAP_UPDATED.get(userId);
+        } else {
+            Athenia user = new Athenia(userId);
+            // TODO : create a new athenia object
+            return USER_MAP_UPDATED.put(userId, user);
         }
+    }
 
-        Language user;
+//    public static Language getUser(String userId) throws DatabaseParserException {
+//        if (USER_MAP.containsKey(userId)) {
+//            return USER_MAP.get(userId);
+//        }
+//
+//        Language user;
+//
+//        try (Connection conn = loadConnection(userId)){
+//            // TODO: NOTE! i hope it was okay to turn these into maps
+//            //          linking the ID of the module in the database to the module itself
+//            String name = loadLanguageName(conn);
+//            Map<String, FreeNote> freeNoteMap = loadFreeNoteMap(conn);
+//            Map<String, Conjugation> conjugationMap = loadConjugationMap(conn);
+//            Map<String, Note> noteMap = loadNoteMap(conn);
+//            Map<String, Tag> tagMap = loadTagMap(conn);
+//            Map<String, Vocab> vocabMap = loadVocabMap(conn);
+//            user = new Language(name, freeNoteMap, conjugationMap, noteMap, tagMap, vocabMap);
+//        } catch (SQLException e) {
+//            throw new DatabaseParserException(e);
+//        }
+//
+//        return USER_MAP.put(userId, user);
+//    }
 
-        try (Connection conn = loadConnection(userId)){
-            // TODO: NOTE! i hope it was okay to turn these into maps
-            //          linking the ID of the module in the database to the module itself
-            Map<String, FreeNote> freeNoteMap = loadFreeNoteMap(conn);
-            Map<String, Conjugation> conjugationMap = loadConjugationMap(conn);
-            Map<String, Note> noteMap = loadNoteMap(conn);
-            Map<String, Tag> tagMap = loadTagMap(conn);
-            Map<String, Vocab> vocabMap = loadVocabMap(conn);
-            user = new Language(freeNoteMap, conjugationMap, noteMap, tagMap, vocabMap);
-        } catch (SQLException e) {
-            throw new DatabaseParserException(e);
-        }
-
-        return USER_MAP.put(userId, user);
+    // TODO : add some way to get the language name
+    private static String loadLanguageName(Connection conn) throws SQLException {
+        return null;
     }
 
     private static Map<String, FreeNote> loadFreeNoteMap(Connection conn) throws SQLException {

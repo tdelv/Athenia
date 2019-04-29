@@ -15,11 +15,13 @@ import edu.brown.cs.athenia.data.Language;
  */
 public class Athenia {
 
+  private String userId;
   private Map<String, Language> languages;
   private Language currLang;
 
-  public Athenia() {
-    languages = new HashMap<String, Language>();
+  public Athenia(String userId) {
+    this.userId = userId;
+    this.languages = new HashMap<String, Language>();
   }
 
   public void setCurrLang(String lang) {
@@ -31,7 +33,7 @@ public class Athenia {
   }
 
   public Language addLanguage(String lang) {
-    Language language = new Language();
+    Language language = new Language(lang);
     languages.put(lang, language);
     return language;
   }

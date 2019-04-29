@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
+import edu.brown.cs.athenia.databaseparser.*;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.data.modules.*;
@@ -21,6 +22,8 @@ import spark.Response;
 import spark.Route;
 import spark.TemplateViewRoute;
 
+import javax.xml.crypto.*;
+
 
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
@@ -31,9 +34,6 @@ import spark.TemplateViewRoute;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
-  private static Language language = null;
-  private static Athenia athenia = new Athenia();
-
   private GUICommand() { }
 
   /**
@@ -124,14 +124,28 @@ public class GUICommand {
   public static class LanguagePromptHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-              .put("title", "Languages")
-              .put("type", "Languages")
-              .put("languages", athenia.getLanguages()).build();
+      String userId = req.session().attribute("user_id");
+      boolean successful = false;
+      String message = "";
 
-      // TODO : CONSIDER WHETHER ADDING NEW LANGUAGE OR NOT
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
-      return new ModelAndView(variables, "languages.ftl");
+      try {
+        // try to find the user in database and send the language name to
+        // the front-end
+        Athenia user = DatabaseParser.getUser(userId);
+        variables.put("languages", user.getLanguages());
+        successful = true;
+        message = "successful";
+      } catch (DatabaseParserException e) {
+        // else send an error message that user not found
+        message = "User not found in database";
+      }
+      variables.put("successful", successful);
+      variables.put("message", message);
+
+      return new ModelAndView(variables.build(), "languages.ftl");
     }
   }
 
@@ -143,12 +157,32 @@ public class GUICommand {
   public static class LanguageAddHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String language = qm.value("newLanguage");
+      String lang = qm.value("newLanguage");
 
-      //TODO: add language in backend
+      boolean successful = false;
+      String message = "";
 
-      return language + " added";
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        if (user.getLanguages().contains(lang)) {
+          message = "language already exists";
+        } else {
+          user.addLanguage(lang);
+          successful = true;
+          message = "language added";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
     }
   }
 
@@ -164,15 +198,15 @@ public class GUICommand {
       String lang = qm.value("language");
 
       if (type.equals("new")) {
-        athenia.addLanguage(lang);
-        athenia.setCurrLang(lang);
+//        athenia.addLanguage(lang);
+//        athenia.setCurrLang(lang);
       } else if (type.equals("existing")) {
-        athenia.setCurrLang(lang);
+//        athenia.setCurrLang(lang);
       } else {
         // TODO : THROW ERROR
       }
 
-      language = athenia.getCurrLanguage();
+//      language = athenia.getCurrLanguage();
 
       // count for each module type
       int vocabCount = 0;
@@ -182,14 +216,14 @@ public class GUICommand {
       List<Map<String, Object>> recentList = new ArrayList<>();
 
       // if language has been determined, get all of the information
-      if (language != null) {
-        vocabCount = language.getVocabCount();
-        noteCount = language.getNoteCount();
-        conjugationCount = language.getConjugationCount();
-        for (FreeNote note : language.getRecentFreeNotes()) {
-          recentList.add(toData(note));
-        }
-      }
+//      if (language != null) {
+//        vocabCount = language.getVocabCount();
+//        noteCount = language.getNoteCount();
+//        conjugationCount = language.getConjugationCount();
+//        for (FreeNote note : language.getRecentFreeNotes()) {
+//          recentList.add(toData(note));
+//        }
+//      }
 
       // create the JSON for the front-end to use
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
@@ -221,11 +255,11 @@ public class GUICommand {
 
       // get all vocab information and convert to JSON
       List<Map<String, Object>> vocabList = new ArrayList<>();
-      if (language != null) {
-        for (Map.Entry<String, Vocab> vocab : language.getVocabMap().entrySet()) {
-          vocabList.add(toData(vocab.getValue()));
-        }
-      }
+//      if (language != null) {
+//        for (Map.Entry<String, Vocab> vocab : language.getVocabMap().entrySet()) {
+//          vocabList.add(toData(vocab.getValue()));
+//        }
+//      }
       variables.put("content", vocabList);
       return new ModelAndView(variables.build(), "...");
     }
@@ -244,15 +278,15 @@ public class GUICommand {
       if (type.equals("add")) {
         Vocab vocab = null;
         // TODO: create information of the vocab and create object
-        language.addVocab(vocab);
+//        language.addVocab(vocab);
       } else if (type.equals("update")) {
         // TODO: get ID of vocab module
         String id = "...";
-        language.updateVocabulary(id);
+//        language.updateVocabulary(id);
       } else if (type.equals("delete")) {
         // TODO: get ID of vocab module
         String id = "...";
-        language.deleteVocabulary(id);
+//        language.deleteVocabulary(id);
       } else {
         // TODO: throw some type of error that vocab doesn't exist
       }
@@ -284,9 +318,9 @@ public class GUICommand {
               new ImmutableMap.Builder<String, Object>();
       // pull all tag information
       List<Map<String, Object>> tags = new ArrayList<>();
-      for (Map.Entry<String, Tag> tag : language.getTagMap().entrySet()) {
-        tags.add(toData(tag.getValue()));
-      }
+//      for (Map.Entry<String, Tag> tag : language.getTagMap().entrySet()) {
+//        tags.add(toData(tag.getValue()));
+//      }
       // prepare tag info to present to front-end
       variables.put("content", tags);
       return new ModelAndView(variables.build(), "...");
@@ -308,13 +342,13 @@ public class GUICommand {
       String type = qm.value("type");
       if (type.equals("add")) {
         Tag tag = null; // TODO: generate a new tag object and add to database
-        language.addTag(tag);
+//        language.addTag(tag);
       } else if (type.equals("update")) {
         String id = "..."; // TODO: get ID of tag to update (aka to change name or add element to?)
-        language.updateTag(id);
+//        language.updateTag(id);
       } else if (type.equals("delete")) {
         String id = "..."; // TODO: get ID of tag to delete from everything
-        language.deleteTag(id);
+//        language.deleteTag(id);
       } else {
         // TODO: throw an error message that tag doesn't exist
       }
@@ -344,17 +378,17 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
 
-      if (language != null) {
-        if (type.equals("add")) {
-
-        } else if (type.equals("update")) {
-
-        } else if (type.equals("delete")) {
-
-        } else {
-          // TODO: throw error
-        }
-      }
+//      if (language != null) {
+//        if (type.equals("add")) {
+//
+//        } else if (type.equals("update")) {
+//
+//        } else if (type.equals("delete")) {
+//
+//        } else {
+//          // TODO: throw error
+//        }
+//      }
       // TODO pull in the information of the module, the tag, and the operation
       // wanted:
       // 1. add tag to the module

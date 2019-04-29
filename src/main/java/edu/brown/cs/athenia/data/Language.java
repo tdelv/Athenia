@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Collections;
 
 public class Language {
+    private String name;
     private Map<String, FreeNote> freeNoteMap;
     private Map<String, Conjugation> conjugationMap;
     private Map<String, Note> noteMap;
@@ -27,7 +28,8 @@ public class Language {
      * Constructors
      */
 
-    public Language() {
+    public Language(String name) {
+        this.name = name;
         this.freeNoteMap = new HashMap<>();
         this.conjugationMap = new HashMap<>();
         this.noteMap = new HashMap<>();
@@ -36,12 +38,14 @@ public class Language {
     }
 
     public Language(
+            String name,
             Map<String, FreeNote> freeNoteMap,
             Map<String, Conjugation> conjugationMap,
             Map<String, Note> noteMap,
             Map<String, Tag> tagMap,
             Map<String, Vocab> vocabMap
     ) {
+        this.name = name;
         this.freeNoteMap = new HashMap<String, FreeNote>(freeNoteMap);
         this.conjugationMap = new HashMap<String, Conjugation>(conjugationMap);
         this.noteMap = new HashMap<String, Note>(noteMap);
@@ -52,6 +56,10 @@ public class Language {
     /**
      * Getters
      */
+
+    public String getName() {
+        return this.name;
+    }
 
     public Map<String, FreeNote> getFreeNoteMap() {
         return Collections.unmodifiableMap(freeNoteMap);
