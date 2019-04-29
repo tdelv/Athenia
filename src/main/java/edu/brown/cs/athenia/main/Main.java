@@ -90,15 +90,17 @@ public class Main {
 
     // A test route
     Spark.get("/hello", (req, res) -> "Hello World!");
+
     try {
       Spark.get("/login", new GUICommand.LoginHandler());
       Spark.get("/validate", new GUICommand.ValidateHandler());
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
-//    Spark.get("/landing", new GUICommand.HomePageHandler(), freeMarker);
 
+    Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
+
+    Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
   }
