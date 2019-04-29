@@ -68,12 +68,14 @@ public class DatabaseParser {
         Language user;
 
         try (Connection conn = loadConnection(userId)){
-            List<FreeNote> freeNoteList = loadFreeNoteList(conn);
-            List<Conjugation> conjugationList = loadConjugationList(conn);
-            List<Note> noteList = loadNoteList(conn);
-            List<Tag> tagList = loadTagList(conn);
-            List<Vocab> vocabList = loadVocabList(conn);
-            user = new Language(freeNoteList, conjugationList, noteList, tagList, vocabList);
+            // TODO: NOTE! i hope it was okay to turn these into maps
+            //          linking the ID of the module in the database to the module itself
+            Map<String, FreeNote> freeNoteMap = loadFreeNoteMap(conn);
+            Map<String, Conjugation> conjugationMap = loadConjugationMap(conn);
+            Map<String, Note> noteMap = loadNoteMap(conn);
+            Map<String, Tag> tagMap = loadTagMap(conn);
+            Map<String, Vocab> vocabMap = loadVocabMap(conn);
+            user = new Language(freeNoteMap, conjugationMap, noteMap, tagMap, vocabMap);
         } catch (SQLException e) {
             throw new DatabaseParserException(e);
         }
@@ -81,23 +83,23 @@ public class DatabaseParser {
         return USER_MAP.put(userId, user);
     }
 
-    private static List<FreeNote> loadFreeNoteList(Connection conn) throws SQLException {
+    private static Map<String, FreeNote> loadFreeNoteMap(Connection conn) throws SQLException {
         return null;
     }
 
-    private static List<Conjugation> loadConjugationList(Connection conn) throws SQLException {
+    private static Map<String, Conjugation> loadConjugationMap(Connection conn) throws SQLException {
         return null;
     }
 
-    private static List<Note> loadNoteList(Connection conn) throws SQLException {
+    private static Map<String, Note> loadNoteMap(Connection conn) throws SQLException {
         return null;
     }
 
-    private static List<Tag> loadTagList(Connection conn) throws SQLException {
+    private static Map<String, Tag> loadTagMap(Connection conn) throws SQLException {
         return null;
     }
 
-    private static List<Vocab> loadVocabList(Connection conn) throws SQLException {
+    private static Map<String, Vocab> loadVocabMap(Connection conn) throws SQLException {
         return null;
     }
 

@@ -14,15 +14,22 @@ public abstract class Module {
   private HashSet<String> tags;
   private Date created;
   private Date dateModified;
+  private String id;
 
   public Module() {
-
     created = new Date();
     dateModified = created;
     tags = new HashSet<String>();
   }
 
   // TODO: an id field and getters / setters for it?
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getId() {
+    return this.id;
+  }
 
   /**
    * Getter for list of tags.

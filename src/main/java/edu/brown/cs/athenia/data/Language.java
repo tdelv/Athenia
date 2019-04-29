@@ -6,16 +6,19 @@ import edu.brown.cs.athenia.data.modules.module.Note;
 import edu.brown.cs.athenia.data.modules.module.Tag;
 import edu.brown.cs.athenia.data.modules.module.Vocab;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 public class Language {
-    private List<FreeNote> freeNoteList;
-    private List<Conjugation> conjugationList;
-    private List<Note> noteList;
-    private List<Tag> tagList;
-    private List<Vocab> vocabList;
+    private Map<String, FreeNote> freeNoteMap;
+    private Map<String, Conjugation> conjugationMap;
+    private Map<String, Note> noteMap;
+    private Map<String, Tag> tagMap;
+    private Map<String, Vocab> vocabMap;
 
     // TODO: some sort of recent list storing the most recent
     //              free notes according to some date value
@@ -25,61 +28,61 @@ public class Language {
      */
 
     public Language() {
-        this.freeNoteList = new ArrayList<>();
-        this.conjugationList = new ArrayList<>();
-        this.noteList = new ArrayList<>();
-        this.tagList = new ArrayList<>();
-        this.vocabList = new ArrayList<>();
+        this.freeNoteMap = new HashMap<>();
+        this.conjugationMap = new HashMap<>();
+        this.noteMap = new HashMap<>();
+        this.tagMap = new HashMap<>();
+        this.vocabMap = new HashMap<>();
     }
 
     public Language(
-            List<FreeNote> freeNoteList,
-            List<Conjugation> conjugationList,
-            List<Note> noteList,
-            List<Tag> tagList,
-            List<Vocab> vocabList
+            Map<String, FreeNote> freeNoteMap,
+            Map<String, Conjugation> conjugationMap,
+            Map<String, Note> noteMap,
+            Map<String, Tag> tagMap,
+            Map<String, Vocab> vocabMap
     ) {
-        this.freeNoteList = new ArrayList<FreeNote>(freeNoteList);
-        this.conjugationList = new ArrayList<Conjugation>(conjugationList);
-        this.noteList = new ArrayList<Note>(noteList);
-        this.tagList = new ArrayList<Tag>(tagList);
-        this.vocabList = new ArrayList<Vocab>(vocabList);
+        this.freeNoteMap = new HashMap<String, FreeNote>(freeNoteMap);
+        this.conjugationMap = new HashMap<String, Conjugation>(conjugationMap);
+        this.noteMap = new HashMap<String, Note>(noteMap);
+        this.tagMap = new HashMap<String, Tag>(tagMap);
+        this.vocabMap = new HashMap<String, Vocab>(vocabMap);
     }
 
     /**
      * Getters
      */
 
-    public List<FreeNote> getFreeNoteList() {
-        return new ArrayList<FreeNote>(freeNoteList);
+    public Map<String, FreeNote> getFreeNoteMap() {
+        return Collections.unmodifiableMap(freeNoteMap);
     }
 
-    public List<Conjugation> getConjugationList() {
-        return new ArrayList<Conjugation>(conjugationList);
+    public Map<String, Conjugation> getConjugationMap() {
+        return Collections.unmodifiableMap(conjugationMap);
     }
 
-    public List<Note> getNoteList() {
-        return new ArrayList<Note>(noteList);
+    public Map<String, Note> getNoteMap() {
+        return Collections.unmodifiableMap(noteMap);
     }
 
-    public List<Tag> getTagList() {
-        return new ArrayList<Tag>(tagList);
+    public Map<String, Tag> getTagMap() {
+        return Collections.unmodifiableMap(tagMap);
     }
 
-    public List<Vocab> getVocabList() {
-        return new ArrayList<Vocab>(vocabList);
+    public Map<String, Vocab> getVocabMap() {
+        return Collections.unmodifiableMap(vocabMap);
     }
 
     public int getVocabCount() {
-        return vocabList.size();
+        return vocabMap.size();
     }
 
     public int getNoteCount() {
-        return freeNoteList.size();
+        return freeNoteMap.size();
     }
 
     public int getConjugationCount() {
-        return conjugationList.size();
+        return conjugationMap.size();
     }
 
     // TODO : a getter for retrieving the most recent FreeNotes
@@ -92,26 +95,29 @@ public class Language {
      */
 
     public void addFreeNote(FreeNote freeNote) {
-        this.freeNoteList.add(freeNote);
+        // TODO get the new id of freenote in database
+        // TODO add to the map
     }
 
     public void addConjugation(Conjugation conjugation) {
-        this.conjugationList.add(conjugation);
+        // TODO get the new id of conjugation in database
+        // TODO add to the map
     }
 
     public void addNote(Note note) {
-        this.noteList.add(note);
+        // TODO get the new id of note in database
+        // TODO add to the map
     }
 
     public void addTag(Tag tag) {
-        this.tagList.add(tag);
+        // TODO get the new id of tag in database
+        // TODO add to the map
     }
 
     public void addVocab(Vocab vocab) {
-        // TODO update the vocab table in database
-        this.vocabList.add(vocab);
+        // TODO get the new vocab of freenote in database
+        // TODO add to the map
     }
-
 
     /**
      * Updaters
@@ -141,11 +147,13 @@ public class Language {
 
     public void deleteVocabulary(String id) {
         // TODO : delete the vocab object in list/map and in database
+        vocabMap.remove(id);
     }
 
     public void deleteTag(String id) {
         // TODO : delete the Tag from this object, the database, and
         //              and all modules that have this tag?
+        tagMap.remove(id);
     }
 
 

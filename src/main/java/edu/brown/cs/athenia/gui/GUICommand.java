@@ -204,8 +204,8 @@ public class GUICommand {
       // get all vocab information and convert to JSON
       List<Map<String, Object>> vocabList = new ArrayList<>();
       if (language != null) {
-        for (Vocab vocab : language.getVocabList()) {
-          vocabList.add(toData(vocab));
+        for (Map.Entry<String, Vocab> vocab : language.getVocabMap().entrySet()) {
+          vocabList.add(toData(vocab.getValue()));
         }
       }
       variables.put("content", vocabList);
@@ -266,8 +266,8 @@ public class GUICommand {
               new ImmutableMap.Builder<String, Object>();
       // pull all tag information
       List<Map<String, Object>> tags = new ArrayList<>();
-      for (Tag tag : language.getTagList()) {
-        tags.add(toData(tag));
+      for (Map.Entry<String, Tag> tag : language.getTagMap().entrySet()) {
+        tags.add(toData(tag.getValue()));
       }
       // prepare tag info to present to front-end
       variables.put("content", tags);
@@ -611,7 +611,7 @@ public class GUICommand {
   // TODO some way to add information from a module in generic way?
   private static void toData(Module module,
                              ImmutableMap.Builder<String, Object> map) {
-    map.put("id", "..."); //TODO get the module id
+    map.put("id", module.getId()); //TODO get the module id
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
     map.put("tags", module.getTags());

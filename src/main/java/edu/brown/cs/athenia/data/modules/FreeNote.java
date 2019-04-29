@@ -13,6 +13,7 @@ public class FreeNote {
 
   private List<Module> modules;
   private String title;
+  private String id;
 
   // TODO: some sort of id variable -- may make it easier to query the info
   //      for the front end
@@ -21,9 +22,10 @@ public class FreeNote {
   //        > stores the date created, edited, accessed for this specifically
 
 
-  public FreeNote(String t) {
-    modules = new ArrayList<Module>();
-    title = t;
+  public FreeNote(String t, String id) {
+    this.id = id;
+    this.modules = new ArrayList<Module>();
+    this.title = t;
   }
 
   /**
@@ -31,7 +33,11 @@ public class FreeNote {
    * @return list of modules
    */
   public List<Module> getModules() {
-    return modules;
+    return this.modules;
+  }
+
+  public String getId() {
+    return this.id;
   }
 
   // TODO : updater method for a specific module in the freenote
@@ -49,7 +55,7 @@ public class FreeNote {
    * @return The title.
    */
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
 }
