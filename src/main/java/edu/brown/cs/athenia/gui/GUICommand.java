@@ -1,8 +1,6 @@
 package edu.brown.cs.athenia.gui;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +8,7 @@ import java.util.ArrayList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
+import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
@@ -38,13 +37,30 @@ public class GUICommand {
   private GUICommand() { }
 
   /**
+   * A general helper method to check if user is logged in.
+   * Returns user's id if logged in.
+   * Redirects user to login of not.
+   * @param req The request.
+   * @param res The response.
+   * @return the user's id.
+   * @throws DriveApiException when something goes wrong with checking whether user is logged in.
+   */
+  private static String checkLoggedIn(Request req, Response res) throws DriveApiException {
+    String userId = req.session().attribute("user_id");
+    if (!GoogleDriveApi.isLoggedIn(userId)) {
+      res.redirect("/login");
+    }
+    return userId;
+  }
+
+  /**
    * Handles initial login request, redirecting user to
    * Google Authenication page if not already logged in.
    */
   public static class LoginHandler implements Route {
 
     @Override
-    public ModelAndView handle(Request req, Response res) throws IOException, GeneralSecurityException {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
       // Set destination to go after login
       if (req.attribute("loginDestination") != null) {
         req.session().attribute("loginDestination", (String) req.attribute("loginDestination"));
@@ -108,7 +124,8 @@ public class GUICommand {
    */
   public class LanguagePromptHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
           .put("type", "Languages")
           .put("content", athenia.getLanguages()).build();
@@ -125,7 +142,8 @@ public class GUICommand {
    */
   public static class HomePageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
       String lang = qm.value("language");
@@ -177,8 +195,8 @@ public class GUICommand {
    */
   public class VocabularyLandingPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
-
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       // have tags as a certain part of frontend
       // --- use data-* thing for storing, filtering tags
 
@@ -207,7 +225,8 @@ public class GUICommand {
    */
   public class UpdateVocabularyHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
       if (type.equals("add")) {
@@ -244,7 +263,8 @@ public class GUICommand {
    */
   public class TagLandingPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: parse out the tag label the user wishes to view (tag ID, tag
       // Name)
@@ -272,7 +292,8 @@ public class GUICommand {
    */
   public class UpdateTagHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
       if (type.equals("add")) {
@@ -309,7 +330,8 @@ public class GUICommand {
    */
   public class UpdateModuleTagHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
 
@@ -347,7 +369,8 @@ public class GUICommand {
    */
   public class ConjugationLandingPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: recognize that user is requesting to view the conjugation page
       // (not really anything to parse out)
@@ -368,7 +391,8 @@ public class GUICommand {
    */
   public class UpdateConjugationHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO pull out the information of the conjugation module and act on it
       // accordingly:
@@ -393,7 +417,8 @@ public class GUICommand {
    */
   public class FreeNotesLandingPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: recognize user wants to visit landing page of FreeNotes
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
@@ -412,7 +437,8 @@ public class GUICommand {
    */
   public class FreeNotesIndividualPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: determine which free note the user wants to view and find in
       // database
@@ -437,7 +463,8 @@ public class GUICommand {
    */
   public class AddModuleToFreeNotesHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: determine which module (vocab, conjugation, text, etc.) the
       // user wishes to create
@@ -456,7 +483,8 @@ public class GUICommand {
    */
   public class UpdateFreeNotesHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: pull out all information on this FreeNotes page
       // > do so either entirely (all information)
@@ -483,7 +511,8 @@ public class GUICommand {
    */
   public class ReviewModeLandingHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: grab all tags and format to send to front end
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
@@ -504,7 +533,8 @@ public class GUICommand {
    */
   public class ReviewModeIndividualHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = checkLoggedIn(req, res);
       QueryParamsMap qm = req.queryMap();
       // TODO: parse out the options the user has chosen to review
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
