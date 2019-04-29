@@ -121,16 +121,17 @@ public class GUICommand {
    * logged in the app and displays the prompt to choose from the options, if
    * they exist.
    */
-  public class LanguagePromptHandler implements TemplateViewRoute {
+  public static class LanguagePromptHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("type", "Languages")
-          .put("content", athenia.getLanguages()).build();
+              .put("title", "Languages")
+              .put("type", "Languages")
+              .put("content", athenia.getLanguages()).build();
 
       // TODO : CONSIDER WHETHER ADDING NEW LANGUAGE OR NOT
 
-      return new ModelAndView(variables, "...");
+      return new ModelAndView(variables, "languages.ftl");
     }
   }
 
