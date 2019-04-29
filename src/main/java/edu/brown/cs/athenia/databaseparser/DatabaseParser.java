@@ -103,4 +103,39 @@ public class DatabaseParser {
         return null;
     }
 
+
+    /**
+     * ADDERS HEHHEHHEHEHEHEHEHEEe
+     */
+
+    // TODO TODO TODO TODO
+    //      so... i'm unsure where the new module objects can be made...
+    //          right now i'm thinking they can be made in the Language class
+    //          and then sent here to add
+    //              there are getter and setters for the module id so
+    //              idk if that alleviates anything :)
+
+    public static String addFreeNote(String userId, FreeNote note) {
+        // TODO add to the database and return the new ID of this freenote in the database
+        //              to store in the map
+
+        return null;
+    }
+
+    public static String addConjugation(String userId, Conjugation conjugation) {
+        // TODO add to database and return new ID of this freenote
+        //          to store in the map
+        return null;
+    }
+
+    public static String addVocab(String userId, Vocab vocab) {
+        // TODO : same thing as above
+        return null;
+    }
+
+    public static String addNote(String userId, Note note) {
+        // TODO : same thing plzzzz
+        return null;
+    }
+
 }

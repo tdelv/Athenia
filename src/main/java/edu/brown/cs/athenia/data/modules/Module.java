@@ -45,6 +45,7 @@ public abstract class Module {
    *          String tag
    */
   public void addTag(String tag) {
+    // TODO : add this change to the database
     this.tags.add(tag);
   }
 
@@ -54,6 +55,7 @@ public abstract class Module {
    * @return Returns the boolean if the String tag is found.
    */
   public boolean removeTag(String tag) {
+    // TODO : indicate this change in the database
     return this.tags.remove(tag);
   }
 
@@ -63,6 +65,7 @@ public abstract class Module {
    *          The new date modified.
    */
   public void setDateModified(Date m) {
+    // TODO : indicate this change in the database
     dateModified = m;
   }
 
