@@ -93,6 +93,7 @@ public class Main {
     final Set<String> NO_FORCE_LOGIN = ImmutableSet.<String>builder()
             .add("/login")
             .add("/validate")
+            .add("/landing")
             .build();
     Spark.before((req, res) -> {
       String userId = req.session().attribute("user_id");
