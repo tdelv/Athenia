@@ -544,7 +544,7 @@ public class GUICommand {
     // TODO: get the id, name/title, dates, tags associate with this
     ImmutableMap.Builder<String, Object> noteData =
             new ImmutableMap.Builder<String, Object>();
-    noteData.put("type", "FreeNote");
+    noteData.put("modtype", "FreeNote");
     noteData.put("title", note.getTitle());
 
     // add all module data
@@ -575,7 +575,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> vocabData =
             new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
-    vocabData.put("type", "Vocab");
+    vocabData.put("modtype", "Vocab");
     toData(vocab, vocabData);
     vocabData.put("content", vocab.getContent());
     return vocabData.build();
@@ -590,7 +590,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> conjugationData =
             new ImmutableMap.Builder<String, Object>();
     // pull information of conjugation table
-    conjugationData.put("type", "Conjugation");
+    conjugationData.put("modtype", "Conjugation");
     toData(conjugation, conjugationData);
     conjugationData.put("content", conjugation.getContent());
     return conjugationData.build();
@@ -604,7 +604,7 @@ public class GUICommand {
   private static Map<String, Object> toData(Tag tag) {
     ImmutableMap.Builder<String, Object> tagData =
             new ImmutableMap.Builder<String, Object>();
-    tagData.put("type", "tag");
+    tagData.put("modtype", "tag");
     tagData.put("content", tag.getContent());
     return tagData.build();
   }
