@@ -7,14 +7,21 @@ $( document ).ready(function() {
 
 function addNewLanguage() {
 
-    console.log("adding new language");
-
     const newLanguage = $("#languageInput").val();
 
-    console.log("new lang: " + newLanguage);
+    if (!newLanguage) {
+        console.log("user must enter a nonempty string");
+    } else {
+        console.log("new lang: " + newLanguage);
 
-/*
+        const postParameters = {newLanguage: newLanguage};
 
- */
+        // DONE: Make a POST request to the "/validate" endpoint with the word information
+        $.post("/addNewLanguage", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            document.location.reload(true);
+        });
+
+    }
 
 }

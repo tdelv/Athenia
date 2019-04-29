@@ -136,6 +136,23 @@ public class GUICommand {
   }
 
   /**
+   * GET request handler which pulls the different languages the user has so far
+   * logged in the app and displays the prompt to choose from the options, if
+   * they exist.
+   */
+  public static class LanguageAddHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      QueryParamsMap qm = req.queryMap();
+      String language = qm.value("newLanguage");
+
+      //TODO: add language in backend
+
+      return language + " added";
+    }
+  }
+
+  /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
    */

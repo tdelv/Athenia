@@ -118,6 +118,7 @@ public class Main {
     Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
     Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
     Spark.get("/languages", new GUICommand.LanguagePromptHandler(), freeMarker);
+    Spark.post("/addNewLanguage", new GUICommand.LanguageAddHandler());
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
 
