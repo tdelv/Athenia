@@ -61,11 +61,9 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = checkLoggedIn(req, res);
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>().build();
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>().put("title", "landing page").build();
 
-      System.out.println("landing page");
-
-      return new ModelAndView(variables, "./landing");
+      return new ModelAndView(variables, "landing.ftl");
     }
   }
 
@@ -173,8 +171,6 @@ public class GUICommand {
       String type = qm.value("type");
       String lang = qm.value("language");
 
-      System.out.println("WHAT?");
-
       if (type.equals("new")) {
         athenia.addLanguage(lang);
         athenia.setCurrLang(lang);
@@ -209,7 +205,8 @@ public class GUICommand {
               .put("noteCount", noteCount)
               .put("conjugationCount", conjugationCount)
               .put("recent", recentList).build();
-      return new ModelAndView(variables, "/landing.ftl");
+
+      return new ModelAndView(variables, "home.ftl");
     }
   }
 
