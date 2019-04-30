@@ -26,7 +26,7 @@ import spark.template.freemarker.FreeMarkerEngine;
  */
 public class Main {
 
-  private static final int DEFAULT_PORT = 6969;
+  private static final int DEFAULT_PORT = 4568;
 
   /**
    * The initial method called when execution begins.
