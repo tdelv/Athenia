@@ -26,7 +26,7 @@ import spark.template.freemarker.FreeMarkerEngine;
  */
 public class Main {
 
-  private static final int DEFAULT_PORT = 6969;
+  private static final int DEFAULT_PORT = 4569;
 
   /**
    * The initial method called when execution begins.
@@ -93,6 +93,7 @@ public class Main {
     final Set<String> NO_FORCE_LOGIN = ImmutableSet.<String>builder()
             .add("/login")
             .add("/validate")
+            .add("/landing")
             .build();
     Spark.before((req, res) -> {
       String userId = req.session().attribute("user_id");
@@ -119,6 +120,7 @@ public class Main {
     Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
     Spark.get("/languages", new GUICommand.LanguagePromptHandler(), freeMarker);
     Spark.post("/addNewLanguage", new GUICommand.LanguageAddHandler());
+
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
 

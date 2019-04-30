@@ -85,6 +85,17 @@ public abstract class Module {
     return dateModified;
   }
 
+  /**
+   * updates the content in the module.
+   * @param update
+   *          : the update, unspecified type of Object.
+   */
   public abstract void update(Object update);
+
+  /**
+   * Gets the content of the object, of various Object subclasses.
+   * @return : the Object subclass object of that Module subclass.
+   */
+  public abstract Object getContent();
 
 }

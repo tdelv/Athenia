@@ -1,7 +1,13 @@
 
+const SELECTED_CLASS_NAME = "selected";
+const SELECTED_SELECTOR = "." + SELECTED_CLASS_NAME + " span";
+
 $( document ).ready(function() {
 
     $("#addLanguageButton").click(addNewLanguage);
+    $("#removeLanguageButton").click(removeLanguage);
+    $(".languageSelectForRemoveButton").click(function() {editSelection(this)});
+    $(".languageCard").click(function() {languageSelect(this)});
 
 });
 
@@ -28,4 +34,37 @@ function addNewLanguage() {
 
     }
 
+}
+
+function removeLanguage() {
+
+    const lang2beRemoved = $(SELECTED_SELECTOR).html();
+
+    if (lang2beRemoved) {
+        const postParameters = {language: lang2beRemoved};
+        // TODO: set up this request in backend
+        $.post("/removeLanguage", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            if (responseObject.successful) {
+                document.location.reload(true);
+            } else {
+                console.log("message: " + message);
+            }
+        });
+    }
+}
+
+function editSelection(lang) {
+    $(".languageSelectForRemoveButton").removeClass(SELECTED_CLASS_NAME);
+    $(lang).addClass(SELECTED_CLASS_NAME);
+}
+
+function languageSelect(lang) {
+
+    const childElt = lang.children[0];
+    const language = $(childElt).html();
+
+    // TODO: tell the backend that this (language) is the current language
+
+    window.location = "home"
 }
