@@ -4,10 +4,7 @@ import edu.brown.cs.athenia.data.modules.FreeNote;
 import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.module.*;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Collections;
+import java.util.*;
 
 public class Language {
     private String name;
@@ -64,7 +61,7 @@ public class Language {
 
     // TODO : a getter for retrieving the most recent FreeNotes
     public List<FreeNote> getRecentFreeNotes() {
-        return null;
+        return new ArrayList<>();
     }
 
     /**

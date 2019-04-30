@@ -11,7 +11,7 @@
             <div class="card mb-4" style="margin-top: 10vh;">
                 <div class="card-body">
                     <p>Returning and New Members:</p>
-                    <a href="#" class="btn btn-google btn-block"><i class="fab fa-google fa-fw"></i> Sign in with Google</a>
+                    <a href="/login" class="btn btn-google btn-block"><i class="fab fa-google fa-fw"></i> Sign in with Google</a>
                 </div>
             </div>
 

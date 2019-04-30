@@ -34,4 +34,4 @@
 
 </#assign>
 
-<#include "home.ftl">
+<#include "template.ftl">

@@ -59,7 +59,10 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       // Set destination to go after login
       if (req.session().attribute("loginDestination") == null) {
-        req.session().attribute("loginDestination", "/home");
+
+        // WAS: req.session().attribute("loginDestination", "/home");
+        // I changed it to go to languages instead of home (Mia)
+        req.session().attribute("loginDestination", "/languages");
       }
 
       // Check if user token already loaded
@@ -216,9 +219,11 @@ public class GUICommand {
 
           List<Map<String, Object>> recentList = new ArrayList<>();
           // pull all recent notes from language
+
           for (FreeNote note : lang.getRecentFreeNotes()) {
             recentList.add(toData(note));
           }
+
 
           // add this info to the map
           variables.put("vocabCount", vocabCount);
