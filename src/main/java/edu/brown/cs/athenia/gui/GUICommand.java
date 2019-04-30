@@ -205,6 +205,7 @@ public class GUICommand {
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
+        // TODO be sure that the current language has been set at some point
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
