@@ -55,7 +55,7 @@ public class DatabaseParser {
         }
     }
 
-    public static Athenia getUser(String userId) throws DriveApiException {
+    public static Athenia getUser(String userId) throws DatabaseParserException {
         if (USER_MAP.containsKey(userId)) {
             return USER_MAP.get(userId);
         }
