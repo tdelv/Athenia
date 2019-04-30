@@ -10,8 +10,8 @@
 
                 <#list languages as l>
                     <div class="card mb-4" style="margin-right: 1vw;">
-                        <div class="card-body">
-                            ${l}
+                        <div class="card-body languageCard">
+                            <span class="langSpan">${l}</span>
                         </div>
                     </div>
                 </#list>
