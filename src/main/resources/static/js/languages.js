@@ -1,37 +1,35 @@
 
+// These are used for the delete functionality
 const SELECTED_CLASS_NAME = "selected";
 const SELECTED_SELECTOR = "." + SELECTED_CLASS_NAME + " span";
 
 $( document ).ready(function() {
-
     $("#addLanguageButton").click(addNewLanguage);
     $("#removeLanguageButton").click(removeLanguage);
     $(".languageSelectForRemoveButton").click(function() {editSelection(this)});
     $(".languageCard").click(function() {languageSelect(this)});
-
 });
+
 
 function addNewLanguage() {
 
     const newLanguage = $("#languageInput").val();
 
     if (!newLanguage) {
+        // TODO: modal dialoge displaying this message
         console.log("user must enter a nonempty string");
     } else {
         console.log("new lang: " + newLanguage);
-
         const postParameters = {newLanguage: newLanguage};
 
-        // DONE: Make a POST request to the "/validate" endpoint with the word information
         $.post("/addNewLanguage", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
             if (responseObject.successful) {
                 document.location.reload(true);
             } else {
-                console.log("message: " + message);
+                console.log("message: " + responseObject.message);
             }
         });
-
     }
 
 }
