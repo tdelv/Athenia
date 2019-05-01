@@ -384,6 +384,43 @@ public class GUICommand {
 
   // TODO EDIT AND DELETE HANDLERS FOR MODULES
 
+  public static class VocabularyAddHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String newTerm = qm.value("newTerm");
+      String newDef = qm.value("newDef");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+          // todo : create a new vocab module and add to language
+
+          // todo : call toData on this and add to variables map
+
+          successful = true;
+          message = "successful";
+        } else {
+          message = "current language null";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      return GSON.toJson(variables);
+    }
+  }
+
   /**
    * POST request handler for adding, updating, or deleting vocabulary
    * information. Called whenever the user edits anything on the Vocabulary
@@ -394,22 +431,10 @@ public class GUICommand {
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String type = qm.value("type");
-      if (type.equals("add")) {
-        Vocab vocab = null;
-        // TODO: create information of the vocab and create object
-//        language.addVocab(vocab);
-      } else if (type.equals("update")) {
-        // TODO: get ID of vocab module
-        String id = "...";
-//        language.updateVocabulary(id);
-      } else if (type.equals("delete")) {
-        // TODO: get ID of vocab module
-        String id = "...";
-//        language.deleteVocabulary(id);
-      } else {
-        // TODO: throw some type of error that vocab doesn't exist
-      }
+      String updatedTerm = qm.value("updatedTerm");
+      String updatedDef = qm.value("updatedDef");
+
+
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
           .put("...", "...").build();
       // TODO execute the appropriate operation:

@@ -68,6 +68,7 @@ public class Language {
      * Adders
      */
 
+    // TODO : how does this work? i have actually no idea how to make an instant of any module yet... (jason)
     public void addModule(StorageType type, Module module) {
         moduleMap.get(type).put(module.getId(), module);
     }
