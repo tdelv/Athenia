@@ -79,7 +79,7 @@
             </a>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item newNoteButton" href="TBD">New Note</a>
+                    <a class="collapse-item newNoteButton" href="#">New Note</a>
                     <a class="collapse-item" href="TBD">View Notes</a>
                 </div>
             </div>
