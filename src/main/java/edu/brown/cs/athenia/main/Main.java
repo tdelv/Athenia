@@ -122,7 +122,7 @@ public class Main {
     Spark.post("/removeLanguage", new GUICommand.LanguageRemoveHandler());
     Spark.post("/changeCurrentLanguage", new GUICommand.LanguageChangeHandler());
 
-    Spark.get("/noteEditor/note", new GUICommand.FreeNotesEditorHandler(), freeMarker);
+    Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
     //Spark.get("/bacon/actor", new BaconActorHandler(), freeMarker);
 
   }

@@ -802,6 +802,10 @@ public class GUICommand {
         variables.put("title", "TODO"); // TODO: put note title
       }
 
+      // Will just retain this info in the front end
+      variables.put("currentLanguage", "temp");
+      variables.put("username", "temp");
+
       // update any info about last date viewed and stuff if we have it
 
       // OLD NOTES:

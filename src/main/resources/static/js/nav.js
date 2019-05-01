@@ -5,7 +5,7 @@ $( document ).ready(function() {
 
 function navToNote(id) {
     // generates the address to navigate to
-    const location = "noteEditor/note?id=" + id;
+    const location = "noteEditor?id=" + id;
     // navigates there
     window.location = location;
 }
