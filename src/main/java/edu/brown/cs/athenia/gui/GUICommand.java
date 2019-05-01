@@ -191,6 +191,44 @@ public class GUICommand {
     }
   }
 
+
+  // TODO : change language, post request, sends "language", return successful and message
+  public static class LanguageChangeHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String language = qm.value("language");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        // find and check for user
+        Athenia user = DatabaseParser.getUser(userId);
+        if (user.getLanguages().contains(language)) {
+          // remove language if in user class
+          user.setCurrLang(language);
+          successful = true;
+          message = "language changed";
+        } else {
+          // else leave message
+          message = "language not in user";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
   /**
    * POST request handler for removing a language from the user's database.
    */
@@ -292,13 +330,6 @@ public class GUICommand {
       variables.put("successful", successful);
       variables.put("message", message);
 
-      // Create callback url for authentication
-      String host = req.url().replace(req.pathInfo(), "/validate");
-      String url = GoogleDriveApi.getUrl(state, host);
-
-      // Redirect to Google authentication page
-      res.redirect(url);
-
       return new ModelAndView(variables.build(), "home.ftl");
     }
   }
@@ -306,9 +337,9 @@ public class GUICommand {
   /**
    * GET request handler which pulls all of the vocabulary information saved by
    * the user in the database and formats it to send to the front end to display
-   * on the "Vocabulary" landing page.
+   * on the "Vocabulary" page.
    */
-  public class VocabularyLandingPageHandler implements TemplateViewRoute {
+  public class VocabularyPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       // have tags as a certain part of frontend
@@ -352,12 +383,16 @@ public class GUICommand {
     }
   }
 
+  // TODO SEPARATE THINGS FOR ADDING MODULES
+
+  // TODO EDIT AND DELETE HANDLERS FOR MODULES
+
   /**
    * POST request handler for adding, updating, or deleting vocabulary
    * information. Called whenever the user edits anything on the Vocabulary
    * landing page, a specific vocabulary page, or in a FreeNotes page.
    */
-  public class UpdateVocabularyHandler implements Route {
+  public class VocabularyUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
@@ -395,7 +430,7 @@ public class GUICommand {
    * this information from the database and formats it to present to the front
    * end.
    */
-  public class TagLandingPageHandler implements TemplateViewRoute {
+  public class TagPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
@@ -437,7 +472,7 @@ public class GUICommand {
    * pages. Specifically used for updating tag information and not for adding or
    * removing tags from a module.
    */
-  public class UpdateTagHandler implements Route {
+  public class TagUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -474,7 +509,7 @@ public class GUICommand {
    * landing, and more importantly, individual pages as well as the tag landing
    * and individual pages.
    */
-  public class UpdateModuleTagHandler implements Route {
+  public class ModuleTagUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -510,9 +545,9 @@ public class GUICommand {
   /**
    * GET request handler which retrieves all conjugation information from the
    * database and formats this information to send to the front end for display
-   * on the user's "Conjugation" landing page.
+   * on the user's "Conjugation" page.
    */
-  public class ConjugationLandingPageHandler implements TemplateViewRoute {
+  public class ConjugationPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -533,7 +568,7 @@ public class GUICommand {
    * conjugation landing and individual pages and the FreeNotes landing and
    * individual pages.
    */
-  public class UpdateConjugationHandler implements Route {
+  public class ConjugationUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -558,7 +593,7 @@ public class GUICommand {
    * database and formats this information to send to the front end for display
    * on the user's "FreeNotes" landing page.
    */
-  public class FreeNotesLandingPageHandler implements TemplateViewRoute {
+  public class FreeNotesPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -621,7 +656,7 @@ public class GUICommand {
    * page. Searches through the updates made and updates all of the areas in the
    * backend. Called sporadically as an auto save feature.
    */
-  public class UpdateFreeNotesHandler implements Route {
+  public class FreeNotesUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
