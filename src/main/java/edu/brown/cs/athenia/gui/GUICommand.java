@@ -144,6 +144,7 @@ public class GUICommand {
         message = "successful";
       } catch (DatabaseParserException e) {
         // else send an error message that user not found
+        e.getCause().printStackTrace();
         message = "User not found in database";
       }
       variables.put("title", "Select Language");

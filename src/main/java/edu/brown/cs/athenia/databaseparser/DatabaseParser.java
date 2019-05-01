@@ -48,20 +48,23 @@ public class DatabaseParser {
     }
 
     private static void setup(String userId, File file) throws IOException, SQLException, ClassNotFoundException {
-        File queryFile = new File("/SQLCommands/setup_database");
+        File queryFile = new File("src/main/resources/SQLCommands/setup_database");
+
         String data;
         try (BufferedReader reader = new BufferedReader(new FileReader(queryFile))) {
             data = reader.lines().reduce("", (acc, ele) -> acc + "\n" + ele);
         }
 
-        String[] queries = data.split("\n");
+        String[] queries = data.split(";");
 
         file.createNewFile();
         try (Connection conn = getConnection(file.getPath());
                 Statement statement = conn.createStatement()) {
             for (String query : queries) {
-                statement.execute(query);
+                statement.addBatch(query);
             }
+
+            statement.executeBatch();
         }
     }
 
@@ -73,18 +76,21 @@ public class DatabaseParser {
         Athenia user = new Athenia(userId);
         USER_MAP.put(userId, user);
 
-        try (Connection conn = loadConnection(userId);
-                Statement statement = conn.createStatement()) {
+        try (Connection conn = loadConnection(userId)) {
             // Get meta data for user
-            try (ResultSet rs = statement.executeQuery(
+            try (Statement statement = conn.createStatement();
+                 ResultSet rs = statement.executeQuery(
                     "SELECT username, joined, last_update FROM user_data")) {
 
             }
 
             // Get languages
-            try (ResultSet rs = statement.executeQuery(
+            try (Statement statement = conn.createStatement();
+                 ResultSet rs = statement.executeQuery(
                     "SELECT language FROM languages")) {
-                user.addLanguage(rs.getString(1));
+                while (rs.next()) {
+                    user.addLanguage(rs.getString(1));
+                }
             }
 
             // Fill in languages
@@ -96,7 +102,8 @@ public class DatabaseParser {
                 String type;
                 int created;
                 int lastModified;
-                try (ResultSet rs = statement.executeQuery(
+                try (Statement statement = conn.createStatement();
+                     ResultSet rs = statement.executeQuery(
                         "SELECT m.id, m.type, m.created, m.last_modified FROM " +
                                 "modules AS m, languages AS l WHERE " +
                                 "m.language_id = l.id AND " +
