@@ -307,6 +307,7 @@ public class GUICommand {
 
           // add this info to the map
           variables.put("username", ""); // TODO: get the user's name. <3 mia
+          variables.put("currentLanguage", ""); // TODO: get the current Language <3 mia
           variables.put("vocabCount", vocabCount);
           variables.put("noteCount", noteCount);
           variables.put("conjugationCount", conjugationCount);
