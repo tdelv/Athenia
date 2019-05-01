@@ -609,20 +609,35 @@ public class GUICommand {
    * to access. Pulls out all of the information on that page and organizes it
    * in a way for the front end to display to the user.
    */
-  public static class FreeNotesIndividualPageHandler implements TemplateViewRoute {
+  public static class FreeNotesEditorHandler implements Route {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
+      // TODO: send id through the url in the js (for mia from mia lol)
+      String noteId = qm.value("id");
+
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>().build();
+
+      if (noteId.equals("new")) {
+        // send the default values to front end / empty lists and stuff
+        variables.put("title", "Note Title");
+      } else {
+        // TODO: use noteId to find the note in the database
+        // send modules and other relevant data (note title, date, etc)
+        variables.put("title", "TODO"); // TODO: put note title
+      }
+
+      // update any info about last date viewed and stuff if we have it
+
+      // OLD NOTES:
       // TODO: determine which free note the user wants to view and find in
       // database
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
       // TODO: pull out all of the information (modules, text, etc.) of the
       // landing page from the database, add to appropriate areas in the
       // backend, and format and send to the front end for display
       // > involves a lot of module storing (a cache in both front end and
       // backend?)
-      return new ModelAndView(variables, "...");
+      return new ModelAndView(variables, "notePageEdit.ftl");
     }
   }
 
