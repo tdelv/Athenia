@@ -88,6 +88,7 @@
 </#assign>
 
 <#assign script>
+    <script src="js/home.js"></script>
 
 </#assign>
 
