@@ -242,6 +242,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String currentLanguage = qm.value("language");
 
+      System.out.print("LANG FROM FRONT END: " + currentLanguage);
+
       boolean successful = false;
       String message = "";
 
@@ -253,6 +255,7 @@ public class GUICommand {
         user.setCurrLang(currentLanguage);
         // TODO be sure that the current language has been set at some point
         Language lang = user.getCurrLanguage();
+        System.out.println("LANG IN BACKEND: " + lang.getName());
 
         if (lang != null) {
 
@@ -288,6 +291,13 @@ public class GUICommand {
       variables.put("title", "Home");
       variables.put("successful", successful);
       variables.put("message", message);
+
+      // Create callback url for authentication
+      String host = req.url().replace(req.pathInfo(), "/validate");
+      String url = GoogleDriveApi.getUrl(state, host);
+
+      // Redirect to Google authentication page
+      res.redirect(url);
 
       return new ModelAndView(variables.build(), "home.ftl");
     }
