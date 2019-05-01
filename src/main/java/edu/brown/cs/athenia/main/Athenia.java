@@ -38,6 +38,11 @@ public class Athenia {
     return language;
   }
 
+  public void removeLanguage(String lang) {
+    languages.remove(lang);
+    // TODO: remove this information from database too
+  }
+
   public Language getCurrLanguage() {
     return currLang;
   }
