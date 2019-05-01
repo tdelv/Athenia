@@ -1,21 +1,16 @@
 package edu.brown.cs.athenia.data.modules.module;
 
-import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.data.modules.Text;
 
-public class AlertExclamation extends Module {
-
-  private String alert;
+/**
+ * Represents an alert or exlamation - a reminder such as "Test on Thursday!".
+ * @author makaylamurphy
+ *
+ */
+public class AlertExclamation extends Text {
 
   public AlertExclamation(String a) {
-    alert = a;
-  }
-
-  public void update(Object a) {
-    alert = (String) a;
-  }
-
-  public String getContent() {
-    return alert;
+    super(a);
   }
 
 }

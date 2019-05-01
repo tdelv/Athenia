@@ -1,6 +1,6 @@
-package edu.brown.cs.athenia.review;
+package edu.brown.cs.athenia.data.modules;
 
-import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.review.Reviewable;
 
 public abstract class ReviewableModule extends Module implements Reviewable {
 

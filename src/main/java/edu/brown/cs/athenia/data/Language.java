@@ -2,6 +2,7 @@ package edu.brown.cs.athenia.data;
 
 import edu.brown.cs.athenia.data.modules.FreeNote;
 import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.*;
 
 import java.util.*;

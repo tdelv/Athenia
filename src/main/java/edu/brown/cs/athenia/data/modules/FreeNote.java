@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.brown.cs.athenia.data.modules.module.Tag;
-
 /**
  * FreeNote represents our FreeNodes, which have modules, tags, and a state of
  * data created, date modified, and title.
