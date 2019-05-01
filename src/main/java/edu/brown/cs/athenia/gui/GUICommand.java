@@ -138,6 +138,7 @@ public class GUICommand {
         // try to find the user in database and send the language name to
         // the front-end
         Athenia user = DatabaseParser.getUser(userId);
+        System.out.println(user.getLanguages());
         variables.put("languages", user.getLanguages());
         successful = true;
         message = "successful";
@@ -191,6 +192,86 @@ public class GUICommand {
   }
 
   /**
+   * POST request for changing the current language of the user to that
+   * specified on the front-end.
+   */
+  public static class LanguageChangeHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String language = qm.value("language");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        // find and check for user
+        Athenia user = DatabaseParser.getUser(userId);
+        if (user.getLanguages().contains(language)) {
+          // remove language if in user class
+          user.setCurrLang(language);
+          successful = true;
+          message = "language changed";
+        } else {
+          // else leave message
+          message = "language not in user";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request handler for removing a language from the user's database.
+   */
+  public static class LanguageRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String lang = qm.value("language");
+
+      // prepare message to send to front end
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        // find and check for user
+        Athenia user = DatabaseParser.getUser(userId);
+        if (user.getLanguages().contains(lang)) {
+          // remove language if in user class
+          user.removeLanguage(lang);
+          successful = true;
+          message = "language removed";
+        } else {
+          // else leave message
+          message = "language not in user";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
    */
@@ -224,9 +305,9 @@ public class GUICommand {
             recentList.add(toData(note));
           }
 
-
           // add this info to the map
           variables.put("username", ""); // TODO: get the user's name. <3 mia
+          variables.put("currentLanguage", lang.getName());
           variables.put("vocabCount", vocabCount);
           variables.put("noteCount", noteCount);
           variables.put("conjugationCount", conjugationCount);
@@ -253,9 +334,9 @@ public class GUICommand {
   /**
    * GET request handler which pulls all of the vocabulary information saved by
    * the user in the database and formats it to send to the front end to display
-   * on the "Vocabulary" landing page.
+   * on the "Vocabulary" page.
    */
-  public class VocabularyLandingPageHandler implements TemplateViewRoute {
+  public static class VocabularyPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       // have tags as a certain part of frontend
@@ -295,16 +376,20 @@ public class GUICommand {
       variables.put("title", "Vocabulary");
       variables.put("successful", successful);
       variables.put("message", message);
-      return new ModelAndView(variables.build(), "...");
+      return new ModelAndView(variables.build(), "vocab.ftl");
     }
   }
+
+  // TODO SEPARATE THINGS FOR ADDING MODULES
+
+  // TODO EDIT AND DELETE HANDLERS FOR MODULES
 
   /**
    * POST request handler for adding, updating, or deleting vocabulary
    * information. Called whenever the user edits anything on the Vocabulary
    * landing page, a specific vocabulary page, or in a FreeNotes page.
    */
-  public class UpdateVocabularyHandler implements Route {
+  public static class VocabularyUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
@@ -342,7 +427,7 @@ public class GUICommand {
    * this information from the database and formats it to present to the front
    * end.
    */
-  public class TagLandingPageHandler implements TemplateViewRoute {
+  public static class TagPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
@@ -384,7 +469,7 @@ public class GUICommand {
    * pages. Specifically used for updating tag information and not for adding or
    * removing tags from a module.
    */
-  public class UpdateTagHandler implements Route {
+  public static class TagUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -421,7 +506,7 @@ public class GUICommand {
    * landing, and more importantly, individual pages as well as the tag landing
    * and individual pages.
    */
-  public class UpdateModuleTagHandler implements Route {
+  public static class ModuleTagUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -457,9 +542,9 @@ public class GUICommand {
   /**
    * GET request handler which retrieves all conjugation information from the
    * database and formats this information to send to the front end for display
-   * on the user's "Conjugation" landing page.
+   * on the user's "Conjugation" page.
    */
-  public class ConjugationLandingPageHandler implements TemplateViewRoute {
+  public static class ConjugationPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -480,7 +565,7 @@ public class GUICommand {
    * conjugation landing and individual pages and the FreeNotes landing and
    * individual pages.
    */
-  public class UpdateConjugationHandler implements Route {
+  public static class ConjugationUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -505,7 +590,7 @@ public class GUICommand {
    * database and formats this information to send to the front end for display
    * on the user's "FreeNotes" landing page.
    */
-  public class FreeNotesLandingPageHandler implements TemplateViewRoute {
+  public static class FreeNotesPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -515,7 +600,7 @@ public class GUICommand {
       // TODO: pull out all information about each separate FreeNotes page
       // of the user and format it appropriately for the user to
       // view
-      return new ModelAndView(variables, "...");
+      return new ModelAndView(variables, "notes.ftl");
     }
   }
 
@@ -524,7 +609,7 @@ public class GUICommand {
    * to access. Pulls out all of the information on that page and organizes it
    * in a way for the front end to display to the user.
    */
-  public class FreeNotesIndividualPageHandler implements TemplateViewRoute {
+  public static class FreeNotesIndividualPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -549,7 +634,7 @@ public class GUICommand {
    * database. Sends to the front-end the information necessary for the user to
    * use that module.
    */
-  public class AddModuleToFreeNotesHandler implements Route {
+  public static class AddModuleToFreeNotesHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -568,7 +653,7 @@ public class GUICommand {
    * page. Searches through the updates made and updates all of the areas in the
    * backend. Called sporadically as an auto save feature.
    */
-  public class UpdateFreeNotesHandler implements Route {
+  public static class FreeNotesUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -595,7 +680,7 @@ public class GUICommand {
    * tag names, the date they were created, the date they were edited, and their
    * rating.
    */
-  public class ReviewModeLandingHandler implements TemplateViewRoute {
+  public static class ReviewModeLandingHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
@@ -616,7 +701,7 @@ public class GUICommand {
    * Sends all of this info to the front-end in the ordered rating
    * according to the algorithm.
    */
-  public class ReviewModeIndividualHandler implements TemplateViewRoute {
+  public static class ReviewModeIndividualHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();

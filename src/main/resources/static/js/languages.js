@@ -40,7 +40,6 @@ function removeLanguage() {
 
     if (lang2beRemoved) {
         const postParameters = {language: lang2beRemoved};
-        // TODO: set up this request in backend
         $.post("/removeLanguage", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
             if (responseObject.successful) {
@@ -62,7 +61,15 @@ function languageSelect(lang) {
     const childElt = lang.children[0];
     const language = $(childElt).html();
 
-    // TODO: tell the backend that this (language) is the current language
+    const postParameters = {language: language};
 
-    window.location = "home"
+    $.post("/changeCurrentLanguage", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            window.location = "home";
+        } else {
+            console.log("message: " + message);
+        }
+    });
+
 }

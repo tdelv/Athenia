@@ -22,7 +22,6 @@ public class Athenia {
   public Athenia(String userId) {
     this.userId = userId;
     this.languages = new HashMap<String, Language>();
-    this.currLang = new Language("test");
   }
 
   public void setCurrLang(String lang) {
@@ -37,6 +36,11 @@ public class Athenia {
     Language language = new Language(lang);
     languages.put(lang, language);
     return language;
+  }
+
+  public void removeLanguage(String lang) {
+    languages.remove(lang);
+    // TODO from jason : remove this information from database too
   }
 
   public Language getCurrLanguage() {

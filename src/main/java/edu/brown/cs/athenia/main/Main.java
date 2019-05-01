@@ -114,15 +114,13 @@ public class Main {
       e.printStackTrace();
     }
 
-    // Spark.get("/home", (req, res) -> "User Id: " + req.session().attribute("user_id"));
-
     Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
     Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
     Spark.get("/languages", new GUICommand.LanguagePromptHandler(), freeMarker);
+    Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
     Spark.post("/addNewLanguage", new GUICommand.LanguageAddHandler());
-
-    // Setup Spark Routes
-    //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
+    Spark.post("/removeLanguage", new GUICommand.LanguageRemoveHandler());
+    Spark.post("/changeCurrentLanguage", new GUICommand.LanguageChangeHandler());
 
   }
 
