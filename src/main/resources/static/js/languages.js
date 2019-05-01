@@ -63,5 +63,5 @@ function languageSelect(lang) {
 
     const getParameters = {language: language};
     $.get("/home", getParameters);
-    window.location = "home";
+    // window.location = "home";
 }
