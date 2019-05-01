@@ -61,7 +61,15 @@ function languageSelect(lang) {
     const childElt = lang.children[0];
     const language = $(childElt).html();
 
-    const getParameters = {language: language};
-    $.get("/home", getParameters);
-    window.location = "home";
+    const postParameters = {language: language};
+
+    $.post("/changeCurrentLanguage", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            window.location = "home";
+        } else {
+            console.log("message: " + message);
+        }
+    });
+
 }
