@@ -12,7 +12,7 @@
                 <div class="card border-bottom-primary shadow py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
-                            <h1>Notes Title</h1>
+                            <h1>${title}</h1>
                         </div>
                         <div class="row no-gutters align-items-center">
                             <h3>Date</h3>
