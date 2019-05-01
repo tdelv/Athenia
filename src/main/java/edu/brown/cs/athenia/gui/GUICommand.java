@@ -191,6 +191,43 @@ public class GUICommand {
     }
   }
 
+  public static class LanguageRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String lang = qm.value("language");
+
+      // prepare message to send to front end
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        // find and check for user
+        Athenia user = DatabaseParser.getUser(userId);
+        if (user.getLanguages().contains(lang)) {
+          // remove language if in user class
+          user.removeLanguage(lang);
+          successful = true;
+          message = "language removed";
+        } else {
+          // else leave message
+          message = "language not in user";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
   /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
@@ -225,7 +262,6 @@ public class GUICommand {
           for (FreeNote note : lang.getRecentFreeNotes()) {
             recentList.add(toData(note));
           }
-
 
           // add this info to the map
           variables.put("username", ""); // TODO: get the user's name. <3 mia
