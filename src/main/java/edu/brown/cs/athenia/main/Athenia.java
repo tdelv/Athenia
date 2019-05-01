@@ -22,7 +22,6 @@ public class Athenia {
   public Athenia(String userId) {
     this.userId = userId;
     this.languages = new HashMap<String, Language>();
-    this.currLang = new Language("test");
   }
 
   public void setCurrLang(String lang) {
