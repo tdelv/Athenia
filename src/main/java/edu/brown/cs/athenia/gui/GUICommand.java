@@ -641,7 +641,8 @@ public class GUICommand {
       // TODO: send id through the url in the js (for mia from mia lol)
       String noteId = qm.value("id");
 
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>().build();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       if (noteId.equals("new")) {
         // send the default values to front end / empty lists and stuff
@@ -662,7 +663,7 @@ public class GUICommand {
       // backend, and format and send to the front end for display
       // > involves a lot of module storing (a cache in both front end and
       // backend?)
-      return new ModelAndView(variables, "notePageEdit.ftl");
+      return new ModelAndView(variables.build(), "notePageEdit.ftl");
     }
   }
 
