@@ -609,7 +609,7 @@ public class GUICommand {
    * to access. Pulls out all of the information on that page and organizes it
    * in a way for the front end to display to the user.
    */
-  public static class FreeNotesEditorHandler implements Route {
+  public static class FreeNotesEditorHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
