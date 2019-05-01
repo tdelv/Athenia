@@ -5,6 +5,9 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Set;
+
+import com.google.api.services.drive.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
@@ -15,6 +18,7 @@ import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.main.Athenia;
+import edu.brown.cs.athenia.review.*;
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -144,7 +148,7 @@ public class GUICommand {
         message = "successful";
       } catch (DatabaseParserException e) {
         // else send an error message that user not found
-        message = "User not found in database";
+        message = "User not found in database in language prompt handler";
       }
       variables.put("title", "Select Language");
       variables.put("successful", successful);
@@ -179,10 +183,10 @@ public class GUICommand {
         } else {
           user.addLanguage(lang);
           successful = true;
-          message = "language added";
+          message = "succesfully added language";
         }
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in language add handler";
       }
 
       variables.put("successful", successful);
@@ -215,14 +219,14 @@ public class GUICommand {
           // remove language if in user class
           user.setCurrLang(language);
           successful = true;
-          message = "language changed";
+          message = "successfully changed language";
         } else {
           // else leave message
-          message = "language not in user";
+          message = "language not in user in language change handler";
         }
 
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in language change handler";
       }
 
       variables.put("successful", successful);
@@ -255,14 +259,14 @@ public class GUICommand {
           // remove language if in user class
           user.removeLanguage(lang);
           successful = true;
-          message = "language removed";
+          message = "successfully removed language";
         } else {
           // else leave message
-          message = "language not in user";
+          message = "language not in user in language remove handler";
         }
 
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in language remove handler";
       }
 
       variables.put("successful", successful);
@@ -313,14 +317,14 @@ public class GUICommand {
           variables.put("conjugationCount", conjugationCount);
           variables.put("recent", recentList);
 
-          message = "successful";
+          message = "successfully grabbed module information";
           successful = true;
         } else {
-          message = "current language null";
+          message = "current language null in home page handler";
         }
 
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in home page handler";
       }
 
       variables.put("title", "Home");
@@ -363,14 +367,15 @@ public class GUICommand {
             vocabList.add(toData((Vocab) vocab.getValue()));
           }
 
+          variables.put("content", vocabList);
           // edit success messages
           successful = true;
-          message = "successful";
+          message = "successfully pulled vocab information";
         } else {
-          message = "current language null";
+          message = "current language null in vocabulary page handler";
         }
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in vocabulary page handler";
       }
 
       variables.put("title", "Vocabulary");
@@ -380,10 +385,10 @@ public class GUICommand {
     }
   }
 
-  // TODO SEPARATE THINGS FOR ADDING MODULES
-
-  // TODO EDIT AND DELETE HANDLERS FOR MODULES
-
+  /**
+   * POST request handler for adding a new Vocab object to the user's
+   * current Language.
+   */
   public static class VocabularyAddHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
@@ -403,21 +408,24 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-          // todo : create a new vocab module and add to language
+          // todo : create a new vocab module and add to language - from jason
 
-          // todo : call toData on this and add to variables map
+          // todo : call toData on this and add to variables map - from jason
 
           successful = true;
-          message = "successful";
+          message = "successfully added vocab";
         } else {
-          message = "current language null";
+          message = "current language null in vocab add handler";
         }
 
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in vocab add handler";
       }
 
-      return GSON.toJson(variables);
+      variables.put("successful", successful);
+      variables.put("message", message);
+
+      return GSON.toJson(variables.build());
     }
   }
 
@@ -431,17 +439,192 @@ public class GUICommand {
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
+      String vocabId = qm.value("vocabId");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
 
+      boolean successful = false;
+      String message = "";
 
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          // TODO call update on this module somehow (done with language method?) - from jason
+
+          // TODO toData this updated module object and put in variables - from jason
+
+          successful = true;
+          message = "successfully updated vocab";
+        } else {
+          message = "current language null in vocab update handler";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in vocab update handler";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  public static class VocabularyRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String vocabId = qm.value("vocabId");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          // TODO call remove on this module somehow (through language) - from jason
+
+          successful = true;
+          message = "successfully removed vocab";
+        } else {
+          message = "current language null in vocab remove handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in vocab remove handler";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+
+  /**
+   * GET request handler which retrieves all conjugation information from the
+   * database and formats this information to send to the front end for display
+   * on the user's "Conjugation" page.
+   */
+  public static class ConjugationPageHandler implements TemplateViewRoute {
+    @Override
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          Map<String, Module> conjMap = lang.getModuleMap(StorageType.CONJUGATION);
+          List<Map<String, Object>> conjList = new ArrayList<>();
+
+          // translate conj objects to JSON
+          for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
+            conjList.add(toData((Conjugation) conj.getValue()));
+          }
+
+          // add content and update success messages
+          variables.put("content", conjList);
+          successful = true;
+          message = "successfully pulled conjugation information";
+        } else {
+          message = "current language null in conjugation page handler";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation page handler";
+      }
+
+      variables.put("title", "Conjugation");
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return new ModelAndView(variables.build(), "conjugations.ftl");
+    }
+  }
+
+  public static class ConjugationAddHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String newHeader = qm.value("header"); // just a string
+      String newContent = qm.value("content"); // list of lists of strings
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          // todo : create new vocab module and add to language - from jason
+          // todo : call toData on this and add to variables map - from jason
+
+          successful = true;
+          message = "successfully added conjugation";
+        } else {
+          message = "current language null in conjugation add handler";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation add handler";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+
+  /**
+   * POST request handler for adding, updating, or deleting a conjugation module
+   * within the database. Called whenever the user makes an edit to any
+   * conjugation module which can be found on the following pages: the
+   * conjugation landing and individual pages and the FreeNotes landing and
+   * individual pages.
+   */
+  public static class ConjugationUpdateHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      QueryParamsMap qm = req.queryMap();
+      // TODO pull out the information of the conjugation module and act on it
+      // accordingly:
+      // 1. adding a new conjugation module
+      // 2. updating old conjugation module
+      // 3. deleting old conjugation module
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
+              .put("...", "...").build();
       // TODO execute the appropriate operation:
-      // 1. add new vocab module to appropriate database tables
-      // 2. update vocab module within appropriate database tables
-      // 3. delete vocab module from all database tables
-      // a. deletion can send confirmation to user
+      // 1. add new conjugation module to appropriate database tables
+      // 2. update conjugation module within appropriate database tables
+      // 3. delete conjugation module from all database tables
+      // a. deletion can send confirmation alert to user
       return GSON.toJson(variables);
     }
   }
@@ -468,20 +651,30 @@ public class GUICommand {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
 
+        if (lang != null) {
+          Set<Tag> tagSet = lang.getTagSet();
+          List<Map<String, Object>> tagList = new ArrayList<>();
 
+          for (Tag tag : tagSet) {
+            tagList.add(toData(tag));
+          }
+
+          // add tagList to variables map
+          variables.put("content", tagSet);
+
+          // edit success messages
+          successful = true;
+          message = "successful pulled tag information";
+        } else {
+          message = "current language null in tag page handler";
+        }
 
       } catch (DatabaseParserException e) {
-        message = "error getting user from database";
+        message = "error getting user from database in tag page handler";
       }
 
-
-      // pull all tag information
-      List<Map<String, Object>> tags = new ArrayList<>();
-//      for (Map.Entry<String, Tag> tag : language.getTagMap().entrySet()) {
-//        tags.add(toData(tag.getValue()));
-//      }
-      // prepare tag info to present to front-end
-      variables.put("content", tags);
+      variables.put("successful", successful);
+      variables.put("message", message);
       return new ModelAndView(variables.build(), "...");
     }
   }
@@ -564,51 +757,7 @@ public class GUICommand {
     }
   }
 
-  /**
-   * GET request handler which retrieves all conjugation information from the
-   * database and formats this information to send to the front end for display
-   * on the user's "Conjugation" page.
-   */
-  public static class ConjugationPageHandler implements TemplateViewRoute {
-    @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      // TODO: recognize that user is requesting to view the conjugation page
-      // (not really anything to parse out)
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: pull all conjugation modules from the database and format
-      // appropriately to present to the user
-      return new ModelAndView(variables, "...");
-    }
-  }
 
-  /**
-   * POST request handler for adding, updating, or deleting a conjugation module
-   * within the database. Called whenever the user makes an edit to any
-   * conjugation module which can be found on the following pages: the
-   * conjugation landing and individual pages and the FreeNotes landing and
-   * individual pages.
-   */
-  public static class ConjugationUpdateHandler implements Route {
-    @Override
-    public String handle(Request req, Response res) throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      // TODO pull out the information of the conjugation module and act on it
-      // accordingly:
-      // 1. adding a new conjugation module
-      // 2. updating old conjugation module
-      // 3. deleting old conjugation module
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO execute the appropriate operation:
-      // 1. add new conjugation module to appropriate database tables
-      // 2. update conjugation module within appropriate database tables
-      // 3. delete conjugation module from all database tables
-      // a. deletion can send confirmation alert to user
-      return GSON.toJson(variables);
-    }
-  }
 
   /**
    * GET request handler which retrieves all free notes information from the

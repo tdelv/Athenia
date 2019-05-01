@@ -14,6 +14,7 @@ public class Language {
     private Map<String, Conjugation> conjugationMap;
     private Map<String, Note> noteMap;
     private Map<String, Tag> tagMap;
+    private Set<Tag> tagSet; // TODO : added by jason
     private Map<String, Vocab> vocabMap;
 
     // TODO: some sort of recent list storing the most recent
@@ -25,6 +26,9 @@ public class Language {
 
     public Language(String name) {
         this.name = name;
+
+        // TODO : this is just a dummy thing for tags, idk how this will look
+        this.tagSet = new HashSet<>();
 
         this.moduleMap = new HashMap<>();
         for (StorageType type : StorageType.values()) {
@@ -50,6 +54,25 @@ public class Language {
 
     public Map<String, Module> getModuleMap(StorageType type) {
         return Collections.unmodifiableMap(moduleMap.get(type));
+    }
+
+    // TODO : tags are not modules, so they need a specialized get method -- jason
+    public Set<Tag> getTagSet() {
+        return Collections.unmodifiableSet(tagSet);
+    }
+
+    // TODO : somehow pull the list of modules listed under a specific tag -- jason
+    //              i guess this would be a lot of database stuff?
+    //              or some means of storing the modules in the tag object itself
+    public Map<StorageType, Map<String, Module>> getModuleListFromTag(Tag tag) {
+        return null;
+    }
+
+    // TODO : tags are not modules and i guess don't have ids? so i guess
+    //                  tags can be stored as just a hashset?
+    public void addTag(Tag tag) {
+        // to do i have no idea
+        tagSet.add(tag);
     }
 
     public Module getModule(StorageType type, String id) {
