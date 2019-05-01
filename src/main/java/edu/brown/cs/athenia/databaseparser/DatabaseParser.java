@@ -61,7 +61,7 @@ public class DatabaseParser {
         }
 
         Athenia user = new Athenia(userId);
-        // TODO: setup user
-        return USER_MAP.put(userId, user);
+        USER_MAP.put(userId, user);
+        return user;
     }
 }

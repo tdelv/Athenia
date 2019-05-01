@@ -138,6 +138,7 @@ public class GUICommand {
         // try to find the user in database and send the language name to
         // the front-end
         Athenia user = DatabaseParser.getUser(userId);
+        System.out.println(user.getLanguages());
         variables.put("languages", user.getLanguages());
         successful = true;
         message = "successful";
