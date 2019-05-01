@@ -6,11 +6,11 @@ CREATE TABLE user_data (
 
 CREATE TABLE languages (
   id INTEGER PRIMARY KEY,
-  name TEXT
+  language TEXT
 );
 
 CREATE TABLE freenotes (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   language_id INTEGER,
   created INTEGER,
   last_modified INTEGER,
@@ -18,57 +18,57 @@ CREATE TABLE freenotes (
 );
 
 CREATE TABLE modules (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   type TEXT,
-  language_id INTEGEr,
+  language_id INTEGER,
   created INTEGER,
   last_modified INTEGER,
   FOREIGN KEY (language_id) REFERENCES languages(id)
 );
 
 CREATE TABLE note_modules (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   body TEXT,
   FOREIGN KEY (id) REFERENCES modules(id)
 );
 
 CREATE TABLE vocab_modules (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   term TEXT,
   definition TEXT,
   FOREIGN KEY (id) REFERENCES modules(id)
 );
 
 CREATE TABLE conjugation_modules (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   header TEXT,
   FOREIGN KEY (id) REFERENCES modules(id)
 );
 
 CREATE TABLE conjugation_rows (
   id INTEGER PRIMARY KEY,
-  module_id INTEGER,
+  module_id TEXT,
   col1 TEXT,
   col2 TEXT,
-  FOREIGN KEY (id) REFERENCES conjugation_modules(id)
+  FOREIGN KEY (module_id) REFERENCES conjugation_modules(id)
 );
 
 CREATE TABLE question_modules (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   body TEXT,
   FOREIGN KEY (id) REFERENCES modules(id)
 );
 
 CREATE TABLE alert_exclamation_modules (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   body TEXT,
   FOREIGN KEY (id) REFERENCES modules(id)
 );
 
 CREATE TABLE freenote_modules (
-  freenote_id INTEGER,
-  module_id INTEGER,
-  position INTEGER,
+  freenote_id TEXT,
+  module_id TEXT,
+  position INTEGEsR,
   FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
   FOREIGN KEY (module_id) REFERENCES modules(id)
 );
@@ -79,14 +79,14 @@ CREATE TABLE tags (
 );
 
 CREATE TABLE module_tags (
-  module_id INTEGER,
+  module_id TEXT,
   tag_id INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id),
   FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
 CREATE TABLE freenote_tags (
-  freenote_id INTEGER,
+  freenote_id TEXT,
   tag_id INTEGER,
   FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
   FOREIGN KEY (tag_id) REFERENCES tags(id)
