@@ -240,9 +240,9 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String currentLanguage = qm.value("language");
+      //String currentLanguage = qm.value("language");
 
-      System.out.print("LANG FROM FRONT END: " + currentLanguage);
+      //System.out.print("LANG FROM FRONT END: " + currentLanguage);
 
       boolean successful = false;
       String message = "";
@@ -252,10 +252,10 @@ public class GUICommand {
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
-        user.setCurrLang(currentLanguage);
+        //user.setCurrLang(currentLanguage);
         // TODO be sure that the current language has been set at some point
         Language lang = user.getCurrLanguage();
-        System.out.println("LANG IN BACKEND: " + lang.getName());
+        //System.out.println("LANG IN BACKEND: " + lang.getName());
 
         if (lang != null) {
 
@@ -293,11 +293,11 @@ public class GUICommand {
       variables.put("message", message);
 
       // Create callback url for authentication
-      String host = req.url().replace(req.pathInfo(), "/validate");
-      String url = GoogleDriveApi.getUrl(state, host);
+      //String host = req.url().replace(req.pathInfo(), "/validate");
+      //String url = GoogleDriveApi.getUrl(state, host);
 
       // Redirect to Google authentication page
-      res.redirect(url);
+      res.redirect("/home");
 
       return new ModelAndView(variables.build(), "home.ftl");
     }
