@@ -62,12 +62,6 @@ function languageSelect(lang) {
     const language = $(childElt).html();
 
     const getParameters = {language: language};
-    $.get("/home", getParameters, responseJSON => {
-        const responseObject = JSON.parse(responseJSON);
-        if (responseObject.successful) {
-            console.log("redirecting to homepage");
-        } else {
-            console.log("message: " + message);
-        }
-    });
+    $.get("/home", getParameters);
+    window.location = "home";
 }
