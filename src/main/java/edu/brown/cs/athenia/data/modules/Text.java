@@ -8,7 +8,7 @@ import java.util.Date;
  * @author makaylamurphy
  *
  */
-public abstract class Text extends ReviewableModule {
+public abstract class Text extends Module {
 
   private String text;
 

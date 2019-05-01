@@ -10,7 +10,7 @@ import java.util.Map;
  * @author makaylamurphy
  *
  */
-public abstract class Table extends ReviewableModule {
+public abstract class Table extends Module {
 
   private Map<String, String> table;
 
