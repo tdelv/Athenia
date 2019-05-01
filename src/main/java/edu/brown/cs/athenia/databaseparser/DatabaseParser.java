@@ -157,7 +157,7 @@ public class DatabaseParser {
         } catch (DriveApiException e) {
             throw new DatabaseParserException(e);
         }
-        List<String> words = Arrays.asList("hello", "goodbye");
+
         return user;
     }
 }
