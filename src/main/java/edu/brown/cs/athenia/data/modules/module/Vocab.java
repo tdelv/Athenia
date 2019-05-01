@@ -17,6 +17,13 @@ public class Vocab extends ReviewableModule {
     vocab[1] = definition;
   }
 
+  // TODO : have some way to add the content to this? - this is a dummy thing
+  //            for getting the connection between front and back end - from jason
+  public void setContent(String term, String definition) {
+    vocab[0] = term;
+    vocab[1] = definition;
+  }
+
   public String[] getContent() {
     return vocab;
   }
