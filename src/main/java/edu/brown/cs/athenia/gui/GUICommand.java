@@ -329,7 +329,7 @@ public class GUICommand {
       variables.put("title", "Home");
       variables.put("successful", successful);
       variables.put("message", message);
-      
+
       return new ModelAndView(variables.build(), "home.ftl");
     }
   }

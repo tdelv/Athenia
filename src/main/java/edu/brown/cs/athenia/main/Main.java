@@ -121,6 +121,7 @@ public class Main {
     Spark.get("/languages", new GUICommand.LanguagePromptHandler(), freeMarker);
     Spark.post("/addNewLanguage", new GUICommand.LanguageAddHandler());
     Spark.post("/removeLanguage", new GUICommand.LanguageRemoveHandler());
+    Spark.post("/changeCurrentLanguage", new GUICommand.LanguageChangeHandler());
 
     // Setup Spark Routes
     //Spark.get("/landing", commander.new SignInHandler(), freeMarker);
