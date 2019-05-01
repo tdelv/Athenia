@@ -1,0 +1,93 @@
+CREATE TABLE user_data (
+  username TEXT,
+  joined INTEGER,
+  last_update INTEGER
+);
+
+CREATE TABLE languages (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE freenotes (
+  id INTEGER PRIMARY KEY,
+  language_id INTEGER,
+  created INTEGER,
+  last_modified INTEGER,
+  FOREIGN KEY (language_id) REFERENCES languages(id)
+);
+
+CREATE TABLE modules (
+  id INTEGER PRIMARY KEY,
+  type TEXT,
+  language_id INTEGEr,
+  created INTEGER,
+  last_modified INTEGER,
+  FOREIGN KEY (language_id) REFERENCES languages(id)
+);
+
+CREATE TABLE note_modules (
+  id INTEGER PRIMARY KEY,
+  body TEXT,
+  FOREIGN KEY (id) REFERENCES modules(id)
+);
+
+CREATE TABLE vocab_modules (
+  id INTEGER PRIMARY KEY,
+  term TEXT,
+  definition TEXT,
+  FOREIGN KEY (id) REFERENCES modules(id)
+);
+
+CREATE TABLE conjugation_modules (
+  id INTEGER PRIMARY KEY,
+  header TEXT,
+  FOREIGN KEY (id) REFERENCES modules(id)
+);
+
+CREATE TABLE conjugation_rows (
+  id INTEGER PRIMARY KEY,
+  module_id INTEGER,
+  col1 TEXT,
+  col2 TEXT,
+  FOREIGN KEY (id) REFERENCES conjugation_modules(id)
+);
+
+CREATE TABLE question_modules (
+  id INTEGER PRIMARY KEY,
+  body TEXT,
+  FOREIGN KEY (id) REFERENCES modules(id)
+);
+
+CREATE TABLE alert_exclamation_modules (
+  id INTEGER PRIMARY KEY,
+  body TEXT,
+  FOREIGN KEY (id) REFERENCES modules(id)
+);
+
+CREATE TABLE freenote_modules (
+  freenote_id INTEGER,
+  module_id INTEGER,
+  position INTEGER,
+  FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
+  FOREIGN KEY (module_id) REFERENCES modules(id)
+);
+
+CREATE TABLE tags (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE module_tags (
+  module_id INTEGER,
+  tag_id INTEGER,
+  FOREIGN KEY (module_id) REFERENCES modules(id),
+  FOREIGN KEY (tag_id) REFERENCES tags(id)
+);
+
+CREATE TABLE freenote_tags (
+  freenote_id INTEGER,
+  tag_id INTEGER,
+  FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
+  FOREIGN KEY (tag_id) REFERENCES tags(id)
+);

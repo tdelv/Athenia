@@ -45,7 +45,13 @@ public class DatabaseParser {
             }
         }
 
-        return DriverManager.getConnection(file.getPath());
+        try {
+            Class.forName("org.sqlite.JDBC");
+            String url = "jdbc:sqlite:" + file.getPath();
+            return DriverManager.getConnection(url);
+        } catch (ClassNotFoundException e) {
+            throw new DatabaseParserException(e);
+        }
     }
 
     private static void setup(String userAuth, File file) throws IOException, DatabaseParserException, SQLException {
