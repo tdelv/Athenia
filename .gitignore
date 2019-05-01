@@ -1,6 +1,6 @@
 /.gradle/
 /build/
 /tokens/
-.gradle/
-build/
-tokens/
+.gradle/*
+build/*
+tokens/*

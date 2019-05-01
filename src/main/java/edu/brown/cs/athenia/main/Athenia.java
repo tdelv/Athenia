@@ -40,7 +40,7 @@ public class Athenia {
 
   public void removeLanguage(String lang) {
     languages.remove(lang);
-    // TODO: remove this information from database too
+    // TODO from jason : remove this information from database too
   }
 
   public Language getCurrLanguage() {

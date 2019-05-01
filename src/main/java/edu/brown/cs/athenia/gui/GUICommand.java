@@ -191,6 +191,9 @@ public class GUICommand {
     }
   }
 
+  /**
+   * POST request handler for removing a language from the user's database.
+   */
   public static class LanguageRemoveHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
@@ -237,6 +240,7 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
+      String currentLanguage = qm.value("language");
 
       boolean successful = false;
       String message = "";
@@ -246,6 +250,7 @@ public class GUICommand {
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
+        user.setCurrLang(currentLanguage);
         // TODO be sure that the current language has been set at some point
         Language lang = user.getCurrLanguage();
 
