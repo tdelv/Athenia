@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
-import edu.brown.cs.athenia.data.modules.FreeNote;
 import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.Conjugation;

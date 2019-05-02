@@ -16,6 +16,7 @@ import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
+import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.review.*;

@@ -1,7 +1,9 @@
 package edu.brown.cs.athenia.data.modules;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Module is a class that stipulates all modules have a set of tags, add and
@@ -11,7 +13,7 @@ import java.util.HashSet;
  */
 public abstract class Module {
 
-  private HashSet<String> tags;
+  private Map<String, Tag> tags;
   private Date created;
   private Date dateModified;
   private String id;
@@ -19,10 +21,10 @@ public abstract class Module {
   public Module() {
     created = new Date();
     dateModified = created;
-    tags = new HashSet<String>();
+    this.tags = new HashMap<String, Tag>();
   }
 
-  // TODO: an id field and getters / setters for it?
+  // TODO: an id field and getters / setters for it? DONE
   public void setId(String id) {
     this.id = id;
   }
@@ -31,32 +33,20 @@ public abstract class Module {
     return this.id;
   }
 
-  /**
-   * Getter for list of tags.
-   * @return Returns the HashSet of String tags.
-   */
-  public HashSet<String> getTags() {
-    return this.tags;
+  public Collection<Tag> getTags() {
+    return tags.values();
   }
 
-  /**
-   * Adds a tag to the HashSet of tags.
-   * @param tag
-   *          String tag
-   */
-  public void addTag(String tag) {
-    // TODO : add this change to the database
-    this.tags.add(tag);
+  public void addTag(String t) {
+    tags.put(t, new Tag(t));
   }
 
-  /**
-   * Removes the passed in String tag.
-   * @param tag
-   * @return Returns the boolean if the String tag is found.
-   */
-  public boolean removeTag(String tag) {
-    // TODO : indicate this change in the database
-    return this.tags.remove(tag);
+  public Tag removeTag(String t) {
+    return tags.remove(t);
+  }
+
+  public boolean hasTag(String tag) {
+    return tags.containsKey(tag);
   }
 
   /**

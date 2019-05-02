@@ -2,7 +2,7 @@ package edu.brown.cs.athenia.databaseparser;
 
 import edu.brown.cs.athenia.driveapi.UnauthenticatedUserException;
 import edu.brown.cs.athenia.main.Athenia;
-import edu.brown.cs.athenia.data.modules.FreeNote;
+import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.Conjugation;
 import edu.brown.cs.athenia.data.modules.module.Note;

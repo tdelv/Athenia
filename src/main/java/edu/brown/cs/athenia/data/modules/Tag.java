@@ -17,4 +17,14 @@ public class Tag {
   public String getTag() {
     return tag;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return tag.equals((String) o);
+  }
+
+  @Override
+  public int hashCode() {
+    return tag.hashCode();
+  }
 }
