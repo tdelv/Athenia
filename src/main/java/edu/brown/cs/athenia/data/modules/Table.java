@@ -30,6 +30,9 @@ public abstract class Table extends Module {
     table.put(term, def);
   }
 
+  // TODO : something to update the map?
+  //           like how could you update a key?
+
   /**
    * Removes a mapping.
    * @param term

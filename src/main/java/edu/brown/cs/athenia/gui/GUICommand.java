@@ -2,10 +2,7 @@ package edu.brown.cs.athenia.gui;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -39,8 +36,7 @@ public class GUICommand {
 
   private static final Gson GSON = new Gson();
 
-  private GUICommand() {
-  }
+  private GUICommand() { }
 
   /**
    *
@@ -127,6 +123,10 @@ public class GUICommand {
       return null;
     }
   }
+
+  /* -------------------------------------------------------------------------*/
+  /* -- LANGUAGE HANDLERS ----------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * GET request handler which pulls the different languages the user has so far
@@ -277,6 +277,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- HOMEPAGE HANDLERS ----------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
@@ -337,6 +341,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- VOCAB HANDLERS -------------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler which pulls all of the vocabulary information saved by
    * the user in the database and formats it to send to the front end to display
@@ -346,8 +354,6 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
-      // have tags as a certain part of frontend
-      // --- use data-* thing for storing, filtering tags
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -369,7 +375,7 @@ public class GUICommand {
             vocabList.add(toData((Vocab) vocab.getValue()));
           }
 
-          variables.put("content", vocabList);
+          variables.put("vocabContent", vocabList);
           // edit success messages
           successful = true;
           message = "successfully pulled vocab information";
@@ -409,10 +415,13 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-          // todo : create a new vocab module and add to language - from jason
+          Vocab newVocab = new Vocab(newTerm, newDef);
+          lang.addModule(StorageType.VOCAB, newVocab);
 
-          // todo : call toData on this and add to variables map - from jason
+          // call to data on new object
+          variables.put("newVocabModule", toData(newVocab));
 
+          // edit success message
           successful = true;
           message = "successfully added vocab";
         } else {
@@ -455,14 +464,23 @@ public class GUICommand {
 
         if (lang != null) {
 
+          if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
+
+
+
+
+            successful = true;
+            message = "updated vocab module successful";
+          } else {
+            message = "vocab module not in language module map in vocab update handler";
+          }
+
           // TODO call update on this module somehow (done with language
           // method?) - from jason
 
           // TODO toData this updated module object and put in variables - from
           // jason
 
-          successful = true;
-          message = "successfully updated vocab";
         } else {
           message = "current language null in vocab update handler";
         }
@@ -512,6 +530,10 @@ public class GUICommand {
       return GSON.toJson(variables.build());
     }
   }
+
+  /* -------------------------------------------------------------------------*/
+  /* -- CONJUGATION HANDLERS -------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * GET request handler which retrieves all conjugation information from the
@@ -628,6 +650,10 @@ public class GUICommand {
       return GSON.toJson(variables);
     }
   }
+
+  /* -------------------------------------------------------------------------*/
+  /* -- TAG HANDLERS ---------------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * GET request handler for retrieving information pertaining to a specific tag
@@ -758,6 +784,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- FREENOTES HANDLERS ---------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler which retrieves all free notes information from the
    * database and formats this information to send to the front end for display
@@ -866,6 +896,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- REVIEW HANDLERS ------------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler for the Review landing page which pulls all of the tags
    * the user has created from the database and backend and formats this
@@ -913,7 +947,9 @@ public class GUICommand {
     }
   }
 
-  // --- Class info to JSON methods -------------------------------------------
+  /* -------------------------------------------------------------------------*/
+  /* -- CLASS TO JSON HANDLERS -----------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * Converts a FreeNote into a data map for JSON.
@@ -952,13 +988,14 @@ public class GUICommand {
    * @return a map of data from the Vocab object
    */
   private static Map<String, Object> toData(Vocab vocab) {
-    // TODO: get vocab content (getContent())
-    // TODO
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
     vocabData.put("modtype", "Vocab");
     toData(vocab, vocabData);
-    vocabData.put("content", vocab.getTable());
+
+    Map<String, String> vocabContentList = new HashMap<>();
+    vocabContentList.put("vocabTerm", vocab.getTerm());
+    vocabContentList.put("vocabDef", vocab.getDefinition());
     return vocabData.build();
   }
 
@@ -996,7 +1033,13 @@ public class GUICommand {
     map.put("id", module.getId()); // TODO get the module id
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
-    map.put("tags", module.getTags());
+    // generate tag list
+    List<Map<String, Object>> tagList = new ArrayList<>();
+    for (Tag tag : module.getTags()) {
+      tagList.add(toData(tag));
+    }
+    // add to map
+    map.put("tags", tagList);
   }
 
 }
