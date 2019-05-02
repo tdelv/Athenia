@@ -1,10 +1,13 @@
 package edu.brown.cs.athenia.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Tag;
 
 /**
@@ -13,10 +16,11 @@ import edu.brown.cs.athenia.data.modules.Tag;
  * @author makaylamurphy
  *
  */
-public class FreeNote extends Modularized {
+public class FreeNote {
 
   // tags of the FreeNote itself
   private Map<String, Tag> tags;
+  private List<Module> modules;
   private Date created;
   private Date dateModified;
   private String title;
@@ -30,7 +34,7 @@ public class FreeNote extends Modularized {
 
   public FreeNote(String t, String id) {
     this.id = id;
-
+    this.modules = new ArrayList<Module>();
     this.tags = new HashMap<String, Tag>();
     this.created = new Date();
     this.dateModified = this.created;
@@ -39,6 +43,18 @@ public class FreeNote extends Modularized {
 
   public String getId() {
     return this.id;
+  }
+
+  public List<Module> getModules() {
+    return this.modules;
+  }
+
+  public boolean removeModule(Module m) {
+    return this.modules.remove(m);
+  }
+
+  public void addModule(Module m) {
+    this.modules.add(m);
   }
 
   public Collection<Tag> getTags() {
