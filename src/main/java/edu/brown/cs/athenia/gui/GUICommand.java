@@ -2,7 +2,11 @@ package edu.brown.cs.athenia.gui;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -11,9 +15,7 @@ import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Tag;
-import edu.brown.cs.athenia.data.modules.module.Conjugation;
-import edu.brown.cs.athenia.data.modules.module.StorageType;
-import edu.brown.cs.athenia.data.modules.module.Vocab;
+import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
@@ -124,9 +126,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- LANGUAGE HANDLERS ----------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- LANGUAGE HANDLERS ----------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which pulls the different languages the user has so far
@@ -277,9 +285,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- HOMEPAGE HANDLERS ----------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- HOMEPAGE HANDLERS ----------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which pulls the most recent activity of the appropriate
@@ -341,9 +355,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- VOCAB HANDLERS -------------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- VOCAB HANDLERS -------------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which pulls all of the vocabulary information saved by
@@ -355,7 +375,6 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
@@ -466,20 +485,18 @@ public class GUICommand {
 
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
 
-
-
-
+            // update the vocab
+            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
+                vocabId);
+            vocabToUpdate.getPair().updatePair(updatedTerm, updatedDef);
+            // convert to JSON for frontend
+            variables.put("updatedVocabModule", toData(vocabToUpdate));
+            // update successful message
             successful = true;
             message = "updated vocab module successful";
           } else {
             message = "vocab module not in language module map in vocab update handler";
           }
-
-          // TODO call update on this module somehow (done with language
-          // method?) - from jason
-
-          // TODO toData this updated module object and put in variables - from
-          // jason
 
         } else {
           message = "current language null in vocab update handler";
@@ -495,6 +512,9 @@ public class GUICommand {
     }
   }
 
+  /**
+   * POST request for removing a Vocab object from the user globally.
+   */
   public static class VocabularyRemoveHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
@@ -510,14 +530,16 @@ public class GUICommand {
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
         if (lang != null) {
-
-          // TODO call remove on this module somehow (through language) - from
-          // jason
-
-          successful = true;
-          message = "successfully removed vocab";
+          if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
+            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB,
+                vocabId);
+            lang.removeModule(StorageType.VOCAB, vocabToRemove);
+            successful = true;
+            message = "successfully removed vocab";
+          } else {
+            message = "vocab module does not exist in language modmap";
+          }
         } else {
           message = "current language null in vocab remove handler";
         }
@@ -531,9 +553,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- CONJUGATION HANDLERS -------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- CONJUGATION HANDLERS -------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which retrieves all conjugation information from the
@@ -651,9 +679,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- TAG HANDLERS ---------------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- TAG HANDLERS ---------------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler for retrieving information pertaining to a specific tag
@@ -784,9 +818,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- FREENOTES HANDLERS ---------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- FREENOTES HANDLERS ---------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which retrieves all free notes information from the
@@ -896,9 +936,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- REVIEW HANDLERS ------------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- REVIEW HANDLERS ------------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler for the Review landing page which pulls all of the tags
@@ -947,9 +993,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- CLASS TO JSON HANDLERS -----------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- CLASS TO JSON HANDLERS -----------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * Converts a FreeNote into a data map for JSON.
@@ -959,9 +1011,9 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(FreeNote note) {
 
-    // TODO: get the id, name/title, dates, tags associate with this
-    ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
-    noteData.put("modtype", "FreeNote");
+    ImmutableMap.Builder<String, Object> noteData =
+            new ImmutableMap.Builder<String, Object>();
+    noteData.put("modtype", StorageType.FREE_NOTE);
     noteData.put("title", note.getTitle());
 
     // add all module data
@@ -990,25 +1042,26 @@ public class GUICommand {
   private static Map<String, Object> toData(Vocab vocab) {
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
-    vocabData.put("modtype", "Vocab");
+    vocabData.put("modtype", StorageType.VOCAB);
     toData(vocab, vocabData);
 
+    // prepare map of content
     Map<String, String> vocabContentList = new HashMap<>();
-    vocabContentList.put("vocabTerm", vocab.getTerm());
-    vocabContentList.put("vocabDef", vocab.getDefinition());
+    vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
+    vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
+    vocabData.put("content", vocabContentList);
     return vocabData.build();
   }
 
   /**
    * Converts a Conjugation module into a data map for JSON.
-   * @param conjugation
-   *          the Conjugation module to convert
+   * @param conjugation the Conjugation module to convert
    * @return a map of data from the FreeNote object
    */
   private static Map<String, Object> toData(Conjugation conjugation) {
     ImmutableMap.Builder<String, Object> conjugationData = new ImmutableMap.Builder<String, Object>();
     // pull information of conjugation table
-    conjugationData.put("modtype", "Conjugation");
+    conjugationData.put("modtype", StorageType.CONJUGATION);
     toData(conjugation, conjugationData);
     conjugationData.put("content", conjugation.getTable());
     return conjugationData.build();
@@ -1016,21 +1069,47 @@ public class GUICommand {
 
   /**
    * Converts a Tag module into a data map for JSON.
-   * @param tag
-   *          the Tag module to convert
+   * @param tag the Tag module to convert
    * @return a map of data from the Tag object
    */
   private static Map<String, Object> toData(Tag tag) {
     ImmutableMap.Builder<String, Object> tagData = new ImmutableMap.Builder<String, Object>();
-    tagData.put("modtype", "tag");
+    tagData.put("modtype", StorageType.TAG);
     tagData.put("content", tag.getTag());
     return tagData.build();
   }
 
-  // TODO some way to add information from a module in generic way?
+  /**
+   * Converts an AlertExclamation into a data map for JSON.
+   * @param alert the AlertExclamation object to convert
+   * @return a map of data from the AlertExclamation object
+   */
+  private static Map<String, Object> toData(AlertExclamation alert) {
+    ImmutableMap.Builder<String, Object> alertData =
+            new ImmutableMap.Builder<String, Object>();
+    alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
+    toData(alert, alertData);
+    alertData.put("content", alert.getText());
+    return alertData.build();
+  }
+
+  private static Map<String, Object> toData(Note note) {
+    ImmutableMap.Builder<String, Object> noteData =
+            new ImmutableMap.Builder<String, Object>();
+    noteData.put("modtype", StorageType.NOTE);
+    toData(note, noteData);
+    
+    return noteData.build();
+  }
+
+  /**
+   * Converts any generic Module data into a data map for JSON.
+   * @param module the generic Module object to convert
+   * @param map the ImmutableMap to add the data information to
+   */
   private static void toData(Module module,
       ImmutableMap.Builder<String, Object> map) {
-    map.put("id", module.getId()); // TODO get the module id
+    map.put("id", module.getId());
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
     // generate tag list
