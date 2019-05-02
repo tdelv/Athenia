@@ -42,6 +42,8 @@ public class GUICommand {
 
   private GUICommand() {
   }
+  
+  private GUICommand() { }
 
   /**
    *
@@ -378,7 +380,6 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
@@ -489,17 +490,17 @@ public class GUICommand {
 
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
 
+            // update the vocab
+            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
+            vocabToUpdate.updateVocab(updatedTerm, updatedDef);
+            // convert to JSON for frontend
+            variables.put("updatedVocabModule", toData(vocabToUpdate));
+            // update successful message
             successful = true;
             message = "updated vocab module successful";
           } else {
             message = "vocab module not in language module map in vocab update handler";
           }
-
-          // TODO call update on this module somehow (done with language
-          // method?) - from jason
-
-          // TODO toData this updated module object and put in variables - from
-          // jason
 
         } else {
           message = "current language null in vocab update handler";
@@ -515,6 +516,9 @@ public class GUICommand {
     }
   }
 
+  /**
+   * POST request for removing a Vocab object from the user globally.
+   */
   public static class VocabularyRemoveHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
@@ -530,14 +534,15 @@ public class GUICommand {
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
         if (lang != null) {
-
-          // TODO call remove on this module somehow (through language) - from
-          // jason
-
-          successful = true;
-          message = "successfully removed vocab";
+          if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
+            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
+            lang.removeModule(StorageType.VOCAB, vocabToRemove);
+            successful = true;
+            message = "successfully removed vocab";
+          } else {
+            message = "vocab module does not exist in language modmap";
+          }
         } else {
           message = "current language null in vocab remove handler";
         }
@@ -1040,12 +1045,16 @@ public class GUICommand {
   private static Map<String, Object> toData(Vocab vocab) {
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
-    vocabData.put("modtype", "Vocab");
+    vocabData.put("modtype", StorageType.VOCAB);
     toData(vocab, vocabData);
 
+    // prepare map of content
     Map<String, String> vocabContentList = new HashMap<>();
     vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
     vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
+    vocabContentList.put("vocabTerm", vocab.getTerm());
+    vocabContentList.put("vocabDef", vocab.getDefinition());
+    vocabData.put("content", vocabContentList);
     return vocabData.build();
   }
 
@@ -1058,7 +1067,7 @@ public class GUICommand {
   private static Map<String, Object> toData(Conjugation conjugation) {
     ImmutableMap.Builder<String, Object> conjugationData = new ImmutableMap.Builder<String, Object>();
     // pull information of conjugation table
-    conjugationData.put("modtype", "Conjugation");
+    conjugationData.put("modtype", StorageType.CONJUGATION);
     toData(conjugation, conjugationData);
     conjugationData.put("content", conjugation.getTable());
     return conjugationData.build();
@@ -1072,7 +1081,7 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(Tag tag) {
     ImmutableMap.Builder<String, Object> tagData = new ImmutableMap.Builder<String, Object>();
-    tagData.put("modtype", "tag");
+    tagData.put("modtype", StorageType.TAG);
     tagData.put("content", tag.getTag());
     return tagData.build();
   }
