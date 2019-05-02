@@ -50,10 +50,13 @@ public class FreeNote {
   }
 
   public boolean removeModule(Module m) {
+    this.dateModified = new Date();
+    m.removeFreeNote();
     return this.modules.remove(m);
   }
 
   public void addModule(Module m) {
+    this.dateModified = new Date();
     this.modules.add(m);
   }
 
@@ -62,6 +65,7 @@ public class FreeNote {
   }
 
   public void addTag(String t) {
+    this.dateModified = new Date();
     tags.put(t, new Tag(t));
   }
 
