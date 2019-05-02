@@ -1,7 +1,9 @@
 package edu.brown.cs.athenia.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.brown.cs.athenia.data.modules.Module;
@@ -28,6 +30,14 @@ public abstract class Modularized {
     return moduleMap.get(type).get(id);
   }
 
+  public List<Module> getModules() {
+    List<Module> modules = new ArrayList<Module>();
+    for (Module m : ((Map<String, Module>) moduleMap.values()).values()) {
+      modules.add(m);
+    }
+    return modules;
+  }
+
   public int getModuleCount(StorageType type) {
     return moduleMap.get(type).size();
   }
@@ -42,24 +52,15 @@ public abstract class Modularized {
   // jason DONE
   // i guess this would be a lot of database stuff?
   // or some means of storing the modules in the tag object itself
-  public Map<StorageType, Map<String, Module>> getModuleListFromTag(Tag tag) {
-    // what will be returned
-    Map<StorageType, Map<String, Module>> returnModuleMap = new HashMap<StorageType, Map<String, Module>>();
-    // for every type
-    for (StorageType type : StorageType.values()) {
-      // module map that starts with all same modules
-      Map<String, Module> typedModules = moduleMap.get(type);
-      // for every module
-      for (Module m : typedModules.values()) {
-        // if doesn't have tag remove from Map of returnable modules
-        if (!m.hasTag(tag.getTag())) {
-          typedModules.remove(m.getId());
-        }
+  public List<Module> getModuleListFromTag(Tag tag) {
+    List<Module> modules = new ArrayList<Module>();
+    for (Module m : ((Map<String, Module>) moduleMap.values()).values()) {
+      if (m.hasTag(tag.getTag())) {
+        modules.add(m);
       }
-      // put every map of typed modules in with types map
-      returnModuleMap.put(type, typedModules);
     }
-    return returnModuleMap;
+    return modules;
+
   }
 
 }
