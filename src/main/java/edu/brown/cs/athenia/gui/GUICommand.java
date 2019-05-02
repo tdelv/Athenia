@@ -2,10 +2,7 @@ package edu.brown.cs.athenia.gui;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -127,6 +124,10 @@ public class GUICommand {
       return null;
     }
   }
+
+  /* -------------------------------------------------------------------------*/
+  /* -- LANGUAGE HANDLERS ----------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * GET request handler which pulls the different languages the user has so far
@@ -346,8 +347,6 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
-      // have tags as a certain part of frontend
-      // --- use data-* thing for storing, filtering tags
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -369,7 +368,7 @@ public class GUICommand {
             vocabList.add(toData((Vocab) vocab.getValue()));
           }
 
-          variables.put("content", vocabList);
+          variables.put("vocabContent", vocabList);
           // edit success messages
           successful = true;
           message = "successfully pulled vocab information";
@@ -409,10 +408,13 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-          // todo : create a new vocab module and add to language - from jason
+          Vocab newVocab = new Vocab(newTerm, newDef);
+          lang.addModule(StorageType.VOCAB, newVocab);
 
-          // todo : call toData on this and add to variables map - from jason
+          // call to data on new object
+          variables.put("newVocabModule", toData(newVocab));
 
+          // edit success message
           successful = true;
           message = "successfully added vocab";
         } else {
@@ -952,8 +954,6 @@ public class GUICommand {
    * @return a map of data from the Vocab object
    */
   private static Map<String, Object> toData(Vocab vocab) {
-    // TODO: get vocab content (getContent())
-    // TODO
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
     vocabData.put("modtype", "Vocab");
@@ -996,7 +996,13 @@ public class GUICommand {
     map.put("id", module.getId()); // TODO get the module id
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
-    map.put("tags", module.getTags());
+    // generate tag list
+    List<String> tagList = new ArrayList<>();
+    for (Tag tag : module.getTags()) {
+      tagList.add(tag.getTag());
+    }
+    // add to map
+    map.put("tags", tagList);
   }
 
 }
