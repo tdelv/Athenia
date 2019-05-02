@@ -278,6 +278,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- HOMEPAGE HANDLERS ----------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler which pulls the most recent activity of the appropriate
    * user and presents this information on the home page of Athenia.
@@ -337,6 +341,10 @@ public class GUICommand {
       return new ModelAndView(variables.build(), "home.ftl");
     }
   }
+
+  /* -------------------------------------------------------------------------*/
+  /* -- VOCAB HANDLERS -------------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * GET request handler which pulls all of the vocabulary information saved by
@@ -515,6 +523,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- CONJUGATION HANDLERS -------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler which retrieves all conjugation information from the
    * database and formats this information to send to the front end for display
@@ -630,6 +642,10 @@ public class GUICommand {
       return GSON.toJson(variables);
     }
   }
+
+  /* -------------------------------------------------------------------------*/
+  /* -- TAG HANDLERS ---------------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * GET request handler for retrieving information pertaining to a specific tag
@@ -760,6 +776,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- FREENOTES HANDLERS ---------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler which retrieves all free notes information from the
    * database and formats this information to send to the front end for display
@@ -868,6 +888,10 @@ public class GUICommand {
     }
   }
 
+  /* -------------------------------------------------------------------------*/
+  /* -- REVIEW HANDLERS ------------------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
+
   /**
    * GET request handler for the Review landing page which pulls all of the tags
    * the user has created from the database and backend and formats this
@@ -915,7 +939,9 @@ public class GUICommand {
     }
   }
 
-  // --- Class info to JSON methods -------------------------------------------
+  /* -------------------------------------------------------------------------*/
+  /* -- CLASS TO JSON HANDLERS -----------------------------------------------*/
+  /* -------------------------------------------------------------------------*/
 
   /**
    * Converts a FreeNote into a data map for JSON.
