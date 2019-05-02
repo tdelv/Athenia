@@ -10,3 +10,4 @@ tokens/*
 .gradle/
 build/
 tokens/
+*/userData/*

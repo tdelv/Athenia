@@ -110,7 +110,7 @@ public class GoogleDriveApi {
 
     try {
       java.io.File file = new java.io.File(
-              "/userData/" + userId + ".sqlite3");
+              "src/main/resources/userData/" + userId + ".sqlite3");
 
       Drive service = getService(userId);
       if (service.files().list().containsKey("userData.sqlite3")) {
@@ -121,7 +121,9 @@ public class GoogleDriveApi {
         setupDriveFile(service);
       }
 
-      return FILE_MAP.put(userId, file);
+      FILE_MAP.put(userId, file);
+
+      return file;
     } catch (IOException | GeneralSecurityException e) {
       throw new DriveApiException(e);
     }

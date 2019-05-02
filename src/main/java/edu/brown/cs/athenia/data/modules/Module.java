@@ -1,5 +1,7 @@
 package edu.brown.cs.athenia.data.modules;
 
+import edu.brown.cs.athenia.data.modules.module.StorageType;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
