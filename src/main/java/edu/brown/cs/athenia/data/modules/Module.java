@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.brown.cs.athenia.data.FreeNote;
+
 /**
  * Module is a class that stipulates all modules have a set of tags, add and
  * remove tags methods, and date last review.
@@ -19,11 +21,32 @@ public abstract class Module {
   private Date created;
   private Date dateModified;
   private String id;
+  private FreeNote freeNote;
 
   public Module() {
+    this.freeNote = null;
     created = new Date();
     dateModified = created;
     this.tags = new HashMap<String, Tag>();
+  }
+
+  public Module(FreeNote f) {
+    this.freeNote = f;
+    created = new Date();
+    dateModified = created;
+    this.tags = new HashMap<String, Tag>();
+  }
+
+  public FreeNote getFreeNote() {
+    return this.freeNote;
+  }
+
+  public boolean hasFreeNote() {
+    return this.freeNote != null;
+  }
+
+  public void removeFreeNote() {
+    this.freeNote = null;
   }
 
   // TODO: an id field and getters / setters for it? DONE

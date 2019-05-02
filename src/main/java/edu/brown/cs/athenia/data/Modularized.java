@@ -38,6 +38,10 @@ public abstract class Modularized {
     return modules;
   }
 
+  public void removeModule(StorageType type, Module m) {
+    this.moduleMap.get(type).remove(m.getId());
+  }
+
   public int getModuleCount(StorageType type) {
     return moduleMap.get(type).size();
   }
