@@ -466,20 +466,17 @@ public class GUICommand {
 
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
 
-
-
-
+            // update the vocab
+            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
+            vocabToUpdate.updateVocab(updatedTerm, updatedDef);
+            // convert to JSON for frontend
+            variables.put("updatedVocabModule", toData(vocabToUpdate));
+            // update successful message
             successful = true;
             message = "updated vocab module successful";
           } else {
             message = "vocab module not in language module map in vocab update handler";
           }
-
-          // TODO call update on this module somehow (done with language
-          // method?) - from jason
-
-          // TODO toData this updated module object and put in variables - from
-          // jason
 
         } else {
           message = "current language null in vocab update handler";
@@ -513,8 +510,7 @@ public class GUICommand {
 
         if (lang != null) {
 
-          // TODO call remove on this module somehow (through language) - from
-          // jason
+          // TODO call the remove module (global remove)
 
           successful = true;
           message = "successfully removed vocab";
