@@ -13,7 +13,6 @@ import java.util.List;
 public abstract class Table extends Module {
 
   private List<Pair> table;
-  private List<String> termList;
 
   public Table() {
     this.table = new ArrayList<Pair>();
@@ -35,9 +34,6 @@ public abstract class Table extends Module {
     this.setDateModified(new Date());
     this.table.add(new Pair(term, def));
   }
-
-  // TODO : something to update the map?
-  // like how could you update a key?
 
   /**
    * Removes a mapping.
