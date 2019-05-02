@@ -1,32 +1,33 @@
 package edu.brown.cs.athenia.data.modules.module;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.brown.cs.athenia.review.ReviewableModule;
+import edu.brown.cs.athenia.data.modules.Table;
+import edu.brown.cs.athenia.review.Reviewable;
 
 /**
  * Conjugation represents our Conjugation module. A Conjugation is a table-like
- * module.
+ * module that essentially adds new mappings of conjugations through Table.
  * @author makaylamurphy
  *
  */
-public class Conjugation extends ReviewableModule {
+public class Conjugation extends Table implements Reviewable {
 
-  // represents a conjugation table of columns [subject and verb, maybe others]
-  // and unknown amount of rows
-  private List<ArrayList<String>> conjugationTable;
+  // rating is originally set to 1 (medium).
+  private int rating;
 
   public Conjugation() {
-    conjugationTable = new ArrayList<ArrayList<String>>();
+    super();
   }
 
-  public List<ArrayList<String>> getContent() {
-    return conjugationTable;
+  /**
+   * Getter for the rating from 0 (easy) to 2 (hard).
+   * @return Returns int rating.
+   */
+  public int getRating() {
+    return this.rating;
   }
 
-  public void update(Object conjugations) {
-    conjugationTable = (List<ArrayList<String>>) conjugations;
+  public void setRating(int r) {
+    this.rating = r;
   }
 
 }

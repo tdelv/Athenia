@@ -4,11 +4,10 @@ $( document ).ready(function() {
 });
 
 function navToNote(id) {
-
-    //TODO: navigate to note page a la bacon
-    // const href = "noteEditor/note?id=" + id;
-
-
+    // generates the address to navigate to
+    const location = "noteEditor?id=" + id;
+    // navigates there
+    window.location = location;
 }
 
 

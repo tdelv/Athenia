@@ -3,23 +3,24 @@
 <div class="container-fluid">
 
     <!-- Main Column -->
-    <div class="col-8">
+    <div class="col-sm">
 
         <!-- Note Heading Row -->
         <div class="row">
-            <!-- LESSON TITLE CARD -->
-            <div class="col-xl-10 mb-4">
-                <div class="card border-bottom-primary shadow py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <h1>Notes Title</h1>
-                        </div>
-                        <div class="row no-gutters align-items-center">
-                            <h3>Date</h3>
-                        </div>
+            <div class="card border-bottom-primary shadow">
+                <div class="card-body">
+
+                    <div class="row no-gutters align-items-center">
+                        <h1>${title}</h1>
                     </div>
+
+                    <div class="row no-gutters align-items-center">
+                        <h3>Date</h3>
+                    </div>
+
                 </div>
             </div>
+
         </div>
         <!-- End of Note Heading Row -->
 
@@ -27,7 +28,12 @@
     </div>
 
     <!-- Menu Column -->
-    <div class="col-4">
+    <div class="col-sm">
+        <div class="card border-bottom-primary shadow">
+            <div class="card-body">
+                <p>menu</p>
+            </div>
+        </div>
     </div>
 
 </div>

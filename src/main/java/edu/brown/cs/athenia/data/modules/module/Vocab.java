@@ -1,28 +1,33 @@
 package edu.brown.cs.athenia.data.modules.module;
 
-import edu.brown.cs.athenia.review.ReviewableModule;
+import edu.brown.cs.athenia.data.modules.Table;
+import edu.brown.cs.athenia.review.Reviewable;
 
 /**
  * Vocab is a module that has a term-definition form.
  * @author makaylamurphy
  *
  */
-public class Vocab extends ReviewableModule {
+public class Vocab extends Table implements Reviewable {
 
-  private String[] vocab;
+  // rating is originally set to 1 (medium).
+  private int rating;
 
-  public void review(String term, String definition) {
-    vocab = new String[2];
-    vocab[0] = term;
-    vocab[1] = definition;
+  public Vocab(String term, String definition) {
+    super();
+    this.add(term, definition);
   }
 
-  public String[] getContent() {
-    return vocab;
+  /**
+   * Getter for the rating from 0 (easy) to 2 (hard).
+   * @return Returns int rating.
+   */
+  public int getRating() {
+    return this.rating;
   }
 
-  public void update(Object voc) {
-    vocab = (String[]) voc;
+  public void setRating(int r) {
+    this.rating = r;
   }
 
 }

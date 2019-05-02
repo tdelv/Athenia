@@ -1,10 +1,11 @@
-package edu.brown.cs.athenia.data.modules;
+package edu.brown.cs.athenia.data;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import edu.brown.cs.athenia.data.modules.module.Tag;
+import edu.brown.cs.athenia.data.modules.Tag;
 
 /**
  * FreeNote represents our FreeNodes, which have modules, tags, and a state of
@@ -12,10 +13,10 @@ import edu.brown.cs.athenia.data.modules.module.Tag;
  * @author makaylamurphy
  *
  */
-public class FreeNote {
+public class FreeNote extends Modularized {
 
-  private List<Module> modules;
-  private List<Tag> tags;
+  // tags of the FreeNote itself
+  private Map<String, Tag> tags;
   private Date created;
   private Date dateModified;
   private String title;
@@ -29,27 +30,31 @@ public class FreeNote {
 
   public FreeNote(String t, String id) {
     this.id = id;
-    this.modules = new ArrayList<Module>();
-    this.tags = new ArrayList<Tag>();
+
+    this.tags = new HashMap<String, Tag>();
     this.created = new Date();
     this.dateModified = this.created;
     this.title = t;
   }
 
-  /**
-   * Getter for list of Modules.
-   * @return list of modules
-   */
-  public List<Module> getModules() {
-    return this.modules;
-  }
-
-  public List<Tag> getTags() {
-    return tags;
-  }
-
   public String getId() {
     return this.id;
+  }
+
+  public Collection<Tag> getTags() {
+    return tags.values();
+  }
+
+  public void addTag(String t) {
+    tags.put(t, new Tag(t));
+  }
+
+  public Tag removeTag(String t) {
+    return tags.remove(t);
+  }
+
+  public boolean hasTag(String tag) {
+    return tags.containsKey(tag);
   }
 
   /**
@@ -77,17 +82,6 @@ public class FreeNote {
   public Date getDateModified() {
     return this.dateModified;
   }
-
-  // TODO : updater method for a specific module in the freenote
-  public void updateModule(Module module) {
-    // update the appropriate module if it exists in the module list
-  }
-
-  // TODO : method for getting a list of all tags in the sub modules
-  // > used to display on the freenotes landing and home pages
-
-  // TODO : methods for getting and setting the date variables of the specific
-  // note
 
   /**
    * Getter for the title.

@@ -1,11 +1,12 @@
 package edu.brown.cs.athenia.databaseparser;
 
+
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.Module;
-import edu.brown.cs.athenia.data.modules.module.Conjugation;
+
+import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.data.modules.module.Note;
 import edu.brown.cs.athenia.data.modules.module.Vocab;
-import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 
@@ -15,9 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -127,8 +126,7 @@ public class DatabaseParser {
                                 try (ResultSet rs2 = statement.executeQuery(
                                         "SELECT term, definition FROM vocab_modules WHERE " +
                                                 "id = " + id)) {
-                                    module = new Vocab();
-                                    module.update(new String[]{rs.getString(1), rs.getString(2)});
+                                    module = new Vocab(rs.getString(1), rs.getString(2));
                                 }
                                 break;
 //                            case "conjugation":

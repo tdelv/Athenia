@@ -1,21 +1,16 @@
 package edu.brown.cs.athenia.data.modules.module;
 
-import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.data.modules.Text;
 
-public class Question extends Module {
-
-  private String question;
+/**
+ * A question such as "Do I need to study this?".
+ * @author makaylamurphy
+ *
+ */
+public class Question extends Text {
 
   public Question(String q) {
-    question = q;
-  }
-
-  public void update(Object q) {
-    question = (String) q;
-  }
-
-  public String getContent() {
-    return question;
+    super(q);
   }
 
 }
