@@ -36,8 +36,7 @@ public class GUICommand {
 
   private static final Gson GSON = new Gson();
 
-  private GUICommand() {
-  }
+  private GUICommand() { }
 
   /**
    *
@@ -465,14 +464,23 @@ public class GUICommand {
 
         if (lang != null) {
 
+          if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
+
+
+
+
+            successful = true;
+            message = "updated vocab module successful";
+          } else {
+            message = "vocab module not in language module map in vocab update handler";
+          }
+
           // TODO call update on this module somehow (done with language
           // method?) - from jason
 
           // TODO toData this updated module object and put in variables - from
           // jason
 
-          successful = true;
-          message = "successfully updated vocab";
         } else {
           message = "current language null in vocab update handler";
         }
@@ -984,7 +992,10 @@ public class GUICommand {
     // pull information of vocab
     vocabData.put("modtype", "Vocab");
     toData(vocab, vocabData);
-    vocabData.put("content", vocab.getTable());
+
+    Map<String, String> vocabContentList = new HashMap<>();
+    vocabContentList.put("vocabTerm", vocab.getTerm());
+    vocabContentList.put("vocabDef", vocab.getDefinition());
     return vocabData.build();
   }
 
@@ -1023,9 +1034,9 @@ public class GUICommand {
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
     // generate tag list
-    List<String> tagList = new ArrayList<>();
+    List<Map<String, Object>> tagList = new ArrayList<>();
     for (Tag tag : module.getTags()) {
-      tagList.add(tag.getTag());
+      tagList.add(toData(tag));
     }
     // add to map
     map.put("tags", tagList);

@@ -44,7 +44,7 @@ public class Vocab extends Module implements Reviewable {
     this.term = t;
   }
 
-  public void updateDefition(String d) {
+  public void updateDefinition(String d) {
     this.definition = d;
   }
 
