@@ -93,7 +93,7 @@ public class Main {
     final Set<String> NO_FORCE_LOGIN = ImmutableSet.<String>builder()
             .add("/login")
             .add("/validate")
-            .add("/landing")
+            .add("/")
             .build();
     Spark.before((req, res) -> {
       String userId = req.session().attribute("user_id");
@@ -114,7 +114,7 @@ public class Main {
       e.printStackTrace();
     }
 
-    Spark.get("/landing", new GUICommand.LandingPageHandler(), freeMarker);
+    Spark.get("/", new GUICommand.LandingPageHandler(), freeMarker);
     Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
     Spark.get("/languages", new GUICommand.LanguagePromptHandler(), freeMarker);
     Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);

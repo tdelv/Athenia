@@ -75,6 +75,7 @@ public class DatabaseParser {
         Athenia user = new Athenia(userId);
         USER_MAP.put(userId, user);
 
+        /**
         try (Connection conn = loadConnection(userId)) {
             // Get meta data for user
             try (Statement statement = conn.createStatement();
@@ -155,6 +156,7 @@ public class DatabaseParser {
         } catch (DriveApiException e) {
             throw new DatabaseParserException(e);
         }
+         */
 
         return user;
     }
