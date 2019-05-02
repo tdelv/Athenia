@@ -52,6 +52,7 @@ public class Language extends Modularized {
   }
 
   public List<FreeNote> getRecentFreeNotes() {
+    /*
     List<FreeNote> returnable = new ArrayList<FreeNote>();
 
     int i = 1;
@@ -63,6 +64,21 @@ public class Language extends Modularized {
     }
 
     return returnable;
+    */
+
+    // a list of the users recent notes
+    List<FreeNote> recentNotes = new ArrayList<>();
+
+    // the max number of notes to return
+    int NUMBER_OF_NOTES = 3;
+
+    for (int i = 0; i < freenotes.size() && i < NUMBER_OF_NOTES; i++) {
+      FreeNote note = freenotes.get(i);
+      recentNotes.add(note);
+    }
+
+    return recentNotes;
+
   }
 
 }
