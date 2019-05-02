@@ -11,9 +11,7 @@ import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Tag;
-import edu.brown.cs.athenia.data.modules.module.Conjugation;
-import edu.brown.cs.athenia.data.modules.module.StorageType;
-import edu.brown.cs.athenia.data.modules.module.Vocab;
+import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
@@ -35,7 +33,7 @@ import spark.TemplateViewRoute;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
-  
+
   private GUICommand() { }
 
   /**
@@ -959,9 +957,9 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(FreeNote note) {
 
-    // TODO: get the id, name/title, dates, tags associate with this
-    ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
-    noteData.put("modtype", "FreeNote");
+    ImmutableMap.Builder<String, Object> noteData =
+            new ImmutableMap.Builder<String, Object>();
+    noteData.put("modtype", StorageType.FREE_NOTE);
     noteData.put("title", note.getTitle());
 
     // add all module data
@@ -1003,8 +1001,7 @@ public class GUICommand {
 
   /**
    * Converts a Conjugation module into a data map for JSON.
-   * @param conjugation
-   *          the Conjugation module to convert
+   * @param conjugation the Conjugation module to convert
    * @return a map of data from the FreeNote object
    */
   private static Map<String, Object> toData(Conjugation conjugation) {
@@ -1018,8 +1015,7 @@ public class GUICommand {
 
   /**
    * Converts a Tag module into a data map for JSON.
-   * @param tag
-   *          the Tag module to convert
+   * @param tag the Tag module to convert
    * @return a map of data from the Tag object
    */
   private static Map<String, Object> toData(Tag tag) {
@@ -1029,10 +1025,37 @@ public class GUICommand {
     return tagData.build();
   }
 
-  // TODO some way to add information from a module in generic way?
+  /**
+   * Converts an AlertExclamation into a data map for JSON.
+   * @param alert the AlertExclamation object to convert
+   * @return a map of data from the AlertExclamation object
+   */
+  private static Map<String, Object> toData(AlertExclamation alert) {
+    ImmutableMap.Builder<String, Object> alertData =
+            new ImmutableMap.Builder<String, Object>();
+    alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
+    toData(alert, alertData);
+    alertData.put("content", alert.getText());
+    return alertData.build();
+  }
+
+  private static Map<String, Object> toData(Note note) {
+    ImmutableMap.Builder<String, Object> noteData =
+            new ImmutableMap.Builder<String, Object>();
+    noteData.put("modtype", StorageType.NOTE);
+    toData(note, noteData);
+    
+    return noteData.build();
+  }
+
+  /**
+   * Converts any generic Module data into a data map for JSON.
+   * @param module the generic Module object to convert
+   * @param map the ImmutableMap to add the data information to
+   */
   private static void toData(Module module,
       ImmutableMap.Builder<String, Object> map) {
-    map.put("id", module.getId()); // TODO get the module id
+    map.put("id", module.getId());
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
     // generate tag list
