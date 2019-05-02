@@ -1,6 +1,6 @@
 package edu.brown.cs.athenia.data.modules.module;
 
-import edu.brown.cs.athenia.data.modules.Table;
+import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.review.Reviewable;
 
 /**
@@ -8,14 +8,16 @@ import edu.brown.cs.athenia.review.Reviewable;
  * @author makaylamurphy
  *
  */
-public class Vocab extends Table implements Reviewable {
+public class Vocab extends Module implements Reviewable {
 
   // rating is originally set to 1 (medium).
   private int rating;
+  private String term;
+  private String definition;
 
-  public Vocab(String term, String definition) {
-    super();
-    this.add(term, definition);
+  public Vocab(String t, String d) {
+    this.term = t;
+    this.definition = d;
   }
 
   /**
@@ -28,6 +30,27 @@ public class Vocab extends Table implements Reviewable {
 
   public void setRating(int r) {
     this.rating = r;
+  }
+
+  public String getTerm() {
+    return this.term;
+  }
+
+  public String getDefinition() {
+    return this.definition;
+  }
+
+  public void updateTerm(String t) {
+    this.term = t;
+  }
+
+  public void updateDefition(String d) {
+    this.definition = d;
+  }
+
+  public void updateVocab(String t, String d) {
+    this.term = t;
+    this.definition = d;
   }
 
 }
