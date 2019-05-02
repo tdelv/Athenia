@@ -35,6 +35,15 @@ public abstract class Table extends Module {
     this.table.add(new Pair(term, def));
   }
 
+
+  // TODO : something to update the map?
+  // like how could you update a key?
+
+  public void update(String updatedTerm, String updatedDef, int index) {
+    this.setDateModified(new Date());
+    table.get(index).updatePair(updatedTerm, updatedDef);
+  }
+
   /**
    * Removes a mapping.
    * @param term
