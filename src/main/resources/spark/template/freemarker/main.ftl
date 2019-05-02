@@ -18,6 +18,9 @@
 
     <script src="js/jquery-2.1.1.js"></script>
 
+    <script src="https://unpkg.com/popper.js"></script>
+    <script src="https://unpkg.com/tooltip.js"></script>
+
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.js"></script>

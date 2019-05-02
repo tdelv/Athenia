@@ -25,7 +25,21 @@
                     </div>
                 </div>
             </div>
-        <!-- End of Note Heading Row -->
+            <!-- End of Note Heading Row -->
+
+            <!-- Note Body Row -->
+            <div class="row">
+                <div class="col">
+                    <div class="card border-bottom-primary shadow" style="margin-top: 1vw;">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <#--TODO: list modules -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of Note Body Row -->
 
         </div>
         <!-- End of Main Column -->
@@ -34,12 +48,29 @@
         <div class="col">
             <div class="card border-left-warning shadow">
                 <div class="card-body">
-                    <p>menu</p>
-                    <p>menu</p>
-                    <p>menu</p>
-                    <p>menu</p>
-                    <p>menu</p>
-                    <p>menu</p>
+
+                    <div class="col">
+                        <a href="#" class="btn btn-success btn-circle" id="insertVocabButton">
+                            <i class="fa fa-list"></i>
+                        </a>
+
+                        <a href="#" class="btn btn-success btn-circle">
+                            <i class="fa fa-list"></i>
+                        </a>
+
+                        <a href="#" class="btn btn-success btn-circle">
+                            <i class="fa fa-list"></i>
+                        </a>
+
+                        <a href="#" class="btn btn-success btn-circle">
+                            <i class="fa fa-list"></i>
+                        </a>
+
+                        <a href="#" class="btn btn-success btn-circle">
+                            <i class="fa fa-list"></i>
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>
