@@ -1050,6 +1050,7 @@ public class GUICommand {
     vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
     vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
     vocabData.put("content", vocabContentList);
+    vocabData.put("rating", vocab.getRating());
     return vocabData.build();
   }
 
@@ -1064,6 +1065,7 @@ public class GUICommand {
     conjugationData.put("modtype", StorageType.CONJUGATION);
     toData(conjugation, conjugationData);
     conjugationData.put("content", conjugation.getTable());
+    conjugationData.put("rating", conjugation.getRating());
     return conjugationData.build();
   }
 
@@ -1093,12 +1095,18 @@ public class GUICommand {
     return alertData.build();
   }
 
+  /**
+   * Converts a Note into a data map for JSON.
+   * @param note the Note object to convert
+   * @return the ImmutableMap to add the data to
+   */
   private static Map<String, Object> toData(Note note) {
     ImmutableMap.Builder<String, Object> noteData =
             new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.NOTE);
     toData(note, noteData);
-    
+    noteData.put("content", note.getText());
+    noteData.put("rating", note.getRating());
     return noteData.build();
   }
 
@@ -1117,7 +1125,6 @@ public class GUICommand {
     for (Tag tag : module.getTags()) {
       tagList.add(toData(tag));
     }
-    // add to map
     map.put("tags", tagList);
   }
 
