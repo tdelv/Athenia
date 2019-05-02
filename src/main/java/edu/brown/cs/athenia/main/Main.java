@@ -125,6 +125,19 @@ public class Main {
     Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
     //Spark.get("/bacon/actor", new BaconActorHandler(), freeMarker);
 
+    Spark.get("/notes", new GUICommand.FreeNotesPageHandler(), freeMarker);
+
+    // TODO:
+    // Dear Jason,
+    // please create the associated GUICommand handlers for the following get requests.
+    // Love, Mia
+
+    // uses vocab.ftl
+    // Spark.get("/vocabulary", new GUICommand.VocabPageHandler(), freeMarker);
+
+    // uses conjugations.ftl
+    // Spark.get("/conjugations", new GUICommand.ConjugationsPageHandler(), freeMarker);
+
   }
 
   /**
