@@ -2,9 +2,7 @@ package edu.brown.cs.athenia.data.modules;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Table is an abstract class that represents any kind of table or mapping. All
@@ -14,12 +12,11 @@ import java.util.Map;
  */
 public abstract class Table extends Module {
 
-  private Map<String, String> table;
+  private List<Pair> table;
   private List<String> termList;
 
   public Table() {
-    this.table = new HashMap<String, String>();
-    this.termList = new ArrayList<String>();
+    this.table = new ArrayList<Pair>();
   }
 
   /**
@@ -31,12 +28,12 @@ public abstract class Table extends Module {
    */
   public void add(String term, String def) {
     this.setDateModified(new Date());
-    this.termList.add(term);
-    this.table.put(term, def);
+    this.table.add(new Pair(term, def));
   }
 
-  public List<String> getTermList() {
-    return termList;
+  public void add(String term, String def, int index) {
+    this.setDateModified(new Date());
+    this.table.add(new Pair(term, def));
   }
 
   // TODO : something to update the map?
@@ -47,13 +44,12 @@ public abstract class Table extends Module {
    * @param term
    * @return
    */
-  public String remove(String term) {
+  public boolean remove(Pair p) {
     this.setDateModified(new Date());
-    termList.remove(term);
-    return table.remove(term);
+    return this.table.remove(p);
   }
 
-  public Map<String, String> getTable() {
+  public List<Pair> getTable() {
     return table;
   }
 
