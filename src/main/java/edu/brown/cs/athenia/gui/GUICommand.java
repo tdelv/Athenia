@@ -35,7 +35,7 @@ import spark.TemplateViewRoute;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
-
+  
   private GUICommand() { }
 
   /**
@@ -355,7 +355,6 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
@@ -492,6 +491,9 @@ public class GUICommand {
     }
   }
 
+  /**
+   * POST request for removing a Vocab object from the user globally.
+   */
   public static class VocabularyRemoveHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
@@ -507,13 +509,15 @@ public class GUICommand {
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
         if (lang != null) {
-
-          // TODO call the remove module (global remove)
-
-          successful = true;
-          message = "successfully removed vocab";
+          if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
+            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
+            lang.removeModule(StorageType.VOCAB, vocabToRemove);
+            successful = true;
+            message = "successfully removed vocab";
+          } else {
+            message = "vocab module does not exist in language modmap";
+          }
         } else {
           message = "current language null in vocab remove handler";
         }
@@ -986,12 +990,14 @@ public class GUICommand {
   private static Map<String, Object> toData(Vocab vocab) {
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
-    vocabData.put("modtype", "Vocab");
+    vocabData.put("modtype", StorageType.VOCAB);
     toData(vocab, vocabData);
 
+    // prepare map of content
     Map<String, String> vocabContentList = new HashMap<>();
     vocabContentList.put("vocabTerm", vocab.getTerm());
     vocabContentList.put("vocabDef", vocab.getDefinition());
+    vocabData.put("content", vocabContentList);
     return vocabData.build();
   }
 
@@ -1004,7 +1010,7 @@ public class GUICommand {
   private static Map<String, Object> toData(Conjugation conjugation) {
     ImmutableMap.Builder<String, Object> conjugationData = new ImmutableMap.Builder<String, Object>();
     // pull information of conjugation table
-    conjugationData.put("modtype", "Conjugation");
+    conjugationData.put("modtype", StorageType.CONJUGATION);
     toData(conjugation, conjugationData);
     conjugationData.put("content", conjugation.getTable());
     return conjugationData.build();
@@ -1018,7 +1024,7 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(Tag tag) {
     ImmutableMap.Builder<String, Object> tagData = new ImmutableMap.Builder<String, Object>();
-    tagData.put("modtype", "tag");
+    tagData.put("modtype", StorageType.TAG);
     tagData.put("content", tag.getTag());
     return tagData.build();
   }

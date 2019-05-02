@@ -1,7 +1,9 @@
 package edu.brown.cs.athenia.data.modules;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,9 +15,11 @@ import java.util.Map;
 public abstract class Table extends Module {
 
   private Map<String, String> table;
+  private List<String> termList;
 
   public Table() {
-    table = new HashMap<String, String>();
+    this.table = new HashMap<String, String>();
+    this.termList = new ArrayList<String>();
   }
 
   /**
@@ -27,11 +31,16 @@ public abstract class Table extends Module {
    */
   public void add(String term, String def) {
     this.setDateModified(new Date());
-    table.put(term, def);
+    this.termList.add(term);
+    this.table.put(term, def);
+  }
+
+  public List<String> getTermList() {
+    return termList;
   }
 
   // TODO : something to update the map?
-  //           like how could you update a key?
+  // like how could you update a key?
 
   /**
    * Removes a mapping.
@@ -40,6 +49,7 @@ public abstract class Table extends Module {
    */
   public String remove(String term) {
     this.setDateModified(new Date());
+    termList.remove(term);
     return table.remove(term);
   }
 

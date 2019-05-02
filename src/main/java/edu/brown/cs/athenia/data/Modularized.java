@@ -30,8 +30,6 @@ public abstract class Modularized {
     return moduleMap.get(type).get(id);
   }
 
-  
-
   public List<Module> getModules() {
     List<Module> modules = new ArrayList<Module>();
     for (Module m : ((Map<String, Module>) moduleMap.values()).values()) {
