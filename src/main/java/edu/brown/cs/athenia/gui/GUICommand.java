@@ -2,7 +2,11 @@ package edu.brown.cs.athenia.gui;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -122,9 +126,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- LANGUAGE HANDLERS ----------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- LANGUAGE HANDLERS ----------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which pulls the different languages the user has so far
@@ -275,9 +285,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- HOMEPAGE HANDLERS ----------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- HOMEPAGE HANDLERS ----------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which pulls the most recent activity of the appropriate
@@ -339,9 +355,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- VOCAB HANDLERS -------------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- VOCAB HANDLERS -------------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which pulls all of the vocabulary information saved by
@@ -464,8 +486,9 @@ public class GUICommand {
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
 
             // update the vocab
-            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
-            vocabToUpdate.updateVocab(updatedTerm, updatedDef);
+            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
+                vocabId);
+            vocabToUpdate.getPair().updatePair(updatedTerm, updatedDef);
             // convert to JSON for frontend
             variables.put("updatedVocabModule", toData(vocabToUpdate));
             // update successful message
@@ -509,7 +532,8 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
         if (lang != null) {
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
-            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
+            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB,
+                vocabId);
             lang.removeModule(StorageType.VOCAB, vocabToRemove);
             successful = true;
             message = "successfully removed vocab";
@@ -529,9 +553,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- CONJUGATION HANDLERS -------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- CONJUGATION HANDLERS -------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which retrieves all conjugation information from the
@@ -649,9 +679,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- TAG HANDLERS ---------------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- TAG HANDLERS ---------------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler for retrieving information pertaining to a specific tag
@@ -782,9 +818,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- FREENOTES HANDLERS ---------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- FREENOTES HANDLERS ---------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler which retrieves all free notes information from the
@@ -894,9 +936,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- REVIEW HANDLERS ------------------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- REVIEW HANDLERS ------------------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * GET request handler for the Review landing page which pulls all of the tags
@@ -945,9 +993,15 @@ public class GUICommand {
     }
   }
 
-  /* -------------------------------------------------------------------------*/
-  /* -- CLASS TO JSON HANDLERS -----------------------------------------------*/
-  /* -------------------------------------------------------------------------*/
+  /*
+   * -------------------------------------------------------------------------
+   */
+  /*
+   * -- CLASS TO JSON HANDLERS -----------------------------------------------
+   */
+  /*
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * Converts a FreeNote into a data map for JSON.
@@ -993,8 +1047,8 @@ public class GUICommand {
 
     // prepare map of content
     Map<String, String> vocabContentList = new HashMap<>();
-    vocabContentList.put("vocabTerm", vocab.getTerm());
-    vocabContentList.put("vocabDef", vocab.getDefinition());
+    vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
+    vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
     vocabData.put("content", vocabContentList);
     return vocabData.build();
   }
