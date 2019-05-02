@@ -40,4 +40,8 @@ public abstract class Table extends Module {
     return table.remove(term);
   }
 
+  public Map<String, String> getTable() {
+    return table;
+  }
+
 }

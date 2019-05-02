@@ -2,33 +2,32 @@ package edu.brown.cs.athenia.gui;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Set;
 
-import com.google.api.services.drive.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
-import edu.brown.cs.athenia.databaseparser.*;
-import edu.brown.cs.athenia.driveapi.DriveApiException;
-import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
-import edu.brown.cs.athenia.data.modules.*;
-import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
+import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.data.modules.Tag;
+import edu.brown.cs.athenia.data.modules.module.Conjugation;
+import edu.brown.cs.athenia.data.modules.module.StorageType;
+import edu.brown.cs.athenia.data.modules.module.Vocab;
+import edu.brown.cs.athenia.databaseparser.DatabaseParser;
+import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
+import edu.brown.cs.athenia.driveapi.DriveApiException;
+import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
-import edu.brown.cs.athenia.review.*;
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.TemplateViewRoute;
-
-import javax.xml.crypto.*;
-
 
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
@@ -39,29 +38,34 @@ import javax.xml.crypto.*;
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
-  private GUICommand() { }
+
+  private GUICommand() {
+  }
 
   /**
    *
    */
   public static class LandingPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       // String userId = checkLoggedIn(req, res);
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>().put("title", "landing page").build();
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
+          .put("title", "landing page").build();
 
       return new ModelAndView(variables, "landing.ftl");
     }
   }
 
   /**
-   * Handles initial login request, redirecting user to
-   * Google Authenication page if not already logged in.
+   * Handles initial login request, redirecting user to Google Authenication
+   * page if not already logged in.
    */
   public static class LoginHandler implements Route {
 
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       // Set destination to go after login
       if (req.session().attribute("loginDestination") == null) {
 
@@ -90,8 +94,8 @@ public class GUICommand {
   }
 
   /**
-   * Handles the redirect from Google Authentication,
-   * storing credentials and redirecting user to correct url.
+   * Handles the redirect from Google Authentication, storing credentials and
+   * redirecting user to correct url.
    */
   public static class ValidateHandler implements Route {
 
@@ -100,8 +104,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       // Ensure that this is no request forgery going on, and that the user
       // sending us this connect request is the user that was supposed to.
-      if (req.session().attribute("state") == null
-              || !qm.value("state").equals((String) req.session().attribute("state"))) {
+      if (req.session().attribute("state") == null || !qm.value("state")
+          .equals((String) req.session().attribute("state"))) {
         res.redirect("/login");
         return null;
       }
@@ -131,13 +135,13 @@ public class GUICommand {
    */
   public static class LanguagePromptHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       String userId = req.session().attribute("user_id");
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         // try to find the user in database and send the language name to
@@ -174,8 +178,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -210,8 +213,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         // find and check for user
@@ -250,8 +252,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         // find and check for user
@@ -282,15 +283,15 @@ public class GUICommand {
    */
   public static class HomePageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -343,7 +344,8 @@ public class GUICommand {
    */
   public static class VocabularyPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       // have tags as a certain part of frontend
       // --- use data-* thing for storing, filtering tags
       String userId = req.session().attribute("user_id");
@@ -352,8 +354,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -387,8 +388,8 @@ public class GUICommand {
   }
 
   /**
-   * POST request handler for adding a new Vocab object to the user's
-   * current Language.
+   * POST request handler for adding a new Vocab object to the user's current
+   * Language.
    */
   public static class VocabularyAddHandler implements Route {
     @Override
@@ -401,8 +402,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -447,8 +447,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -456,9 +455,11 @@ public class GUICommand {
 
         if (lang != null) {
 
-          // TODO call update on this module somehow (done with language method?) - from jason
+          // TODO call update on this module somehow (done with language
+          // method?) - from jason
 
-          // TODO toData this updated module object and put in variables - from jason
+          // TODO toData this updated module object and put in variables - from
+          // jason
 
           successful = true;
           message = "successfully updated vocab";
@@ -486,8 +487,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -495,7 +495,8 @@ public class GUICommand {
 
         if (lang != null) {
 
-          // TODO call remove on this module somehow (through language) - from jason
+          // TODO call remove on this module somehow (through language) - from
+          // jason
 
           successful = true;
           message = "successfully removed vocab";
@@ -512,7 +513,6 @@ public class GUICommand {
     }
   }
 
-
   /**
    * GET request handler which retrieves all conjugation information from the
    * database and formats this information to send to the front end for display
@@ -520,15 +520,15 @@ public class GUICommand {
    */
   public static class ConjugationPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -536,7 +536,8 @@ public class GUICommand {
 
         if (lang != null) {
 
-          Map<String, Module> conjMap = lang.getModuleMap(StorageType.CONJUGATION);
+          Map<String, Module> conjMap = lang
+              .getModuleMap(StorageType.CONJUGATION);
           List<Map<String, Object>> conjList = new ArrayList<>();
 
           // translate conj objects to JSON
@@ -574,8 +575,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -602,7 +602,6 @@ public class GUICommand {
     }
   }
 
-
   /**
    * POST request handler for adding, updating, or deleting a conjugation module
    * within the database. Called whenever the user makes an edit to any
@@ -620,7 +619,7 @@ public class GUICommand {
       // 2. updating old conjugation module
       // 3. deleting old conjugation module
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-              .put("...", "...").build();
+          .put("...", "...").build();
       // TODO execute the appropriate operation:
       // 1. add new conjugation module to appropriate database tables
       // 2. update conjugation module within appropriate database tables
@@ -638,22 +637,22 @@ public class GUICommand {
    */
   public static class TagPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-          Set<Tag> tagSet = lang.getTagSet();
+          Collection<Tag> tagSet = lang.getTags();
           List<Map<String, Object>> tagList = new ArrayList<>();
 
           for (Tag tag : tagSet) {
@@ -695,13 +694,14 @@ public class GUICommand {
       String type = qm.value("type");
       if (type.equals("add")) {
         Tag tag = null; // TODO: generate a new tag object and add to database
-//        language.addTag(tag);
+        // language.addTag(tag);
       } else if (type.equals("update")) {
-        String id = "..."; // TODO: get ID of tag to update (aka to change name or add element to?)
-//        language.updateTag(id);
+        String id = "..."; // TODO: get ID of tag to update (aka to change name
+                           // or add element to?)
+        // language.updateTag(id);
       } else if (type.equals("delete")) {
         String id = "..."; // TODO: get ID of tag to delete from everything
-//        language.deleteTag(id);
+        // language.deleteTag(id);
       } else {
         // TODO: throw an error message that tag doesn't exist
       }
@@ -731,17 +731,17 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String type = qm.value("type");
 
-//      if (language != null) {
-//        if (type.equals("add")) {
-//
-//        } else if (type.equals("update")) {
-//
-//        } else if (type.equals("delete")) {
-//
-//        } else {
-//          // TODO: throw error
-//        }
-//      }
+      // if (language != null) {
+      // if (type.equals("add")) {
+      //
+      // } else if (type.equals("update")) {
+      //
+      // } else if (type.equals("delete")) {
+      //
+      // } else {
+      // // TODO: throw error
+      // }
+      // }
       // TODO pull in the information of the module, the tag, and the operation
       // wanted:
       // 1. add tag to the module
@@ -758,8 +758,6 @@ public class GUICommand {
     }
   }
 
-
-
   /**
    * GET request handler which retrieves all free notes information from the
    * database and formats this information to send to the front end for display
@@ -767,7 +765,8 @@ public class GUICommand {
    */
   public static class FreeNotesPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
       // TODO: recognize user wants to visit landing page of FreeNotes
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
@@ -786,13 +785,13 @@ public class GUICommand {
    */
   public static class FreeNotesEditorHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
       // TODO: send id through the url in the js (for mia from mia lol)
       String noteId = qm.value("id");
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       if (noteId.equals("new")) {
         // send the default values to front end / empty lists and stuff
@@ -877,7 +876,8 @@ public class GUICommand {
    */
   public static class ReviewModeLandingHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
       // TODO: grab all tags and format to send to front end
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
@@ -889,16 +889,17 @@ public class GUICommand {
   }
 
   /**
-   * GET request handler for an individual Review page which pulls all of
-   * the information of the modules and tags the user has chosen to review,
-   * packages it, and formats it to send to the front-end to display to the
-   * user. Retrieves all information including content, type, and rating.
-   * Sends all of this info to the front-end in the ordered rating
-   * according to the algorithm.
+   * GET request handler for an individual Review page which pulls all of the
+   * information of the modules and tags the user has chosen to review, packages
+   * it, and formats it to send to the front-end to display to the user.
+   * Retrieves all information including content, type, and rating. Sends all of
+   * this info to the front-end in the ordered rating according to the
+   * algorithm.
    */
   public static class ReviewModeIndividualHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
       // TODO: parse out the options the user has chosen to review
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
@@ -912,18 +913,18 @@ public class GUICommand {
     }
   }
 
-  //--- Class info to JSON methods -------------------------------------------
+  // --- Class info to JSON methods -------------------------------------------
 
   /**
    * Converts a FreeNote into a data map for JSON.
-   * @param note the FreeNote object to convert
+   * @param note
+   *          the FreeNote object to convert
    * @return a map of data from the FreeNote object
    */
   private static Map<String, Object> toData(FreeNote note) {
 
     // TODO: get the id, name/title, dates, tags associate with this
-    ImmutableMap.Builder<String, Object> noteData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", "FreeNote");
     noteData.put("title", note.getTitle());
 
@@ -946,53 +947,53 @@ public class GUICommand {
 
   /**
    * Converts a Vocab module into a data map for JSON.
-   * @param vocab the Vocab object to convert
+   * @param vocab
+   *          the Vocab object to convert
    * @return a map of data from the Vocab object
    */
   private static Map<String, Object> toData(Vocab vocab) {
     // TODO: get vocab content (getContent())
     // TODO
-    ImmutableMap.Builder<String, Object> vocabData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
     vocabData.put("modtype", "Vocab");
     toData(vocab, vocabData);
-    vocabData.put("content", vocab.getContent());
+    vocabData.put("content", vocab.getTable());
     return vocabData.build();
   }
 
   /**
    * Converts a Conjugation module into a data map for JSON.
-   * @param conjugation the Conjugation module to convert
+   * @param conjugation
+   *          the Conjugation module to convert
    * @return a map of data from the FreeNote object
    */
   private static Map<String, Object> toData(Conjugation conjugation) {
-    ImmutableMap.Builder<String, Object> conjugationData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> conjugationData = new ImmutableMap.Builder<String, Object>();
     // pull information of conjugation table
     conjugationData.put("modtype", "Conjugation");
     toData(conjugation, conjugationData);
-    conjugationData.put("content", conjugation.getContent());
+    conjugationData.put("content", conjugation.getTable());
     return conjugationData.build();
   }
 
   /**
    * Converts a Tag module into a data map for JSON.
-   * @param tag the Tag module to convert
+   * @param tag
+   *          the Tag module to convert
    * @return a map of data from the Tag object
    */
   private static Map<String, Object> toData(Tag tag) {
-    ImmutableMap.Builder<String, Object> tagData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> tagData = new ImmutableMap.Builder<String, Object>();
     tagData.put("modtype", "tag");
-    tagData.put("content", tag.getContent());
+    tagData.put("content", tag.getTag());
     return tagData.build();
   }
 
   // TODO some way to add information from a module in generic way?
   private static void toData(Module module,
-                             ImmutableMap.Builder<String, Object> map) {
-    map.put("id", module.getId()); //TODO get the module id
+      ImmutableMap.Builder<String, Object> map) {
+    map.put("id", module.getId()); // TODO get the module id
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
     map.put("tags", module.getTags());
