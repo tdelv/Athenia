@@ -42,8 +42,6 @@ public class GUICommand {
 
   private GUICommand() {
   }
-  
-  private GUICommand() { }
 
   /**
    *
@@ -491,8 +489,9 @@ public class GUICommand {
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
 
             // update the vocab
-            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
-            vocabToUpdate.updateVocab(updatedTerm, updatedDef);
+            Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
+                vocabId);
+            vocabToUpdate.getPair().updatePair(updatedTerm, updatedDef);
             // convert to JSON for frontend
             variables.put("updatedVocabModule", toData(vocabToUpdate));
             // update successful message
@@ -536,7 +535,8 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
         if (lang != null) {
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
-            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB, vocabId);
+            Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB,
+                vocabId);
             lang.removeModule(StorageType.VOCAB, vocabToRemove);
             successful = true;
             message = "successfully removed vocab";
@@ -1052,8 +1052,6 @@ public class GUICommand {
     Map<String, String> vocabContentList = new HashMap<>();
     vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
     vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
-    vocabContentList.put("vocabTerm", vocab.getTerm());
-    vocabContentList.put("vocabDef", vocab.getDefinition());
     vocabData.put("content", vocabContentList);
     return vocabData.build();
   }
