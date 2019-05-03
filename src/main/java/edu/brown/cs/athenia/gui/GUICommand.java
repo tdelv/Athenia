@@ -13,8 +13,7 @@ import com.google.gson.Gson;
 
 import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
-import edu.brown.cs.athenia.data.modules.Module;
-import edu.brown.cs.athenia.data.modules.Tag;
+import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
@@ -128,11 +127,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- LANGUAGE HANDLERS ----------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -260,7 +255,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         // find and check for user
@@ -287,11 +283,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- HOMEPAGE HANDLERS ----------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -357,11 +349,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- VOCAB HANDLERS -------------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -379,7 +367,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -427,7 +416,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -471,20 +461,18 @@ public class GUICommand {
       String vocabId = qm.value("vocabId");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
-
+      // successful messages
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
         if (lang != null) {
-
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
-
             // update the vocab
             Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
@@ -497,11 +485,9 @@ public class GUICommand {
           } else {
             message = "vocab module not in language module map in vocab update handler";
           }
-
         } else {
           message = "current language null in vocab update handler";
         }
-
       } catch (DatabaseParserException e) {
         message = "error getting user from database in vocab update handler";
       }
@@ -525,7 +511,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -555,11 +542,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- CONJUGATION HANDLERS -------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -585,7 +568,6 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-
           Map<String, Module> conjMap = lang
               .getModuleMap(StorageType.CONJUGATION);
           List<Map<String, Object>> conjList = new ArrayList<>();
@@ -602,7 +584,6 @@ public class GUICommand {
         } else {
           message = "current language null in conjugation page handler";
         }
-
       } catch (DatabaseParserException e) {
         message = "error getting user from database in conjugation page handler";
       }
@@ -619,13 +600,15 @@ public class GUICommand {
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
+      String conjugationId = qm.value("conjId");
       String newHeader = qm.value("header"); // just a string
       String newContent = qm.value("content"); // list of lists of strings
 
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -633,15 +616,18 @@ public class GUICommand {
 
         if (lang != null) {
 
-          // todo : create new vocab module and add to language - from jason
-          // todo : call toData on this and add to variables map - from jason
+          Conjugation conjToAdd = new Conjugation();
+          conjToAdd.setHeader(newHeader);
+
+          // TODO : parse out how newContent is formatted and translate
+
+          // TODO : add content to conjToAdd and throw into map to present to front-end
 
           successful = true;
           message = "successfully added conjugation";
         } else {
           message = "current language null in conjugation add handler";
         }
-
       } catch (DatabaseParserException e) {
         message = "error getting user from database in conjugation add handler";
       }
@@ -662,30 +648,89 @@ public class GUICommand {
   public static class ConjugationUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      // TODO pull out the information of the conjugation module and act on it
-      // accordingly:
-      // 1. adding a new conjugation module
-      // 2. updating old conjugation module
-      // 3. deleting old conjugation module
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO execute the appropriate operation:
-      // 1. add new conjugation module to appropriate database tables
-      // 2. update conjugation module within appropriate database tables
-      // 3. delete conjugation module from all database tables
-      // a. deletion can send confirmation alert to user
+      // information pulled from front-end
+      String conjId = qm.value("conjId");
+      String indexToUpdateStr = qm.value("updateIndex");
+      String updatedTerm = qm.value("updatedTerm");
+      String updatedDef = qm.value("updatedDef");
+      // successful messages
+      String message = "";
+      boolean successful = true;
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to pull the user info from the database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        if (lang != null) {
+          // check if module in map
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            Conjugation conjToUpdate = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            List<Pair> conjToUpdatePairs = conjToUpdate.getTable();
+            // try to parse index into integer
+            try {
+              int indexToUpdateInt = Integer.parseInt(indexToUpdateStr);
+              // check for index out of bounds
+              if (indexToUpdateInt < 0 ||
+                      indexToUpdateInt >= conjToUpdatePairs.size()) {
+                message = "index out of bounds in conjugation update handler";
+              } else {
+                // else finally do the update
+                conjToUpdate.update(updatedTerm, updatedDef, indexToUpdateInt);
+                variables.put("updatedConjModule", toData(conjToUpdate));
+                successful = true;
+                message = "successfully updated conjugation entry";
+              }
+              // catch a number format exception on passed in index
+            } catch (NumberFormatException e) {
+              message = "index of conjugation entry not a number";
+            }
+            // catch if conjugation module is not in the map
+          } else {
+            message = "conjugation module not in language module map";
+          }
+          // catch if current user language is null
+        } else {
+         message = "current language null in conjugation update handler";
+        }
+        // catch if user not properly found in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation update handler";
+      }
+
+      // put successful variables in map and send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
       return GSON.toJson(variables);
     }
   }
 
+  // TODO : remove one row (entry) in conjugation table
+  public static class ConjugationRemoveEntryHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String conjId = qm.value("conjId");
+      String indexToRemove = qm.value("indexToRemove");
+
+      boolean successful = false;
+      String message = "";
+
+
+    }
+  }
+
+  // TODO : remove entire conjugation table
+
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- TAG HANDLERS ---------------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -820,11 +865,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- FREENOTES HANDLERS ---------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -938,11 +979,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- REVIEW HANDLERS ------------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -995,11 +1032,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- CLASS TO JSON HANDLERS -----------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -1029,7 +1062,7 @@ public class GUICommand {
     }
 
     // put module data into map
-    noteData.put("content", modulesList);
+    noteData.put("freeNoteContent", modulesList);
     return noteData.build();
   }
 
@@ -1049,7 +1082,7 @@ public class GUICommand {
     Map<String, String> vocabContentList = new HashMap<>();
     vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
     vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
-    vocabData.put("content", vocabContentList);
+    vocabData.put("vocabContent", vocabContentList);
     vocabData.put("rating", vocab.getRating());
     return vocabData.build();
   }
@@ -1064,7 +1097,19 @@ public class GUICommand {
     // pull information of conjugation table
     conjugationData.put("modtype", StorageType.CONJUGATION);
     toData(conjugation, conjugationData);
-    conjugationData.put("content", conjugation.getTable());
+    conjugationData.put("header", conjugation.getHeader());
+
+    List<List<String>> conjPairData = new ArrayList<>();
+    // parse out the pair data
+    for (Pair p : conjugation.getTable()) {
+      List<String> pairData = new ArrayList<>();
+      pairData.add(p.getTerm());
+      pairData.add(p.getDefinition());
+      conjPairData.add(pairData);
+    }
+
+    // content of the conjugation table
+    conjugationData.put("tableContent", conjPairData);
     conjugationData.put("rating", conjugation.getRating());
     return conjugationData.build();
   }
@@ -1077,7 +1122,7 @@ public class GUICommand {
   private static Map<String, Object> toData(Tag tag) {
     ImmutableMap.Builder<String, Object> tagData = new ImmutableMap.Builder<String, Object>();
     tagData.put("modtype", StorageType.TAG);
-    tagData.put("content", tag.getTag());
+    tagData.put("tagContent", tag.getTag());
     return tagData.build();
   }
 
@@ -1091,7 +1136,7 @@ public class GUICommand {
             new ImmutableMap.Builder<String, Object>();
     alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(alert, alertData);
-    alertData.put("content", alert.getText());
+    alertData.put("alertContent", alert.getText());
     return alertData.build();
   }
 
@@ -1105,7 +1150,7 @@ public class GUICommand {
             new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.NOTE);
     toData(note, noteData);
-    noteData.put("content", note.getText());
+    noteData.put("noteContent", note.getText());
     noteData.put("rating", note.getRating());
     return noteData.build();
   }
