@@ -104,9 +104,6 @@ public class Main {
       }
     });
 
-    // A test route
-    Spark.get("/hello", (req, res) -> "Hello World!");
-
     try {
       Spark.get("/login", new GUICommand.LoginHandler());
       Spark.get("/validate", new GUICommand.ValidateHandler());
@@ -116,27 +113,27 @@ public class Main {
 
     Spark.get("/", new GUICommand.LandingPageHandler(), freeMarker);
     Spark.get("/home", new GUICommand.HomePageHandler(), freeMarker);
+
+    // language spark handlers
     Spark.get("/languages", new GUICommand.LanguagePromptHandler(), freeMarker);
-    Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
     Spark.post("/addNewLanguage", new GUICommand.LanguageAddHandler());
     Spark.post("/removeLanguage", new GUICommand.LanguageRemoveHandler());
     Spark.post("/changeCurrentLanguage", new GUICommand.LanguageChangeHandler());
 
-    Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
+
     //Spark.get("/bacon/actor", new BaconActorHandler(), freeMarker);
 
+    // freenotes spark handlers
     Spark.get("/notes", new GUICommand.FreeNotesPageHandler(), freeMarker);
+    Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
 
-    // TODO:
-    // Dear Jason,
-    // please create the associated GUICommand handlers for the following get requests.
-    // Love, Mia
-
-    // uses vocab.ftl
-    // Spark.get("/vocabulary", new GUICommand.VocabPageHandler(), freeMarker);
-
-    // uses conjugations.ftl
-    // Spark.get("/conjugations", new GUICommand.ConjugationsPageHandler(), freeMarker);
+    // module specific spark handlers
+    Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
+    Spark.post("/vocabularyAdd", new GUICommand.VocabularyAddHandler());
+    Spark.post("/vocabularyUpdate", new GUICommand.VocabularyUpdateHandler());
+    Spark.post("/vocabularyRemove", new GUICommand.VocabularyRemoveHandler());
+    
+    Spark.get("/conjugations", new GUICommand.ConjugationPageHandler(), freeMarker);
 
   }
 

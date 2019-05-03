@@ -711,6 +711,20 @@ public class GUICommand {
   }
 
   // TODO : remove one row (entry) in conjugation table
+  public static class ConjugationRemoveEntryHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String conjId = qm.value("conjId");
+      String indexToRemove = qm.value("indexToRemove");
+
+      boolean successful = false;
+      String message = "";
+
+
+    }
+  }
 
   // TODO : remove entire conjugation table
 
