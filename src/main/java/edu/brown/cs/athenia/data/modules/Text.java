@@ -13,6 +13,7 @@ public abstract class Text extends Module {
   private String text;
 
   public Text(String text) {
+    // TODO: store in database and generate (and set) id
     this.text = text;
   }
 

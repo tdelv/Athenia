@@ -31,10 +31,8 @@
             <div class="row">
                 <div class="col">
                     <div class="card border-bottom-primary shadow" style="margin-top: 1vw;">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <#--TODO: list modules -->
-                            </div>
+                        <div class="card-body" id="noteBody">
+
                         </div>
                     </div>
                 </div>
@@ -46,29 +44,33 @@
 
         <!-- Menu Column -->
         <div class="col">
-            <div class="card border-left-warning shadow">
+            <div class="card border-left-success shadow">
                 <div class="card-body">
 
-                    <div class="col">
-                        <a href="#" class="btn btn-success btn-circle" id="insertVocabButton">
+                    <div class="col d-flex flex-column">
+
+                        <h6>Insert</h6>
+
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertTextButton">
+                            <i class="fa fa-font"></i>
+                        </a>
+
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertVocabButton">
                             <i class="fa fa-list"></i>
                         </a>
 
-                        <a href="#" class="btn btn-success btn-circle">
-                            <i class="fa fa-list"></i>
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertConjugationButton">
+                            <i class="fa fa-table"></i>
                         </a>
 
-                        <a href="#" class="btn btn-success btn-circle">
-                            <i class="fa fa-list"></i>
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertExclamationButton">
+                            <i class="fa fa-exclamation"></i>
                         </a>
 
-                        <a href="#" class="btn btn-success btn-circle">
-                            <i class="fa fa-list"></i>
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertQuestionButton">
+                            <i class="fa fa-question"></i>
                         </a>
 
-                        <a href="#" class="btn btn-success btn-circle">
-                            <i class="fa fa-list"></i>
-                        </a>
                     </div>
 
                 </div>

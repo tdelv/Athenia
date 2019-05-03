@@ -36,9 +36,6 @@ public abstract class Table extends Module {
   }
 
 
-  // TODO : something to update the map?
-  // like how could you update a key?
-
   public void update(String updatedTerm, String updatedDef, int index) {
     this.setDateModified(new Date());
     table.get(index).updatePair(updatedTerm, updatedDef);
@@ -46,12 +43,16 @@ public abstract class Table extends Module {
 
   /**
    * Removes a mapping.
-   * @param term
    * @return
    */
   public boolean remove(Pair p) {
     this.setDateModified(new Date());
     return this.table.remove(p);
+  }
+
+  public void remove(int index) {
+    this.setDateModified(new Date());
+    this.table.remove(index);
   }
 
   public List<Pair> getTable() {

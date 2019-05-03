@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,14 +12,14 @@ import com.google.gson.Gson;
 
 import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
-import edu.brown.cs.athenia.data.modules.Module;
-import edu.brown.cs.athenia.data.modules.Tag;
+import edu.brown.cs.athenia.data.modules.*;
 import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
+
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -128,11 +127,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- LANGUAGE HANDLERS ----------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -260,7 +255,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         // find and check for user
@@ -287,11 +283,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- HOMEPAGE HANDLERS ----------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -357,11 +349,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- VOCAB HANDLERS -------------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -379,7 +367,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -427,7 +416,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -436,6 +426,11 @@ public class GUICommand {
         if (lang != null) {
           Vocab newVocab = new Vocab(newTerm, newDef);
           lang.addModule(StorageType.VOCAB, newVocab);
+
+          System.out.println("term: " + newVocab.getPair().getTerm());
+          System.out.println("def: " + newVocab.getPair().getDefinition());
+
+          System.out.println("to data: " + toData(newVocab));
 
           // call to data on new object
           variables.put("newVocabModule", toData(newVocab));
@@ -471,20 +466,18 @@ public class GUICommand {
       String vocabId = qm.value("vocabId");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
-
+      // successful messages
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
         if (lang != null) {
-
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
-
             // update the vocab
             Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
@@ -497,11 +490,9 @@ public class GUICommand {
           } else {
             message = "vocab module not in language module map in vocab update handler";
           }
-
         } else {
           message = "current language null in vocab update handler";
         }
-
       } catch (DatabaseParserException e) {
         message = "error getting user from database in vocab update handler";
       }
@@ -525,7 +516,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -555,11 +547,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- CONJUGATION HANDLERS -------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -573,19 +561,18 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
-
+      // successful messages
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
-
           Map<String, Module> conjMap = lang
               .getModuleMap(StorageType.CONJUGATION);
           List<Map<String, Object>> conjList = new ArrayList<>();
@@ -602,7 +589,6 @@ public class GUICommand {
         } else {
           message = "current language null in conjugation page handler";
         }
-
       } catch (DatabaseParserException e) {
         message = "error getting user from database in conjugation page handler";
       }
@@ -614,18 +600,23 @@ public class GUICommand {
     }
   }
 
+  /**
+   * POST request which adds a completely new conjugation module.
+   */
   public static class ConjugationAddHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
+      String conjugationId = qm.value("conjId");
       String newHeader = qm.value("header"); // just a string
       String newContent = qm.value("content"); // list of lists of strings
 
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -633,15 +624,18 @@ public class GUICommand {
 
         if (lang != null) {
 
-          // todo : create new vocab module and add to language - from jason
-          // todo : call toData on this and add to variables map - from jason
+          Conjugation conjToAdd = new Conjugation();
+          conjToAdd.setHeader(newHeader);
+
+          // TODO : parse out how newContent is formatted and translate
+
+          // TODO : add content to conjToAdd and throw into map to present to front-end
 
           successful = true;
           message = "successfully added conjugation";
         } else {
           message = "current language null in conjugation add handler";
         }
-
       } catch (DatabaseParserException e) {
         message = "error getting user from database in conjugation add handler";
       }
@@ -653,39 +647,737 @@ public class GUICommand {
   }
 
   /**
-   * POST request handler for adding, updating, or deleting a conjugation module
-   * within the database. Called whenever the user makes an edit to any
-   * conjugation module which can be found on the following pages: the
-   * conjugation landing and individual pages and the FreeNotes landing and
-   * individual pages.
+   * POST request for adding a conjugation entry to a preexisting conjugation
+   * table.
    */
-  public static class ConjugationUpdateHandler implements Route {
+  public static class ConjugationAddEntryHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      // TODO pull out the information of the conjugation module and act on it
-      // accordingly:
-      // 1. adding a new conjugation module
-      // 2. updating old conjugation module
-      // 3. deleting old conjugation module
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO execute the appropriate operation:
-      // 1. add new conjugation module to appropriate database tables
-      // 2. update conjugation module within appropriate database tables
-      // 3. delete conjugation module from all database tables
-      // a. deletion can send confirmation alert to user
+      // conjugation add information
+      String conjId = qm.value("conjId");
+      String indexToAddAt = qm.value("indexToAddAt");
+      String termToAdd = qm.value("termToAdd");
+      String defToAdd = qm.value("defToAdd");
+      // successful information
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current language not null
+        if (lang != null) {
+          // check if user map has the module in it
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            Conjugation conjToAddTo = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            // try to parse indexToAddAt into integer
+            try {
+              int indexToAddAtInt = Integer.parseInt(indexToAddAt);
+              // check for index out of bounds
+              if (indexToAddAtInt < 0 ||
+                      indexToAddAtInt >= conjToAddTo.getTable().size()) {
+                conjToAddTo.add(termToAdd, defToAdd, indexToAddAtInt);
+                successful = true;
+                message = "successfully added entry to conjugation table";
+
+                // catch if index out of bounds
+              } else {
+                message = "index out of bounds in conjugation add entry handler";
+              }
+              // catch number format exception
+            } catch (NumberFormatException e) {
+              message = "index to add at not an int in conjugation add entry handler";
+            }
+            // catch if conjugation module not in map
+          } else {
+            message = "conjugation module not in user map";
+          }
+          // catch if current language is null
+        } else {
+          message = "current language null in conjugation add entry handler";
+        }
+        // catch if user not in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation add entry handler";
+      }
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request which handles any edits made to a preexisting conjugation
+   * table's entries.
+   */
+  public static class ConjugationEntryUpdateHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      // information pulled from front-end
+      String conjId = qm.value("conjId");
+      String indexToUpdateStr = qm.value("updateIndex");
+      String updatedTerm = qm.value("updatedTerm");
+      String updatedDef = qm.value("updatedDef");
+      // successful messages
+      String message = "";
+      boolean successful = true;
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to pull the user info from the database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        if (lang != null) {
+          // check if module in map
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            Conjugation conjToUpdate = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            List<Pair> conjToUpdatePairs = conjToUpdate.getTable();
+            // try to parse index into integer
+            try {
+              int indexToUpdateInt = Integer.parseInt(indexToUpdateStr);
+              // check for index out of bounds
+              if (indexToUpdateInt < 0 ||
+                      indexToUpdateInt >= conjToUpdatePairs.size()) {
+                message = "index out of bounds in conjugation update handler";
+              } else {
+                // else finally do the update
+                conjToUpdate.update(updatedTerm, updatedDef, indexToUpdateInt);
+                variables.put("updatedConjModule", toData(conjToUpdate));
+                successful = true;
+                message = "successfully updated conjugation entry";
+              }
+              // catch a number format exception on passed in index
+            } catch (NumberFormatException e) {
+              message = "index of conjugation entry not a number";
+            }
+            // catch if conjugation module is not in the map
+          } else {
+            message = "conjugation module not in language module map";
+          }
+          // catch if current user language is null
+        } else {
+         message = "current language null in conjugation update handler";
+        }
+        // catch if user not properly found in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation update handler";
+      }
+
+      // put successful variables in map and send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
       return GSON.toJson(variables);
+    }
+  }
+
+  /**
+   * POST request handler for removing a single entry from a conjugation
+   * table.
+   */
+  public static class ConjugationRemoveEntryHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // conjugation remove information
+      String conjId = qm.value("conjId");
+      String indexToRemoveStr = qm.value("indexToRemove");
+
+      // successful messages
+      boolean successful = false;
+      String message = "";
+
+      // try to pull user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current language not null
+        if (lang != null) {
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            Conjugation conjToRemoveFrom = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            // try for parsing out int of index
+            try {
+              int indexToRemoveInt = Integer.parseInt(indexToRemoveStr);
+              // check for index out of bounds error
+              if (indexToRemoveInt < 0 ||
+                      indexToRemoveInt >= conjToRemoveFrom.getTable().size()) {
+                message = "index out of bounds in conjugation remove entry handler";
+              } else {
+                // if all is good, do the update
+                conjToRemoveFrom.remove(indexToRemoveInt);
+                successful = true;
+                message = "successfully remove conjugation entry";
+              }
+              // catch if index to remove is not an integer
+            } catch (NumberFormatException e) {
+              message = "index of conjugation entry to remove not an integer";
+            }
+            // catch if module not in map
+          } else {
+            message = "conjugation module not in user map";
+          }
+          // catch if current language is null
+        } else {
+          message = "current language null in conjugation entry remove handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation entry remove handler";
+      }
+
+      // prepare information to send to front-end
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
+              .put("successful", successful)
+              .put("message", message).build();
+      return GSON.toJson(variables);
+    }
+  }
+
+  /**
+   * POST request for removing an entire conjugation table from the user's
+   * language map.
+   */
+  public static class ConjugationRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String conjId = qm.value("conjId");
+      // successful variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if language not null
+        if (lang != null) {
+          // check if module in user map
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            // actually remove conjugation module
+            Conjugation conjToRemove = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            lang.removeModule(StorageType.CONJUGATION, conjToRemove);
+            // edit sucessful messages
+            successful = true;
+            message = "successfully removed conjugation module";
+
+            // catch if conjugation module does not exist
+          } else {
+            message = "conjugation module does not exist in user map";
+          }
+          // catch if current language is null
+        } else {
+          message = "current language null in conjugation remove handler";
+        }
+        // catch if user not in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation remove handler";
+      }
+
+      // prepare successful messages to front-end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
     }
   }
 
   /*
    * -------------------------------------------------------------------------
+   * -- NOTE HANDLERS --------------------------------------------------------
+   * -------------------------------------------------------------------------
    */
+
+  /**
+   * POST request which adds a completely new note module.
+   */
+  public static class NoteAddHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String noteStr = qm.value("noteString");
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // create new note and add to variables map
+          Note note = new Note(noteStr);
+          variables.put("newNote", toData(note));
+          // edit successful variables
+          successful = true;
+          message = "successfully added note to map";
+
+          // catch if current lang is null
+        } else {
+          message = "current language is null in add note handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in add note handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request which handles any edits made to a preexisting note module.
+   */
+  public static class NoteUpdateHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String noteId = qm.value("noteId");
+      String noteChange = qm.value("noteUpdate");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if note module is in map
+          if (lang.getModule(StorageType.NOTE, noteId) != null) {
+            // update the actual node
+            Note noteToUpdate = (Note) lang.getModule(StorageType.NOTE, noteId);
+            noteToUpdate.update(noteChange);
+            variables.put("updatedNote", toData(noteToUpdate));
+            // update successful messages
+            successful = true;
+            message = "successfully update note";
+            // catch if note module is not in map
+          } else {
+            message = "note module not in map in update note handler";
+          }
+          // catch if current lang is null
+        } else {
+          message = "current language is null in update note handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in update note handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+
+  }
+
+  /**
+   * POST request for handling the removal of a note object from the user map.
+   */
+  public static class NoteRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String noteId = qm.value("noteId");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if module is in user map
+          if (lang.getModule(StorageType.NOTE, noteId) != null) {
+            Note noteToRemove = (Note) lang.getModule(StorageType.NOTE, noteId);
+            lang.removeModule(StorageType.NOTE, noteToRemove);
+            // edit successful messages
+            successful = true;
+            message = "successfully removed note";
+            // catch if note module not in user map
+          } else {
+            message = "note module not in user map";
+          }
+          // catch if current lang is null
+        } else {
+          message = "current language null in note remove handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in note remove handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
   /*
+   * -------------------------------------------------------------------------
+   * -- ALERT EXCLAMATION HANDLERS -------------------------------------------
+   * -------------------------------------------------------------------------
+   */
+
+  /**
+   * POST request for handling the addition of a completely new alert
+   * exclamation module.
+   */
+  public static class AlertAddHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String alertStr = qm.value("alertString");
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          AlertExclamation alert = new AlertExclamation(alertStr);
+          variables.put("newAlert", toData(alert));
+          // edit successful variables
+          successful = true;
+          message = "successfully added new alert";
+
+          // catch if current lang is null
+        } else {
+          message = "current language null in alert add handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in alert add handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request for handling an update to an alert exclamation module.
+   */
+  public static class AlertUpdateHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String alertId = qm.value("alertId");
+      String alertUpdate = qm.value("alertUpdate");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if alert module is in map
+          if (lang.getModule(StorageType.ALERT_EXCLAMATION, alertId) != null) {
+            // update module
+            AlertExclamation alertToUpdate = (AlertExclamation)
+                    lang.getModule(StorageType.ALERT_EXCLAMATION, alertId);
+            alertToUpdate.update(alertUpdate);
+            variables.put("updatedAlert", toData(alertToUpdate));
+            // update successful messages
+            successful = true;
+            message = "successfully updated alert module";
+
+            // catch if alert module not in map
+          } else {
+            message = "alert module not in map in alert update handler";
+          }
+          // catch if current lang is null
+        } else {
+          message = "current language null in alert update handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in alert update handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request for handling the removal of an alert exclamation module.
+   */
+  public static class AlertRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String alertId = qm.value("alertId");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if module is in user map
+          if (lang.getModule(StorageType.ALERT_EXCLAMATION, alertId) != null) {
+            // remove module
+            AlertExclamation alertToRemove = (AlertExclamation)
+                    lang.getModule(StorageType.ALERT_EXCLAMATION, alertId);
+            lang.removeModule(StorageType.ALERT_EXCLAMATION, alertToRemove);
+            // edit successful variables
+            successful = true;
+            message = "successfully removed alert module";
+
+            // catch if module not in map
+          } else {
+            message = "alert module not in map in alert removal handler";
+          }
+          // catch if current lang is null
+        } else {
+          message = "current language null in alert removal handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in alert removal handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /*
+   * -------------------------------------------------------------------------
+   * -- QUESTION HANDLERS ----------------------------------------------------
+   * -------------------------------------------------------------------------
+   */
+
+  /**
+   * POST request for handling the addition of a completely new Question
+   * module.
+   */
+  public static class QuestionAddHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String questionStr = qm.value("questionStr");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          Question question = new Question(questionStr);
+          variables.put("newQuestion", toData(question));
+          // edit successful variables
+          successful = true;
+          message = "successfully added new question";
+
+          // catch if current lang is null
+        } else {
+          message = "current language null in question add handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in question add handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request for updating a preexisting Question module.
+   */
+  public static class QuestionUpdateHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String questionID = qm.value("questionId");
+      String questionUpdate = qm.value("questionUpdate");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if question module is in map
+          if (lang.getModule(StorageType.QUESTION, questionID) != null) {
+            // update the module
+            Question questionToUpdate = (Question)
+                    lang.getModule(StorageType.QUESTION, questionID);
+            questionToUpdate.update(questionUpdate);
+            variables.put("updatedQuestion", questionToUpdate);
+            // update successful variables
+            successful = true;
+            message = "successfully updated question module";
+
+            // catch if module not in map
+          } else {
+            message = "question module not in map in question update handler";
+          }
+          // catch if current lang is null
+        } else {
+          message = "current language null in question update handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in question update handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request for handling the removal of a question module.
+   */
+  public static class QuestionRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String questionId = qm.value("questionId");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if module is in user map
+          if (lang.getModule(StorageType.QUESTION, questionId) != null) {
+            // remove the question module
+            Question questionToRemove = (Question)
+                    lang.getModule(StorageType.QUESTION, questionId);
+            lang.removeModule(StorageType.QUESTION, questionToRemove);
+            // update successful variables
+            successful = true;
+            message = "successfully removed question module";
+
+            // catch if module not in user map
+          } else {
+            message = "question module not in user map in question remove handler";
+          }
+          // catch if current lang is null
+        } else {
+          message = "current language is null in question remove handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in question remove handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /*
+   * -------------------------------------------------------------------------
    * -- TAG HANDLERS ---------------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -697,42 +1389,42 @@ public class GUICommand {
    */
   public static class TagPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
 
+      // successful variables
       boolean successful = false;
       String message = "";
 
       ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
+      // try to find user in database
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
+        // check if current language is not null
         if (lang != null) {
           Collection<Tag> tagSet = lang.getTags();
           List<Map<String, Object>> tagList = new ArrayList<>();
-
+          // create list of tags
           for (Tag tag : tagSet) {
             tagList.add(toData(tag));
           }
-
           // add tagList to variables map
           variables.put("content", tagSet);
-
           // edit success messages
           successful = true;
           message = "successful pulled tag information";
+
+          // catch if current language is null
         } else {
           message = "current language null in tag page handler";
         }
-
+        // catch if user not in database
       } catch (DatabaseParserException e) {
         message = "error getting user from database in tag page handler";
       }
-
+      // prepare variables for front end
       variables.put("successful", successful);
       variables.put("message", message);
       return new ModelAndView(variables.build(), "...");
@@ -740,43 +1432,109 @@ public class GUICommand {
   }
 
   /**
-   * POST request handler for adding, updating, or deleting a tag and its
-   * information. Called whenever the user edits a tag on any of the pages,
-   * including the vocabulary landing and individual pages, the conjugation
-   * landing and individual pages, and the FreeNotes landing and individual
-   * pages. Specifically used for updating tag information and not for adding or
-   * removing tags from a module.
+   * POST request for adding a completely new tag to the user map.
    */
-  public static class TagUpdateHandler implements Route {
+  public static class TagAddHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String type = qm.value("type");
-      if (type.equals("add")) {
-        Tag tag = null; // TODO: generate a new tag object and add to database
-        // language.addTag(tag);
-      } else if (type.equals("update")) {
-        String id = "..."; // TODO: get ID of tag to update (aka to change name
-                           // or add element to?)
-        // language.updateTag(id);
-      } else if (type.equals("delete")) {
-        String id = "..."; // TODO: get ID of tag to delete from everything
-        // language.deleteTag(id);
-      } else {
-        // TODO: throw an error message that tag doesn't exist
+      String tagVal = qm.value("tagValue");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          //add new tag
+          lang.addTag(tagVal);
+          // update successful variables
+          successful = true;
+          message = "successfully added tag";
+
+          // catch if current lang is null
+        } else {
+          message = "current language is null in tag add handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in tag add handler";
       }
 
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: execute the appropriate operation to insert, update, or delete
-      // the tag's information to the database
-      // 1. add tag module to appropriate database tables
-      // 2. update tag module within appropriate database tables
-      // 1. delete tag module from all database tables
-      // a. deletion can send confirmation alert to user
-      return GSON.toJson(variables);
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
     }
   }
+
+  // TODO maybe? an update tag handler
+
+  /**
+   * POST request for removing a tag from the user map.
+   */
+  public static class TagRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String tagValue = qm.value("tagValue");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if lang has the tag
+          if (lang.hasTag(tagValue)) {
+            lang.removeTag(tagValue);
+            // update successful variables
+            successful = true;
+            message = "successfully removed tag";
+
+            // catch if tag is not in lang
+          } else {
+            message = "tag is not in user map in tag remove handler";
+          }
+
+          // catch if current lang is null
+        } else {
+          message = "current language is null in tag remove handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in tag remove handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+
+  /*
+   * -------------------------------------------------------------------------
+   * -- GENERIC MODULE HANDLERS ----------------------------------------------
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * POST request handler for updating a module's tag set, particularly adding
@@ -820,11 +1578,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- FREENOTES HANDLERS ---------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -938,11 +1692,16 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
+   * -- RATING HANDLERS ------------------------------------------------------
+   * -------------------------------------------------------------------------
    */
+
+  // TODO create a set handler for all things reviewable
+
+
   /*
+   * -------------------------------------------------------------------------
    * -- REVIEW HANDLERS ------------------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -995,11 +1754,7 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   */
-  /*
    * -- CLASS TO JSON HANDLERS -----------------------------------------------
-   */
-  /*
    * -------------------------------------------------------------------------
    */
 
@@ -1029,7 +1784,7 @@ public class GUICommand {
     }
 
     // put module data into map
-    noteData.put("content", modulesList);
+    noteData.put("freeNoteContent", modulesList);
     return noteData.build();
   }
 
@@ -1040,16 +1795,25 @@ public class GUICommand {
    * @return a map of data from the Vocab object
    */
   private static Map<String, Object> toData(Vocab vocab) {
+    System.out.println("got here C");
+
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
     vocabData.put("modtype", StorageType.VOCAB);
+
+    // TODO bug
     toData(vocab, vocabData);
 
     // prepare map of content
+    /*
     Map<String, String> vocabContentList = new HashMap<>();
     vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
     vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
-    vocabData.put("content", vocabContentList);
+    vocabData.put("vocabContent", vocabContentList);
+    */
+
+    vocabData.put("term", vocab.getPair().getTerm());
+    vocabData.put("def", vocab.getPair().getDefinition());
     vocabData.put("rating", vocab.getRating());
     return vocabData.build();
   }
@@ -1064,7 +1828,19 @@ public class GUICommand {
     // pull information of conjugation table
     conjugationData.put("modtype", StorageType.CONJUGATION);
     toData(conjugation, conjugationData);
-    conjugationData.put("content", conjugation.getTable());
+    conjugationData.put("header", conjugation.getHeader());
+
+    List<List<String>> conjPairData = new ArrayList<>();
+    // parse out the pair data
+    for (Pair p : conjugation.getTable()) {
+      List<String> pairData = new ArrayList<>();
+      pairData.add(p.getTerm());
+      pairData.add(p.getDefinition());
+      conjPairData.add(pairData);
+    }
+
+    // content of the conjugation table
+    conjugationData.put("tableContent", conjPairData);
     conjugationData.put("rating", conjugation.getRating());
     return conjugationData.build();
   }
@@ -1077,7 +1853,7 @@ public class GUICommand {
   private static Map<String, Object> toData(Tag tag) {
     ImmutableMap.Builder<String, Object> tagData = new ImmutableMap.Builder<String, Object>();
     tagData.put("modtype", StorageType.TAG);
-    tagData.put("content", tag.getTag());
+    tagData.put("tagContent", tag.getTag());
     return tagData.build();
   }
 
@@ -1091,8 +1867,22 @@ public class GUICommand {
             new ImmutableMap.Builder<String, Object>();
     alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(alert, alertData);
-    alertData.put("content", alert.getText());
+    alertData.put("alertContent", alert.getText());
     return alertData.build();
+  }
+
+  /**
+   * Converts a Question module into a data map for JSON.
+   * @param question the Question object to convert
+   * @return a map of dating storing the Question information
+   */
+  private static Map<String, Object> toData(Question question) {
+    ImmutableMap.Builder<String, Object> questionData =
+            new ImmutableMap.Builder<String, Object>();
+    questionData.put("modtype", StorageType.ALERT_EXCLAMATION);
+    toData(question, questionData);
+    questionData.put("questionContent", question.getText());
+    return questionData.build();
   }
 
   /**
@@ -1105,7 +1895,7 @@ public class GUICommand {
             new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.NOTE);
     toData(note, noteData);
-    noteData.put("content", note.getText());
+    noteData.put("noteContent", note.getText());
     noteData.put("rating", note.getRating());
     return noteData.build();
   }
@@ -1117,14 +1907,17 @@ public class GUICommand {
    */
   private static void toData(Module module,
       ImmutableMap.Builder<String, Object> map) {
+
     map.put("id", module.getId());
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
+
     // generate tag list
     List<Map<String, Object>> tagList = new ArrayList<>();
     for (Tag tag : module.getTags()) {
       tagList.add(toData(tag));
     }
+
     map.put("tags", tagList);
   }
 

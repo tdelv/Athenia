@@ -14,8 +14,11 @@ public class Conjugation extends Table implements Reviewable {
   // rating is originally set to 1 (medium).
   private int rating;
 
+  private String header;
+
   public Conjugation() {
     super();
+    // TODO: store in database and generate (and set) id
   }
 
   /**
@@ -28,6 +31,14 @@ public class Conjugation extends Table implements Reviewable {
 
   public void setRating(int r) {
     this.rating = r;
+  }
+
+  public void setHeader(String head) {
+    this.header = head;
+  }
+
+  public String getHeader() {
+    return this.header;
   }
 
 }
