@@ -46,16 +46,10 @@ public abstract class Modularized {
     return moduleMap.get(type).size();
   }
 
-  // TODO : how does this work? i have actually no idea how to make an instant
-  // of any module yet... (jason)
   public void addModule(StorageType type, Module module) {
     moduleMap.get(type).put(module.getId(), module);
   }
 
-  // TODO : somehow pull the list of modules listed under a specific tag --
-  // jason DONE
-  // i guess this would be a lot of database stuff?
-  // or some means of storing the modules in the tag object itself
   public List<Module> getModuleListFromTag(Tag tag) {
     List<Module> modules = new ArrayList<Module>();
     for (Module m : ((Map<String, Module>) moduleMap.values()).values()) {

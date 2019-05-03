@@ -595,6 +595,9 @@ public class GUICommand {
     }
   }
 
+  /**
+   * POST request which adds a completely new conjugation module.
+   */
   public static class ConjugationAddHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
@@ -639,11 +642,22 @@ public class GUICommand {
   }
 
   /**
-   * POST request handler for adding, updating, or deleting a conjugation module
-   * within the database. Called whenever the user makes an edit to any
-   * conjugation module which can be found on the following pages: the
-   * conjugation landing and individual pages and the FreeNotes landing and
-   * individual pages.
+   * POST request for adding a conjugation entry to a preexisting conjugation
+   * table.
+   */
+  public static class ConjugationAddEntryHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+
+
+      // TODO just send success message
+      return null;
+    }
+  }
+
+  /**
+   * POST request which handles any edits made to a preexisting conjugation
+   * table's entries.
    */
   public static class ConjugationUpdateHandler implements Route {
     @Override
@@ -710,47 +724,123 @@ public class GUICommand {
     }
   }
 
-  // TODO : remove one row (entry) in conjugation table
+  /**
+   * POST request handler for removing a single entry from a conjugation
+   * table.
+   */
   public static class ConjugationRemoveEntryHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
+
+      // conjugation remove information
       String conjId = qm.value("conjId");
       String indexToRemoveStr = qm.value("indexToRemove");
 
+      // successful messages
       boolean successful = false;
       String message = "";
 
+      // try to pull user from database
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
+        // check if current language not null
         if (lang != null) {
-
           if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            Conjugation conjToRemoveFrom = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            // try for parsing out int of index
             try {
               int indexToRemoveInt = Integer.parseInt(indexToRemoveStr);
-
-              
-
+              // check for index out of bounds error
+              if (indexToRemoveInt < 0 ||
+                      indexToRemoveInt >= conjToRemoveFrom.getTable().size()) {
+                message = "index out of bounds in conjugation remove entry handler";
+              } else {
+                // if all is good, do the update
+                conjToRemoveFrom.remove(indexToRemoveInt);
+                successful = true;
+                message = "successfully remove conjugation entry";
+              }
+              // catch if index to remove is not an integer
             } catch (NumberFormatException e) {
               message = "index of conjugation entry to remove not an integer";
             }
+            // catch if module not in map
           } else {
             message = "conjugation module not in user map";
           }
+          // catch if current language is null
         } else {
           message = "current language null in conjugation entry remove handler";
         }
+        // catch if user not found in database
       } catch (DatabaseParserException e) {
         message = "error getting user from database in conjugation entry remove handler";
       }
 
-      return null;
+      // prepare information to send to front-end
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
+              .put("successful", successful)
+              .put("message", message).build();
+      return GSON.toJson(variables);
     }
   }
 
-  // TODO : remove entire conjugation table
+  /**
+   * POST request for removing an entire conjugation table from the user's
+   * language map.
+   */
+  public static class ConjugationRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String conjId = qm.value("conjId");
+      // successful variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if language not null
+        if (lang != null) {
+          // check if module in user map
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            // actually remove conjugation module
+            Conjugation conjToRemove = (Conjugation)
+                    lang.getModule(StorageType.CONJUGATION, conjId);
+            lang.removeModule(StorageType.CONJUGATION, conjToRemove);
+            // edit sucessful messages
+            successful = true;
+            message = "successfully removed conjugation module";
+
+            // catch if conjugation module does not exist
+          } else {
+            message = "conjugation module does not exist in user map";
+          }
+          // catch if current language is null
+        } else {
+          message = "current language null in conjugation remove handler";
+        }
+        // catch if user not in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation remove handler";
+      }
+
+      // prepare successful messages to front-end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
 
   /*
    * -------------------------------------------------------------------------
