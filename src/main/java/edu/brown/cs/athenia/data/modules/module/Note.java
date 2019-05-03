@@ -15,6 +15,10 @@ public class Note extends Text implements Reviewable {
   // rating is originally set to 1 (medium).
   private int rating;
 
+  public Note(String n) {
+    super(n);
+  }
+
   public Note(String n, FreeNote f) {
     super(n, f);
   }
