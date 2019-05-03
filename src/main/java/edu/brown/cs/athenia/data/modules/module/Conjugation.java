@@ -1,5 +1,6 @@
 package edu.brown.cs.athenia.data.modules.module;
 
+import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.modules.Table;
 import edu.brown.cs.athenia.review.Reviewable;
 
@@ -16,8 +17,8 @@ public class Conjugation extends Table implements Reviewable {
 
   private String header;
 
-  public Conjugation() {
-    super();
+  public Conjugation(FreeNote f) {
+    super(f);
     // TODO: store in database and generate (and set) id
   }
 

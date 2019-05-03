@@ -1,5 +1,6 @@
 package edu.brown.cs.athenia.data.modules.module;
 
+import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Pair;
 import edu.brown.cs.athenia.review.Reviewable;
@@ -17,6 +18,13 @@ public class Vocab extends Module implements Reviewable {
 
   public Vocab(String t, String d) {
     // TODO: store in database and generate (and set) id
+    super();
+    pair = new Pair(t, d);
+  }
+
+  public Vocab(String t, String d, FreeNote f) {
+    // TODO: store in database and generate (and set) id
+    super(f);
     pair = new Pair(t, d);
   }
 
