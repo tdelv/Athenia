@@ -22,12 +22,32 @@ $( document ).ready(function() {
     $("#insertQuestionButton").click(insertQuestion);
 });
 
+function renderText(content) {
+    $("#noteBody").append(`<p>${content}</p>`);
+}
+
 function insertText() {
     console.log("inserting text");
+
+    renderText("write here!");
 }
 
 function insertVocab() {
     console.log("inserting vocab");
+    // vocabularyAdd
+    // VocabularyAddHandler
+
+    const postParameters = {id: "hackergirlxoxo", newTerm: "term", newDef: "definition"};
+
+    $.post("/vocabularyAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newGirl = responseObject.newVocabModule;
+            console.log("here she is: " + newGirl);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
 }
 
 function insertConjugation() {
