@@ -31,10 +31,8 @@
             <div class="row">
                 <div class="col">
                     <div class="card border-bottom-primary shadow" style="margin-top: 1vw;">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <#--append modules here -->
-                            </div>
+                        <div class="card-body" id="noteBody">
+
                         </div>
                     </div>
                 </div>

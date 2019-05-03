@@ -427,6 +427,11 @@ public class GUICommand {
           Vocab newVocab = new Vocab(newTerm, newDef);
           lang.addModule(StorageType.VOCAB, newVocab);
 
+          System.out.println("term: " + newVocab.getPair().getTerm());
+          System.out.println("def: " + newVocab.getPair().getDefinition());
+
+          System.out.println("to data: " + toData(newVocab));
+
           // call to data on new object
           variables.put("newVocabModule", toData(newVocab));
 
@@ -1097,16 +1102,25 @@ public class GUICommand {
    * @return a map of data from the Vocab object
    */
   private static Map<String, Object> toData(Vocab vocab) {
+    System.out.println("got here C");
+
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
     vocabData.put("modtype", StorageType.VOCAB);
+
+    // bug
     toData(vocab, vocabData);
 
     // prepare map of content
+    /*
     Map<String, String> vocabContentList = new HashMap<>();
     vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
     vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
     vocabData.put("vocabContent", vocabContentList);
+    */
+
+    vocabData.put("term", vocab.getPair().getTerm());
+    vocabData.put("def", vocab.getPair().getDefinition());
     vocabData.put("rating", vocab.getRating());
     return vocabData.build();
   }
@@ -1186,14 +1200,17 @@ public class GUICommand {
    */
   private static void toData(Module module,
       ImmutableMap.Builder<String, Object> map) {
+
     map.put("id", module.getId());
     map.put("dateCreated", module.getDateCreated());
     map.put("dateModified", module.getDateModified());
+
     // generate tag list
     List<Map<String, Object>> tagList = new ArrayList<>();
     for (Tag tag : module.getTags()) {
       tagList.add(toData(tag));
     }
+
     map.put("tags", tagList);
   }
 
