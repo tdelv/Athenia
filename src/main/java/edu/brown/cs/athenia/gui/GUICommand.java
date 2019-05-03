@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
-import javafx.scene.control.*;
+
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -1390,42 +1389,42 @@ public class GUICommand {
    */
   public static class TagPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+    public ModelAndView handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
 
+      // successful variables
       boolean successful = false;
       String message = "";
 
       ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
+      // try to find user in database
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
+        // check if current language is not null
         if (lang != null) {
           Collection<Tag> tagSet = lang.getTags();
           List<Map<String, Object>> tagList = new ArrayList<>();
-
+          // create list of tags
           for (Tag tag : tagSet) {
             tagList.add(toData(tag));
           }
-
           // add tagList to variables map
           variables.put("content", tagSet);
-
           // edit success messages
           successful = true;
           message = "successful pulled tag information";
+
+          // catch if current language is null
         } else {
           message = "current language null in tag page handler";
         }
-
+        // catch if user not in database
       } catch (DatabaseParserException e) {
         message = "error getting user from database in tag page handler";
       }
-
+      // prepare variables for front end
       variables.put("successful", successful);
       variables.put("message", message);
       return new ModelAndView(variables.build(), "...");
@@ -1433,43 +1432,109 @@ public class GUICommand {
   }
 
   /**
-   * POST request handler for adding, updating, or deleting a tag and its
-   * information. Called whenever the user edits a tag on any of the pages,
-   * including the vocabulary landing and individual pages, the conjugation
-   * landing and individual pages, and the FreeNotes landing and individual
-   * pages. Specifically used for updating tag information and not for adding or
-   * removing tags from a module.
+   * POST request for adding a completely new tag to the user map.
    */
-  public static class TagUpdateHandler implements Route {
+  public static class TagAddHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String type = qm.value("type");
-      if (type.equals("add")) {
-        Tag tag = null; // TODO: generate a new tag object and add to database
-        // language.addTag(tag);
-      } else if (type.equals("update")) {
-        String id = "..."; // TODO: get ID of tag to update (aka to change name
-                           // or add element to?)
-        // language.updateTag(id);
-      } else if (type.equals("delete")) {
-        String id = "..."; // TODO: get ID of tag to delete from everything
-        // language.deleteTag(id);
-      } else {
-        // TODO: throw an error message that tag doesn't exist
+      String tagVal = qm.value("tagValue");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          //add new tag
+          lang.addTag(tagVal);
+          // update successful variables
+          successful = true;
+          message = "successfully added tag";
+
+          // catch if current lang is null
+        } else {
+          message = "current language is null in tag add handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in tag add handler";
       }
 
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: execute the appropriate operation to insert, update, or delete
-      // the tag's information to the database
-      // 1. add tag module to appropriate database tables
-      // 2. update tag module within appropriate database tables
-      // 1. delete tag module from all database tables
-      // a. deletion can send confirmation alert to user
-      return GSON.toJson(variables);
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
     }
   }
+
+  // TODO maybe? an update tag handler
+
+  /**
+   * POST request for removing a tag from the user map.
+   */
+  public static class TagRemoveHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String tagValue = qm.value("tagValue");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+          // check if lang has the tag
+          if (lang.hasTag(tagValue)) {
+            lang.removeTag(tagValue);
+            // update successful variables
+            successful = true;
+            message = "successfully removed tag";
+
+            // catch if tag is not in lang
+          } else {
+            message = "tag is not in user map in tag remove handler";
+          }
+
+          // catch if current lang is null
+        } else {
+          message = "current language is null in tag remove handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in tag remove handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+
+  /*
+   * -------------------------------------------------------------------------
+   * -- GENERIC MODULE HANDLERS ----------------------------------------------
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * POST request handler for updating a module's tag set, particularly adding
@@ -1624,6 +1689,15 @@ public class GUICommand {
       return GSON.toJson(variables);
     }
   }
+
+  /*
+   * -------------------------------------------------------------------------
+   * -- RATING HANDLERS ------------------------------------------------------
+   * -------------------------------------------------------------------------
+   */
+
+  // TODO create a set handler for all things reviewable
+
 
   /*
    * -------------------------------------------------------------------------
