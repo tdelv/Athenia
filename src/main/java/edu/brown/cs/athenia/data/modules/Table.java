@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.brown.cs.athenia.data.FreeNote;
+
 /**
  * Table is an abstract class that represents any kind of table or mapping. All
  * tables are reviewable modules.
@@ -15,6 +17,12 @@ public abstract class Table extends Module {
   private List<Pair> table;
 
   public Table() {
+    super();
+    this.table = new ArrayList<Pair>();
+  }
+
+  public Table(FreeNote f) {
+    super(f);
     this.table = new ArrayList<Pair>();
   }
 
@@ -34,7 +42,6 @@ public abstract class Table extends Module {
     this.setDateModified(new Date());
     this.table.add(new Pair(term, def));
   }
-
 
   public void update(String updatedTerm, String updatedDef, int index) {
     this.setDateModified(new Date());

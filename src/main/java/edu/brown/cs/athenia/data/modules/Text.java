@@ -2,6 +2,8 @@ package edu.brown.cs.athenia.data.modules;
 
 import java.util.Date;
 
+import edu.brown.cs.athenia.data.FreeNote;
+
 /**
  * A text object holds a String. It is any kind of text and is a
  * reviewablemodule.
@@ -14,6 +16,13 @@ public abstract class Text extends Module {
 
   public Text(String text) {
     // TODO: store in database and generate (and set) id
+    super();
+    this.text = text;
+  }
+
+  public Text(String text, FreeNote f) {
+    // TODO: store in database and generate (and set) id
+    super(f);
     this.text = text;
   }
 
