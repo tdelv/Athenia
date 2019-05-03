@@ -50,6 +50,11 @@ public abstract class Table extends Module {
     return this.table.remove(p);
   }
 
+  public void remove(int index) {
+    this.setDateModified(new Date());
+    this.table.remove(index);
+  }
+
   public List<Pair> getTable() {
     return table;
   }
