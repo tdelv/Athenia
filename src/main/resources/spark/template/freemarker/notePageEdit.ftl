@@ -65,11 +65,11 @@
                             <i class="fa fa-table"></i>
                         </a>
 
-                        <a href="#" class="btn btn-success btn-circle mb-2" id="insert!Button">
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertExclamationButton">
                             <i class="fa fa-exclamation"></i>
                         </a>
 
-                        <a href="#" class="btn btn-success btn-circle mb-2" id="insert?Button">
+                        <a href="#" class="btn btn-success btn-circle mb-2" id="insertQuestionButton">
                             <i class="fa fa-question"></i>
                         </a>
 
