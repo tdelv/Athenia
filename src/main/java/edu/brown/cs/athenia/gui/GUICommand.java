@@ -556,12 +556,12 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
-
+      // successful messages
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
