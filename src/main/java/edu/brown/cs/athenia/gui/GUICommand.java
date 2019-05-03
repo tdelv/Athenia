@@ -717,12 +717,36 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String conjId = qm.value("conjId");
-      String indexToRemove = qm.value("indexToRemove");
+      String indexToRemoveStr = qm.value("indexToRemove");
 
       boolean successful = false;
       String message = "";
 
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        if (lang != null) {
 
+          if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
+            try {
+              int indexToRemoveInt = Integer.parseInt(indexToRemoveStr);
+
+              
+
+            } catch (NumberFormatException e) {
+              message = "index of conjugation entry to remove not an integer";
+            }
+          } else {
+            message = "conjugation module not in user map";
+          }
+        } else {
+          message = "current language null in conjugation entry remove handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation entry remove handler";
+      }
+
+      return null;
     }
   }
 

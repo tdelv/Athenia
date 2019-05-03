@@ -120,7 +120,6 @@ public class Main {
     Spark.post("/removeLanguage", new GUICommand.LanguageRemoveHandler());
     Spark.post("/changeCurrentLanguage", new GUICommand.LanguageChangeHandler());
 
-
     //Spark.get("/bacon/actor", new BaconActorHandler(), freeMarker);
 
     // freenotes spark handlers
@@ -132,7 +131,7 @@ public class Main {
     Spark.post("/vocabularyAdd", new GUICommand.VocabularyAddHandler());
     Spark.post("/vocabularyUpdate", new GUICommand.VocabularyUpdateHandler());
     Spark.post("/vocabularyRemove", new GUICommand.VocabularyRemoveHandler());
-    
+
     Spark.get("/conjugations", new GUICommand.ConjugationPageHandler(), freeMarker);
 
   }
