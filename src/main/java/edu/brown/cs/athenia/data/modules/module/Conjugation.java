@@ -18,6 +18,7 @@ public class Conjugation extends Table implements Reviewable {
 
   public Conjugation() {
     super();
+    // TODO: store in database and generate (and set) id
   }
 
   /**

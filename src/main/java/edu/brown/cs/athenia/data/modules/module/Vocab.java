@@ -16,7 +16,7 @@ public class Vocab extends Module implements Reviewable {
   private Pair pair;
 
   public Vocab(String t, String d) {
-    // TODO: store in database and generate id
+    // TODO: store in database and generate (and set) id
     pair = new Pair(t, d);
   }
 

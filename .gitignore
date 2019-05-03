@@ -11,3 +11,4 @@ tokens/*
 build/
 tokens/
 */userData/*
+.gradle/buildOutputCleanup/buildOutputCleanup.lock
