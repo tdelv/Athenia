@@ -934,7 +934,7 @@ public class GUICommand {
         if (lang != null) {
           // create new note and add to variables map
           Note note = new Note(noteStr);
-          variables.put("newNote", toData(note));
+          variables.put("newNoteModule", toData(note));
           // edit successful variables
           successful = true;
           message = "successfully added note to map";
@@ -1086,7 +1086,7 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
           AlertExclamation alert = new AlertExclamation(alertStr);
-          variables.put("newAlert", toData(alert));
+          variables.put("newAlertModule", toData(alert));
           // edit successful variables
           successful = true;
           message = "successfully added new alert";
@@ -1227,7 +1227,7 @@ public class GUICommand {
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String questionStr = qm.value("questionStr");
+      String questionStr = qm.value("questionString");
 
       // success variables
       boolean successful = false;
@@ -1242,7 +1242,7 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
           Question question = new Question(questionStr);
-          variables.put("newQuestion", toData(question));
+          variables.put("newQuestionModule", toData(question));
           // edit successful variables
           successful = true;
           message = "successfully added new question";
