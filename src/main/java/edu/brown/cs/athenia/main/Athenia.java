@@ -52,13 +52,33 @@ public class Athenia {
     return currLang;
   }
 
+  /**
+   * The review method created a ReviewMode that takes in the info the user
+   * wants to review. It then creates a ModuleRanker that ranks the modules
+   * based on rating and date last reviewed. Then, updates all the used modules'
+   * date last reviewed.
+   * @param tagsToReview
+   *          : the Tags user wants to review.
+   * @param startDateCreated
+   *          : the start date user wants to start reviewing at
+   * @param endDateCreated
+   *          : the end date user wants to start reviewing at.
+   * @return : the ranked modules to review, with the first index being the
+   *         hardest and last reviewed and the last being the easiest and
+   *         closest reviewed.
+   */
   public List<Reviewable> review(List<Tag> tagsToReview, Date startDateCreated,
       Date endDateCreated) {
     ReviewMode review = new ReviewMode(this, tagsToReview, startDateCreated,
         endDateCreated);
+    // get modules to review with given tags and in dates
     List<Reviewable> modulesToReview = review.review();
     ModuleRanker ranker = new ModuleRanker();
     List<Reviewable> rankedModules = ranker.rank(modulesToReview);
+    // updated date last reviewed
+    for (Reviewable mod : rankedModules) {
+      mod.setDateLastReviewed(new Date());
+    }
     return rankedModules;
 
   }

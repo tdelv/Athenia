@@ -1393,7 +1393,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       // try to find user in database
       try {
@@ -1401,15 +1402,10 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
         // check if current language is not null
         if (lang != null) {
-          Collection<Tag> tagSet = lang.getTags();
-          List<Map<String, Object>> tagList = new ArrayList<>();
-          // create list of tags
-          for (Tag tag : tagSet) {
-            tagList.add(toData(tag));
-          }
-          // add tagList to variables map
-          variables.put("content", tagSet);
-          // edit success messages
+
+          // TODO pull out all of the modules associating with a certain
+          //      tag and todata them to send to front end
+
           successful = true;
           message = "successful pulled tag information";
 
@@ -1699,30 +1695,6 @@ public class GUICommand {
     }
   }
 
-  /**
-   * POST request handler for updating the information on an existing FreeNote
-   * page. Searches through the updates made and updates all of the areas in the
-   * backend. Called sporadically as an auto save feature.
-   */
-  public static class FreeNotesUpdateHandler implements Route {
-    @Override
-    public String handle(Request req, Response res) throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      // TODO: pull out all information on this FreeNotes page
-      // > do so either entirely (all information)
-      // > or as updated and edited (adding, updating, deleting, etc.)
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: figure out which execution to run:
-      // 1. add new freenotes page (title, tags, date created, date accessed,
-      // date edited, etc.)
-      // 2. update the information of the specific freenotes page
-      // 2. delete the information on the freenotes page
-      // a. need to decide if everything in it is deleted everywhere else
-      return GSON.toJson(variables);
-    }
-  }
-
   /*
    * -------------------------------------------------------------------------
    * -- RATING HANDLERS ------------------------------------------------------
@@ -1832,6 +1804,12 @@ public class GUICommand {
       } else if (m instanceof Conjugation) {
         Conjugation conjugation = (Conjugation) m;
         modulesList.add(toData(conjugation));
+      } else if (m instanceof Note) {
+        Note newNote = (Note) m;
+        modulesList.add(toData(newNote));
+      } else if (m instanceof AlertExclamation) {
+        AlertExclamation alert = (AlertExclamation) m;
+        modulesList.add(toData(alert));
       }
     }
 
