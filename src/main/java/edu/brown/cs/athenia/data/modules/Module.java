@@ -1,5 +1,7 @@
 package edu.brown.cs.athenia.data.modules;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +26,7 @@ public abstract class Module {
 
   public Module() {
     this.freeNote = null;
+    this.id = new BigInteger(130, new SecureRandom()).toString(32);
     this.created = new Date();
     this.dateModified = created;
     this.dateLastReviewed = created;
@@ -32,6 +35,7 @@ public abstract class Module {
 
   public Module(FreeNote f) {
     this.freeNote = f;
+    this.id = new BigInteger(130, new SecureRandom()).toString(32);
     this.created = new Date();
     this.dateModified = created;
     this.dateLastReviewed = created;
