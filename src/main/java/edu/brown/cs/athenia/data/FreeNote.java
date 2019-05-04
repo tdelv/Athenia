@@ -26,12 +26,6 @@ public class FreeNote {
   private String title;
   private String id;
 
-  // TODO: some sort of id variable -- may make it easier to query the info
-  // for the front end DONE
-
-  // TODO: some type of way to store tags and dates for these FreeNote
-  // > stores the date created, edited, accessed for this specifically DONE
-
   public FreeNote(String t, String id) {
     this.id = id;
     this.modules = new ArrayList<Module>();

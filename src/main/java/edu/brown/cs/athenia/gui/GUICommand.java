@@ -422,6 +422,8 @@ public class GUICommand {
       String newTerm = qm.value("newTerm");
       String newDef = qm.value("newDef");
 
+      // TODO check for freenote id
+
       boolean successful = false;
       String message = "";
 
@@ -434,11 +436,6 @@ public class GUICommand {
         if (lang != null) {
           Vocab newVocab = new Vocab(newTerm, newDef);
           lang.addModule(StorageType.VOCAB, newVocab);
-
-          System.out.println("term: " + newVocab.getPair().getTerm());
-          System.out.println("def: " + newVocab.getPair().getDefinition());
-
-          System.out.println("to data: " + toData(newVocab));
 
           // call to data on new object
           variables.put("newVocabModule", toData(newVocab));
@@ -474,6 +471,9 @@ public class GUICommand {
       String vocabId = qm.value("vocabId");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
+
+      // TODO check for freenote id
+
       // successful messages
       boolean successful = false;
       String message = "";
@@ -519,6 +519,8 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String vocabId = qm.value("vocabId");
+
+      // TODO check for freenote id
 
       boolean successful = false;
       String message = "";
@@ -621,6 +623,8 @@ public class GUICommand {
       String newHeader = qm.value("header"); // just a string
       String newContent = qm.value("content"); // list of lists of strings
 
+      // TODO check for freenote id
+
       boolean successful = false;
       String message = "";
 
@@ -669,6 +673,9 @@ public class GUICommand {
       String indexToAddAt = qm.value("indexToAddAt");
       String termToAdd = qm.value("termToAdd");
       String defToAdd = qm.value("defToAdd");
+
+      // TODO check for freenote id
+
       // successful information
       boolean successful = false;
       String message = "";
@@ -736,6 +743,9 @@ public class GUICommand {
       String indexToUpdateStr = qm.value("updateIndex");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
+
+      // TODO check for freenote id
+
       // successful messages
       String message = "";
       boolean successful = true;
@@ -803,6 +813,8 @@ public class GUICommand {
       String conjId = qm.value("conjId");
       String indexToRemoveStr = qm.value("indexToRemove");
 
+      // TODO check for freenote id
+
       // successful messages
       boolean successful = false;
       String message = "";
@@ -867,6 +879,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
+      // TODO check for freenote id
+
       ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
@@ -920,6 +934,9 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String noteStr = qm.value("noteString");
+
+      // TODO check for freenote id
+
       // success variables
       boolean successful = false;
       String message = "";
@@ -965,6 +982,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
       String noteChange = qm.value("noteUpdate");
+
+      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1017,6 +1036,8 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
+
+      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1073,6 +1094,9 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String alertStr = qm.value("alertString");
+
+      // TODO check for freenoteId
+
       // success variables
       boolean successful = false;
       String message = "";
@@ -1117,6 +1141,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
       String alertUpdate = qm.value("alertUpdate");
+
+      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1170,6 +1196,8 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
+
+      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1229,6 +1257,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionStr = qm.value("questionString");
 
+      // TODO check for freenoteId
+
       // success variables
       boolean successful = false;
       String message = "";
@@ -1273,6 +1303,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionID = qm.value("questionId");
       String questionUpdate = qm.value("questionUpdate");
+
+      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1326,6 +1358,8 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String questionId = qm.value("questionId");
+
+      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1810,6 +1844,9 @@ public class GUICommand {
       } else if (m instanceof AlertExclamation) {
         AlertExclamation alert = (AlertExclamation) m;
         modulesList.add(toData(alert));
+      } else if (m instanceof Question) {
+        Question question = (Question) m;
+        modulesList.add(toData(question));
       }
     }
 
@@ -1831,16 +1868,6 @@ public class GUICommand {
     vocabData.put("modtype", StorageType.VOCAB);
 
     toData(vocab, vocabData);
-
-
-    // prepare map of content
-    /*
-     * Map<String, String> vocabContentList = new HashMap<>();
-     * vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
-     * vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
-     * vocabData.put("vocabContent", vocabContentList);
-     */
-
 
     vocabData.put("term", vocab.getPair().getTerm());
     vocabData.put("def", vocab.getPair().getDefinition());
