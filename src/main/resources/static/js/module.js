@@ -10,13 +10,15 @@ class Module {
         // TODO: use animation instead of css
         console.log("hovering");
         const selector = "#" + this.id;
-        $(selector).css("backgroundColor", "#D3D3D3");
+        $(selector).css("backgroundColor", "#f2f2f2");
+        document.body.style.cursor = "pointer";
     }
 
     onModuleLeave() {
         console.log("left");
         const selector = "#" + this.id;
         $(selector).css("backgroundColor", "white");
+        document.body.style.cursor = "default";
     }
 
     onModuleClick() {

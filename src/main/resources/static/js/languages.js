@@ -7,8 +7,17 @@ $( document ).ready(function() {
     $("#addLanguageButton").click(addNewLanguage);
     $("#removeLanguageButton").click(removeLanguage);
     $(".languageSelectForRemoveButton").click(function() {editSelection(this)});
+    $(".languageCard").hover(langHover, langLeave);
     $(".languageCard").click(function() {languageSelect(this)});
 });
+
+function langHover() {
+    document.body.style.cursor = "pointer";
+}
+
+function langLeave() {
+    document.body.style.cursor = "default";
+}
 
 
 function addNewLanguage() {
