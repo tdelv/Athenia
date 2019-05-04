@@ -24,14 +24,12 @@ class Module {
     onModuleHover() {
         // slight shadow background
         // TODO: use animation instead of css
-        console.log("hovering");
         const selector = "#" + this.id;
         $(selector).css("backgroundColor", "#f2f2f2");
         document.body.style.cursor = "pointer";
     }
 
     onModuleLeave() {
-        console.log("left");
         const selector = "#" + this.id;
         $(selector).css("backgroundColor", "white");
         document.body.style.cursor = "default";
@@ -57,11 +55,20 @@ class Exclamation extends TextModule {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified, content);
     }
+
+    toHTML() {
+        return `<p id=\"${this.id}\">$!!! {this.content}</p>`;
+    }
+
 }
 
 class Question extends TextModule {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified, content);
+    }
+
+    toHTML() {
+        return `<p id=\"${this.id}\">$??? {this.content}</p>`;
     }
 }
 
