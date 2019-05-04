@@ -40,7 +40,7 @@ class Module {
     }
 }
 
-class TextModule extends Module {
+class Note extends Module {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified);
         this.content = content;
@@ -51,24 +51,24 @@ class TextModule extends Module {
     }
 }
 
-class Exclamation extends TextModule {
+class Exclamation extends Note {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified, content);
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">$!!! {this.content}</p>`;
+        return `<p id=\"${this.id}\">!!! ${this.content}</p>`;
     }
 
 }
 
-class Question extends TextModule {
+class Question extends Note {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified, content);
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">$??? {this.content}</p>`;
+        return `<p id=\"${this.id}\">??? ${this.content}</p>`;
     }
 }
 
