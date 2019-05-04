@@ -1,5 +1,7 @@
 package edu.brown.cs.athenia.data;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,11 +28,14 @@ public class FreeNote {
   private String title;
   private String id;
 
-  // TODO: some sort of id variable -- may make it easier to query the info
-  // for the front end DONE
-
-  // TODO: some type of way to store tags and dates for these FreeNote
-  // > stores the date created, edited, accessed for this specifically DONE
+  public FreeNote(String t) {
+    this.id = new BigInteger(130, new SecureRandom()).toString(32);
+    this.modules = new ArrayList<Module>();
+    this.tags = new HashMap<String, Tag>();
+    this.created = new Date();
+    this.dateModified = this.created;
+    this.title = t;
+  }
 
   public FreeNote(String t, String id) {
     this.id = id;

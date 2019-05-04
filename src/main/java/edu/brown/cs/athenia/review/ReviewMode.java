@@ -40,9 +40,13 @@ public class ReviewMode {
     for (Tag tag : tags) {
       List<Module> modulesFromTag = currLang.getModuleListFromTag(tag);
       for (Module mod : modulesFromTag) {
+        // is module to review if is reviewable and is either equal to start or
+        // end date created or between those two dates
         if (mod instanceof Reviewable
-            && mod.getDateCreated().after(startDateCreated)
-            && mod.getDateCreated().before(endDateCreated)) {
+            && ((mod.getDateCreated().equals(startDateCreated)
+                || mod.getDateCreated().equals(endDateCreated))
+                || (mod.getDateCreated().after(startDateCreated)
+                    && mod.getDateCreated().before(endDateCreated)))) {
           modulesToReview.add((Reviewable) mod);
         }
       }

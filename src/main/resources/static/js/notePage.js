@@ -20,13 +20,14 @@ function insertModule(module) {
 }
 
 function insertNote() {
-    console.log("inserting text");
-    const postParameters = {newTerm: "content"};
+    console.log("inserting note");
+    const postParameters = {noteString: "content"};
     $.post("noteAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
             const newNote = responseObject.newNoteModule;
-            const newNoteModule = new Vocabulary(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            console.log("new note content: " + newNote.noteContent);
+            const newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -55,12 +56,12 @@ function insertConjugation() {
 
 function insertExclamation() {
     console.log("inserting exclamation");
-    const postParameters = {newTerm: "content"};
-    $.post("alertExclamationAdd", postParameters, responseJSON => {
+    const postParameters = {alertString: "content"};
+    $.post("alertAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newExclamation = responseObject.newAlertExclamationModule;
-            const newExclamationModule = new Vocabulary(newExclamation.id, newExclamation.dateCreated, newExclamation.dateModified, newExclamation.noteContent);
+            const newExclamation = responseObject.newAlertModule;
+            const newExclamationModule = new Exclamation(newExclamation.id, newExclamation.dateCreated, newExclamation.dateModified, newExclamation.alertContent);
             insertModule(newExclamationModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -70,13 +71,13 @@ function insertExclamation() {
 
 function insertQuestion() {
     console.log("inserting question");
-    const postParameters = {newTerm: "content"};
+    const postParameters = {questionString: "content"};
     $.post("questionAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
             const newQuestion = responseObject.newQuestionModule;
-            const newQuestionModule = new Vocabulary(newQuestion.id, newQuestion.dateCreated, newQuestion.dateModified, newQuestion.noteContent);
-            insertModule(newExclamationModule);
+            const newQuestionModule = new Question(newQuestion.id, newQuestion.dateCreated, newQuestion.dateModified, newQuestion.questionContent);
+            insertModule(newQuestionModule);
         } else {
             console.log("message: " + responseObject.message);
         }
