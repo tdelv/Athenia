@@ -5,6 +5,7 @@ import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.Module;
 
+import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
@@ -132,7 +133,7 @@ public class DatabaseParser {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    language.addTag(rs.getString("tag_name"));
+                    language.addTag(new Tag(rs.getString("tag_name")));
                 }
             }
         }
@@ -198,7 +199,7 @@ public class DatabaseParser {
                     // Add freenote
                     getModuleTags(conn, module, language);
 
-                    getModuleFreenote(conn, module);
+                    getModuleFreenote(conn, module, language);
                 }
             }
         }
