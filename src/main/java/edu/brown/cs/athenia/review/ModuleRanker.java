@@ -23,13 +23,48 @@ public class ModuleRanker {
   public List<Reviewable> rank(List<Reviewable> toRank) {
 
     rankedModules = new ArrayList<Reviewable>();
-    Map<Date, Reviewable> modTree = new TreeMap<Date, Reviewable>();
+
+    // get separately ranked modules
+
+    List<Reviewable> zerosMods = new ArrayList<Reviewable>();
+    List<Reviewable> onesMods = new ArrayList<Reviewable>();
+    List<Reviewable> twosMods = new ArrayList<Reviewable>();
 
     for (Reviewable mod : toRank) {
-      modTree.put(mod.getDateLastReviewed(), mod);
+      if (mod.getRating() == 0) {
+        // easy modules
+        zerosMods.add(mod);
+      } else if (mod.getRating() == 1) {
+        // medium modules
+        onesMods.add(mod);
+      } else if (mod.getRating() == 2) {
+        // hard modules
+        twosMods.add(mod);
+      }
     }
 
+    // sorted trees of each rating
+    Map<Date, Reviewable> zerosModsTree = new TreeMap<Date, Reviewable>();
+    Map<Date, Reviewable> onesModsTree = new TreeMap<Date, Reviewable>();
+    Map<Date, Reviewable> twosModsTree = new TreeMap<Date, Reviewable>();
+
+    for (Reviewable mod : zerosMods) {
+      zerosModsTree.put(mod.getDateLastReviewed(), mod);
+    }
+
+    for (Reviewable mod : onesMods) {
+      onesModsTree.put(mod.getDateLastReviewed(), mod);
+    }
+
+    for (Reviewable mod : twosMods) {
+      twosModsTree.put(mod.getDateLastReviewed(), mod);
+    }
+
+    rankedModules.addAll(twosModsTree.values());
+    rankedModules.addAll(onesModsTree.values());
+    rankedModules.addAll(zerosModsTree.values());
+
     // Set<Date> rankedDates
-    return null;
+    return rankedModules;
   }
 }

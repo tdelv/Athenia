@@ -1386,6 +1386,8 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+      String tagName = qm.value("tag");
 
       // successful variables
       boolean successful = false;
@@ -1599,7 +1601,6 @@ public class GUICommand {
       try {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
-
 
         if (lang != null) {
 
