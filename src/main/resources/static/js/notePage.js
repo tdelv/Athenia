@@ -1,19 +1,11 @@
 
-// INSERT VOCAB BUTTON JQUERY ELEMENT
-const ivb = $("#insertVocabButton");
-
-
 $( document ).ready(function() {
 
-    const tt = new Tooltip($("#insertTextButton"), {
+    let tt = new Tooltip($("#insertTextButton"), {
         placement: "right",
         title: "Top",
         trigger: "hover"
     });
-
-    // ivb.hover(function(){
-    //     console.log("yeet");
-    //     tt.show()});
 
     $("#insertTextButton").click(insertText);
     $("#insertVocabButton").click(insertVocab);
@@ -22,28 +14,35 @@ $( document ).ready(function() {
     $("#insertQuestionButton").click(insertQuestion);
 });
 
-function renderText(content) {
-    $("#noteBody").append(`<p>${content}</p>`);
+function insertModule(module) {
+    $("#noteBody").append(module.toHTML());
+    module.setUp();
 }
 
-function insertText() {
+function insertNote() {
     console.log("inserting text");
-
-    renderText("write here!");
+    const postParameters = {newTerm: "content"};
+    $.post("noteAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newNote = responseObject.newNoteModule;
+            const newNoteModule = new Vocabulary(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            insertModule(newNoteModule);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
 }
 
 function insertVocab() {
     console.log("inserting vocab");
-    // vocabularyAdd
-    // VocabularyAddHandler
-
-    const postParameters = {id: "hackergirlxoxo", newTerm: "term", newDef: "definition"};
-
+    const postParameters = {newTerm: "term", newDef: "definition"};
     $.post("/vocabularyAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newGirl = responseObject.newVocabModule;
-            console.log("here she is: " + newGirl);
+            const newVocab = responseObject.newVocabModule;
+            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def);
+            insertModule(newVocabModule);
         } else {
             console.log("message: " + responseObject.message);
         }

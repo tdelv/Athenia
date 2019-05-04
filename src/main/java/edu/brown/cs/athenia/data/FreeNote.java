@@ -78,6 +78,16 @@ public class FreeNote {
   }
 
   /**
+   * Setter for date created.
+   * @param m
+   *          The date created.
+   */
+  public void setDateCreated(Date m) {
+    // TODO : indicate this change in the database
+    this.created = m;
+  }
+
+  /**
    * Setter for date modified.
    * @param m
    *          The new date modified.

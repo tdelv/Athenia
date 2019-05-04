@@ -1,11 +1,16 @@
 package edu.brown.cs.athenia.main;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import edu.brown.cs.athenia.data.Language;
+import edu.brown.cs.athenia.data.modules.Tag;
+import edu.brown.cs.athenia.review.ModuleRanker;
+import edu.brown.cs.athenia.review.ReviewMode;
+import edu.brown.cs.athenia.review.Reviewable;
 
 /**
  * Athenia is our object class that calls on everything. Has ReviewMode and
@@ -47,16 +52,19 @@ public class Athenia {
     return currLang;
   }
 
-  /*
-   * public List<Object> review(Date startDateCreated, Date endDateCreated) {
-   * ReviewMode review = new ReviewMode(this, currLang.getTagList(),
-   * startDateCreated, endDateCreated);
-   * 
-   * }
-   */
+  public List<Reviewable> review(List<Tag> tagsToReview, Date startDateCreated,
+      Date endDateCreated) {
+    ReviewMode review = new ReviewMode(this, tagsToReview, startDateCreated,
+        endDateCreated);
+    List<Reviewable> modulesToReview = review.review();
+    ModuleRanker ranker = new ModuleRanker();
+    List<Reviewable> rankedModules = ranker.rank(modulesToReview);
+    return rankedModules;
+
+  }
 
   // TODO : public method for getting a list of languages for the user to
-  //          choose from (of the one's they have -- used for the language landing page)
+  // choose from (of the one's they have -- used for the language landing page)
 
   public List<String> getLanguages() {
     return new ArrayList<String>(languages.keySet());

@@ -5,13 +5,14 @@ CREATE TABLE user_data (
 );
 
 CREATE TABLE languages (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   language TEXT
 );
 
 CREATE TABLE freenotes (
   id TEXT PRIMARY KEY,
-  language_id INTEGER,
+  language_id TEXT,
+  title TEXT,
   created INTEGER,
   last_modified INTEGER,
   FOREIGN KEY (language_id) REFERENCES languages(id)
@@ -20,29 +21,29 @@ CREATE TABLE freenotes (
 CREATE TABLE modules (
   id TEXT PRIMARY KEY,
   type TEXT,
-  language_id INTEGER,
+  language_id TEXT,
   created INTEGER,
   last_modified INTEGER,
   FOREIGN KEY (language_id) REFERENCES languages(id)
 );
 
 CREATE TABLE note_modules (
-  id TEXT PRIMARY KEY,
+  module_id TEXT PRIMARY KEY,
   body TEXT,
-  FOREIGN KEY (id) REFERENCES modules(id)
+  FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE vocab_modules (
-  id TEXT PRIMARY KEY,
+  module_id TEXT PRIMARY KEY,
   term TEXT,
   definition TEXT,
-  FOREIGN KEY (id) REFERENCES modules(id)
+  FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE conjugation_modules (
-  id TEXT PRIMARY KEY,
+  module_id TEXT PRIMARY KEY,
   header TEXT,
-  FOREIGN KEY (id) REFERENCES modules(id)
+  FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE conjugation_rows (
@@ -50,44 +51,52 @@ CREATE TABLE conjugation_rows (
   module_id TEXT,
   col1 TEXT,
   col2 TEXT,
-  FOREIGN KEY (module_id) REFERENCES conjugation_modules(id)
+  index INTEGER,
+  FOREIGN KEY (module_id) REFERENCES conjugation_modules(module_id)
 );
 
 CREATE TABLE question_modules (
-  id TEXT PRIMARY KEY,
+  module_id TEXT PRIMARY KEY,
   body TEXT,
-  FOREIGN KEY (id) REFERENCES modules(id)
+  FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE alert_exclamation_modules (
-  id TEXT PRIMARY KEY,
+  module_id TEXT PRIMARY KEY,
   body TEXT,
-  FOREIGN KEY (id) REFERENCES modules(id)
+  FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE freenote_modules (
   freenote_id TEXT,
   module_id TEXT,
-  position INTEGEsR,
+  position INTEGER,
   FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
   FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE tags (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   name TEXT
+);
+
+CREATE TABLE language_tags (
+  language_id TEXT,
+  tag_id TEXT,
+  FOREIGN KEY (language_id) REFERENCES languages(id),
+  FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
 CREATE TABLE module_tags (
   module_id TEXT,
-  tag_id INTEGER,
+  tag_id TEXT,
   FOREIGN KEY (module_id) REFERENCES modules(id),
   FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
 CREATE TABLE freenote_tags (
   freenote_id TEXT,
-  tag_id INTEGER,
+  tag_id TEXT,
   FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
   FOREIGN KEY (tag_id) REFERENCES tags(id)
 );

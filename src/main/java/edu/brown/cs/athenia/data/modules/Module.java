@@ -1,7 +1,7 @@
 package edu.brown.cs.athenia.data.modules;
 
-import edu.brown.cs.athenia.data.modules.module.StorageType;
-
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,18 +22,23 @@ public abstract class Module {
   private Date dateModified;
   private String id;
   private FreeNote freeNote;
+  private Date dateLastReviewed;
 
   public Module() {
     this.freeNote = null;
-    created = new Date();
-    dateModified = created;
+    this.id = new BigInteger(130, new SecureRandom()).toString(32);
+    this.created = new Date();
+    this.dateModified = created;
+    this.dateLastReviewed = created;
     this.tags = new HashMap<String, Tag>();
   }
 
   public Module(FreeNote f) {
     this.freeNote = f;
-    created = new Date();
-    dateModified = created;
+    this.id = new BigInteger(130, new SecureRandom()).toString(32);
+    this.created = new Date();
+    this.dateModified = created;
+    this.dateLastReviewed = created;
     this.tags = new HashMap<String, Tag>();
   }
 
@@ -62,8 +67,8 @@ public abstract class Module {
     return tags.values();
   }
 
-  public void addTag(String t) {
-    tags.put(t, new Tag(t));
+  public void addTag(Tag t) {
+    tags.put(t.getTag(), t);
   }
 
   public Tag removeTag(String t) {
@@ -72,6 +77,10 @@ public abstract class Module {
 
   public boolean hasTag(String tag) {
     return tags.containsKey(tag);
+  }
+
+  public Tag getTag(String tag) {
+    return tags.get(tag);
   }
 
   /**
@@ -98,6 +107,24 @@ public abstract class Module {
    */
   public Date getDateModified() {
     return dateModified;
+  }
+
+  /**
+   * Setter for date last reviewed.
+   * @param m
+   *          The new date last review.
+   */
+  public void setDateLastReviewed(Date m) {
+    // TODO : indicate this change in the database
+    this.dateLastReviewed = m;
+  }
+
+  /**
+   * Getter for date last reviewed.
+   * @return The date it was last reviewed.
+   */
+  public Date getDateLastReviewed() {
+    return this.dateLastReviewed;
   }
 
 }
