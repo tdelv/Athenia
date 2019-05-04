@@ -1,15 +1,12 @@
 package edu.brown.cs.athenia.review;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Tag;
-import edu.brown.cs.athenia.data.modules.module.Conjugation;
-import edu.brown.cs.athenia.data.modules.module.StorageType;
 import edu.brown.cs.athenia.main.Athenia;
 
 /**
@@ -21,14 +18,37 @@ import edu.brown.cs.athenia.main.Athenia;
  */
 public class ReviewMode {
 
+  private Language currLang;
+  private List<Tag> tags;
+  private Date startDateCreated;
+  private Date endDateCreated;
+
+  // TODO: update all dates last reviewed for the modules found
   public ReviewMode(Athenia project, List<Tag> tags, Date startDateCreated,
       Date endDateCreated) {
-    Language currLang = project.getCurrLanguage();
-    Collection<Module> conjugations = currLang.getModuleMap(StorageType.CONJUGATION)
-            .values();
-    Collection<Module> freeNotes = currLang.getModuleMap(StorageType.FREE_NOTE)
-            .values();
+    // get the current language from Athenia
+    this.currLang = project.getCurrLanguage();
+    this.tags = tags;
+    this.startDateCreated = startDateCreated;
+    this.endDateCreated = endDateCreated;
+  }
 
+  public List<Reviewable> review() {
+
+    List<Reviewable> modulesToReview = new ArrayList<Reviewable>();
+
+    for (Tag tag : tags) {
+      List<Module> modulesFromTag = currLang.getModuleListFromTag(tag);
+      for (Module mod : modulesFromTag) {
+        if (mod instanceof Reviewable
+            && mod.getDateCreated().after(startDateCreated)
+            && mod.getDateCreated().before(endDateCreated)) {
+          modulesToReview.add((Reviewable) mod);
+        }
+      }
+    }
+
+    return modulesToReview;
   }
 
 }
