@@ -64,9 +64,9 @@ public class FreeNote {
     return tags.values();
   }
 
-  public void addTag(String t) {
+  public void addTag(Tag t) {
     this.dateModified = new Date();
-    tags.put(t, new Tag(t));
+    tags.put(t.getTag(), t);
   }
 
   public Tag removeTag(String t) {

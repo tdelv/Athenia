@@ -15,15 +15,18 @@ import edu.brown.cs.athenia.data.FreeNote;
 public abstract class Table extends Module {
 
   private List<Pair> table;
+  private int height;
 
   public Table() {
     super();
     this.table = new ArrayList<Pair>();
+    this.height = 3;
   }
 
   public Table(FreeNote f) {
     super(f);
     this.table = new ArrayList<Pair>();
+    this.height = 3;
   }
 
   /**
@@ -64,6 +67,14 @@ public abstract class Table extends Module {
 
   public List<Pair> getTable() {
     return table;
+  }
+
+  public int getHeight() {
+    return this.height;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
   }
 
 }

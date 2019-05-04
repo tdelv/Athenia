@@ -11,7 +11,7 @@ import edu.brown.cs.athenia.data.modules.Tag;
 public class Language extends Modularized {
   private String name;
   private Map<String, Tag> tags;
-  private List<FreeNote> freenotes;
+  private List<FreeNote> freeNotes;
 
   // TODO: some sort of recent list storing the most recent
   // free notes according to some date value
@@ -23,7 +23,7 @@ public class Language extends Modularized {
   public Language(String name) {
     this.name = name;
     this.tags = new HashMap<String, Tag>();
-    this.freenotes = new ArrayList<FreeNote>();
+    this.freeNotes = new ArrayList<FreeNote>();
 
   }
 
@@ -55,6 +55,10 @@ public class Language extends Modularized {
     return tags.get(tag);
   }
 
+  public List<FreeNote> getFreeNotes() {
+    return new ArrayList<FreeNote>(this.freeNotes);
+  }
+
   public List<FreeNote> getRecentFreeNotes() {
     /*
      * List<FreeNote> returnable = new ArrayList<FreeNote>();
@@ -72,8 +76,8 @@ public class Language extends Modularized {
     // the max number of notes to return
     int NUMBER_OF_NOTES = 3;
 
-    for (int i = 0; i < freenotes.size() && i < NUMBER_OF_NOTES; i++) {
-      FreeNote note = freenotes.get(i);
+    for (int i = 0; i < freeNotes.size() && i < NUMBER_OF_NOTES; i++) {
+      FreeNote note = freeNotes.get(i);
       recentNotes.add(note);
     }
 
