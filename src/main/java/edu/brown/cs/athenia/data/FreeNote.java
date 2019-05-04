@@ -37,6 +37,15 @@ public class FreeNote {
     this.title = t;
   }
 
+  public FreeNote(String t, String id) {
+    this.id = id;
+    this.modules = new ArrayList<Module>();
+    this.tags = new HashMap<String, Tag>();
+    this.created = new Date();
+    this.dateModified = this.created;
+    this.title = t;
+  }
+
   public String getId() {
     return this.id;
   }

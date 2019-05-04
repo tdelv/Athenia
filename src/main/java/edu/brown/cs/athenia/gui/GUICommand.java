@@ -1805,10 +1805,11 @@ public class GUICommand {
   private static Map<String, Object> toDataNoModules(FreeNote note) {
     ImmutableMap.Builder<String, Object> variables =
             new ImmutableMap.Builder<>();
+    variables.put("modtype", StorageType.FREE_NOTE);
     variables.put("noteId", note.getId());
     variables.put("dateCreated", note.getDateCreated());
     variables.put("dateModified", note.getDateModified());
-    variables.put("title", note.getTitle());
+    variables.put("noteTitle", note.getTitle());
     List<String> tags = new ArrayList<>();
     for (Tag t : note.getTags()) {
       tags.add(t.getTag());
@@ -1825,9 +1826,19 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(FreeNote note) {
 
-    ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> noteData =
+            new ImmutableMap.Builder<String, Object>();
+
     noteData.put("modtype", StorageType.FREE_NOTE);
-    noteData.put("title", note.getTitle());
+    noteData.put("noteId", note.getId());
+    noteData.put("dateCreated", note.getDateCreated());
+    noteData.put("dateModified", note.getDateModified());
+    noteData.put("noteTitle", note.getTitle());
+    List<String> tags = new ArrayList<>();
+    for (Tag t : note.getTags()) {
+      tags.add(t.getTag());
+    }
+    noteData.put("tags", tags);
 
     // add all module data
     List<Map<String, Object>> modulesList = new ArrayList<>();
@@ -1851,7 +1862,7 @@ public class GUICommand {
     }
 
     // put module data into map
-    noteData.put("freeNoteContent", modulesList);
+    noteData.put("moduleContent", modulesList);
     return noteData.build();
   }
 
