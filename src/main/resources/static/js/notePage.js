@@ -7,7 +7,7 @@ $( document ).ready(function() {
         trigger: "hover"
     });
 
-    $("#insertTextButton").click(insertText);
+    $("#insertTextButton").click(insertNote);
     $("#insertVocabButton").click(insertVocab);
     $("#insertConjugationButton").click(insertConjugation);
     $("#insertExclamationButton").click(insertExclamation);
@@ -55,8 +55,30 @@ function insertConjugation() {
 
 function insertExclamation() {
     console.log("inserting exclamation");
+    const postParameters = {newTerm: "content"};
+    $.post("alertExclamationAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newExclamation = responseObject.newAlertExclamationModule;
+            const newExclamationModule = new Vocabulary(newExclamation.id, newExclamation.dateCreated, newExclamation.dateModified, newExclamation.noteContent);
+            insertModule(newExclamationModule);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
 }
 
 function insertQuestion() {
     console.log("inserting question");
+    const postParameters = {newTerm: "content"};
+    $.post("questionAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newQuestion = responseObject.newQuestionModule;
+            const newQuestionModule = new Vocabulary(newQuestion.id, newQuestion.dateCreated, newQuestion.dateModified, newQuestion.noteContent);
+            insertModule(newExclamationModule);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
 }
