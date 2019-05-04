@@ -15,6 +15,12 @@ class Module {
         this.dateModified = dateModified;
     }
 
+    setUp() {
+        const selector = "#" + this.id;
+        $(selector).hover(Module.prototype.onModuleHover, Module.prototype.onModuleLeave);
+        $(selector).click(Module.prototype.onModuleHover);
+    }
+
     onModuleHover() {
         // slight shadow background
         // TODO: use animation instead of css
@@ -36,9 +42,6 @@ class Module {
     }
 }
 
-/*
- *
- */
 class TextModule extends Module {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified);
@@ -47,12 +50,6 @@ class TextModule extends Module {
 
     toHTML() {
         return `<p id=\"${this.id}\">${this.content}</p>`;
-    }
-
-    setUp() {
-        const selector = "#" + this.id;
-        $(selector).hover(Module.prototype.onModuleHover, Module.prototype.onModuleLeave);
-        $(selector).click(Module.prototype.onModuleHover);
     }
 }
 
@@ -74,6 +71,10 @@ class Vocabulary extends Module {
         this.term = term;
         this.def = def;
     }
+
+    toHTML() {
+        return `<p id=\"${this.id}\">${this.term} ${this.def}</p>`;
+    }
 }
 
 class ConjugationTable extends Module {
@@ -81,6 +82,5 @@ class ConjugationTable extends Module {
         super(id, dateCreated, dateModified);
         this.pairList = pairList;
         this.tableHeight = tableHeight;
-
     }
 }
