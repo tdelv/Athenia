@@ -39,8 +39,8 @@ public class Language extends Modularized {
     return tags.values();
   }
 
-  public void addTag(String t) {
-    tags.put(t, new Tag(t));
+  public void addTag(Tag t) {
+    tags.put(t.getTag(), t);
   }
 
   public Tag removeTag(String t) {
@@ -51,20 +51,20 @@ public class Language extends Modularized {
     return tags.containsKey(tag);
   }
 
+  public Tag getTag(String tag) {
+    return tags.get(tag);
+  }
+
   public List<FreeNote> getRecentFreeNotes() {
     /*
-    List<FreeNote> returnable = new ArrayList<FreeNote>();
-
-    int i = 1;
-    while (i <= 3) {
-      FreeNote note = freenotes.get(freenotes.size() - i);
-      if (note != null) {
-        returnable.add(note);
-      }
-    }
-
-    return returnable;
-    */
+     * List<FreeNote> returnable = new ArrayList<FreeNote>();
+     * 
+     * int i = 1; while (i <= 3) { FreeNote note =
+     * freenotes.get(freenotes.size() - i); if (note != null) {
+     * returnable.add(note); } }
+     * 
+     * return returnable;
+     */
 
     // a list of the users recent notes
     List<FreeNote> recentNotes = new ArrayList<>();
