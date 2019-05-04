@@ -1,4 +1,14 @@
+/*
+ * THE BIG DADDY
+ */
 class Module {
+
+    /**
+     * a constructor for a Module
+     * @param id the module's id, generated in backend
+     * @param dateCreated
+     * @param dateModified
+     */
     constructor(id, dateCreated, dateModified) {
         this.id = id;
         this.dateCreated = dateCreated;
@@ -26,6 +36,9 @@ class Module {
     }
 }
 
+/*
+ *
+ */
 class TextModule extends Module {
     constructor(id, dateCreated, dateModified, content) {
         super(id, dateCreated, dateModified);
