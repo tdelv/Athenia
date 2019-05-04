@@ -12,14 +12,20 @@ import com.google.gson.Gson;
 
 import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
-import edu.brown.cs.athenia.data.modules.*;
-import edu.brown.cs.athenia.data.modules.module.*;
+import edu.brown.cs.athenia.data.modules.Module;
+import edu.brown.cs.athenia.data.modules.Pair;
+import edu.brown.cs.athenia.data.modules.Tag;
+import edu.brown.cs.athenia.data.modules.module.AlertExclamation;
+import edu.brown.cs.athenia.data.modules.module.Conjugation;
+import edu.brown.cs.athenia.data.modules.module.Note;
+import edu.brown.cs.athenia.data.modules.module.Question;
+import edu.brown.cs.athenia.data.modules.module.StorageType;
+import edu.brown.cs.athenia.data.modules.module.Vocab;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
-
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -37,7 +43,8 @@ public class GUICommand {
 
   private static final Gson GSON = new Gson();
 
-  private GUICommand() { }
+  private GUICommand() {
+  }
 
   /**
    *
@@ -255,8 +262,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         // find and check for user
@@ -367,8 +373,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -420,8 +425,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -474,8 +478,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -520,8 +523,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -569,8 +571,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -623,8 +624,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -637,7 +637,8 @@ public class GUICommand {
 
           // TODO : parse out how newContent is formatted and translate
 
-          // TODO : add content to conjToAdd and throw into map to present to front-end
+          // TODO : add content to conjToAdd and throw into map to present to
+          // front-end
 
           successful = true;
           message = "successfully added conjugation";
@@ -672,8 +673,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -683,14 +683,14 @@ public class GUICommand {
         if (lang != null) {
           // check if user map has the module in it
           if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
-            Conjugation conjToAddTo = (Conjugation)
-                    lang.getModule(StorageType.CONJUGATION, conjId);
+            Conjugation conjToAddTo = (Conjugation) lang
+                .getModule(StorageType.CONJUGATION, conjId);
             // try to parse indexToAddAt into integer
             try {
               int indexToAddAtInt = Integer.parseInt(indexToAddAt);
               // check for index out of bounds
-              if (indexToAddAtInt < 0 ||
-                      indexToAddAtInt >= conjToAddTo.getTable().size()) {
+              if (indexToAddAtInt < 0
+                  || indexToAddAtInt >= conjToAddTo.getTable().size()) {
                 conjToAddTo.add(termToAdd, defToAdd, indexToAddAtInt);
                 successful = true;
                 message = "successfully added entry to conjugation table";
@@ -740,8 +740,7 @@ public class GUICommand {
       String message = "";
       boolean successful = true;
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to pull the user info from the database
       try {
@@ -750,15 +749,15 @@ public class GUICommand {
         if (lang != null) {
           // check if module in map
           if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
-            Conjugation conjToUpdate = (Conjugation)
-                    lang.getModule(StorageType.CONJUGATION, conjId);
+            Conjugation conjToUpdate = (Conjugation) lang
+                .getModule(StorageType.CONJUGATION, conjId);
             List<Pair> conjToUpdatePairs = conjToUpdate.getTable();
             // try to parse index into integer
             try {
               int indexToUpdateInt = Integer.parseInt(indexToUpdateStr);
               // check for index out of bounds
-              if (indexToUpdateInt < 0 ||
-                      indexToUpdateInt >= conjToUpdatePairs.size()) {
+              if (indexToUpdateInt < 0
+                  || indexToUpdateInt >= conjToUpdatePairs.size()) {
                 message = "index out of bounds in conjugation update handler";
               } else {
                 // else finally do the update
@@ -777,7 +776,7 @@ public class GUICommand {
           }
           // catch if current user language is null
         } else {
-         message = "current language null in conjugation update handler";
+          message = "current language null in conjugation update handler";
         }
         // catch if user not properly found in database
       } catch (DatabaseParserException e) {
@@ -792,8 +791,7 @@ public class GUICommand {
   }
 
   /**
-   * POST request handler for removing a single entry from a conjugation
-   * table.
+   * POST request handler for removing a single entry from a conjugation table.
    */
   public static class ConjugationRemoveEntryHandler implements Route {
     @Override
@@ -816,14 +814,14 @@ public class GUICommand {
         // check if current language not null
         if (lang != null) {
           if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
-            Conjugation conjToRemoveFrom = (Conjugation)
-                    lang.getModule(StorageType.CONJUGATION, conjId);
+            Conjugation conjToRemoveFrom = (Conjugation) lang
+                .getModule(StorageType.CONJUGATION, conjId);
             // try for parsing out int of index
             try {
               int indexToRemoveInt = Integer.parseInt(indexToRemoveStr);
               // check for index out of bounds error
-              if (indexToRemoveInt < 0 ||
-                      indexToRemoveInt >= conjToRemoveFrom.getTable().size()) {
+              if (indexToRemoveInt < 0
+                  || indexToRemoveInt >= conjToRemoveFrom.getTable().size()) {
                 message = "index out of bounds in conjugation remove entry handler";
               } else {
                 // if all is good, do the update
@@ -850,8 +848,7 @@ public class GUICommand {
 
       // prepare information to send to front-end
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-              .put("successful", successful)
-              .put("message", message).build();
+          .put("successful", successful).put("message", message).build();
       return GSON.toJson(variables);
     }
   }
@@ -870,8 +867,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -882,8 +878,8 @@ public class GUICommand {
           // check if module in user map
           if (lang.getModule(StorageType.CONJUGATION, conjId) != null) {
             // actually remove conjugation module
-            Conjugation conjToRemove = (Conjugation)
-                    lang.getModule(StorageType.CONJUGATION, conjId);
+            Conjugation conjToRemove = (Conjugation) lang
+                .getModule(StorageType.CONJUGATION, conjId);
             lang.removeModule(StorageType.CONJUGATION, conjToRemove);
             // edit sucessful messages
             successful = true;
@@ -928,8 +924,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -975,8 +970,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1028,8 +1022,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1084,8 +1077,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1130,8 +1122,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1142,8 +1133,8 @@ public class GUICommand {
           // check if alert module is in map
           if (lang.getModule(StorageType.ALERT_EXCLAMATION, alertId) != null) {
             // update module
-            AlertExclamation alertToUpdate = (AlertExclamation)
-                    lang.getModule(StorageType.ALERT_EXCLAMATION, alertId);
+            AlertExclamation alertToUpdate = (AlertExclamation) lang
+                .getModule(StorageType.ALERT_EXCLAMATION, alertId);
             alertToUpdate.update(alertUpdate);
             variables.put("updatedAlert", toData(alertToUpdate));
             // update successful messages
@@ -1184,8 +1175,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1196,8 +1186,8 @@ public class GUICommand {
           // check if module is in user map
           if (lang.getModule(StorageType.ALERT_EXCLAMATION, alertId) != null) {
             // remove module
-            AlertExclamation alertToRemove = (AlertExclamation)
-                    lang.getModule(StorageType.ALERT_EXCLAMATION, alertId);
+            AlertExclamation alertToRemove = (AlertExclamation) lang
+                .getModule(StorageType.ALERT_EXCLAMATION, alertId);
             lang.removeModule(StorageType.ALERT_EXCLAMATION, alertToRemove);
             // edit successful variables
             successful = true;
@@ -1230,8 +1220,7 @@ public class GUICommand {
    */
 
   /**
-   * POST request for handling the addition of a completely new Question
-   * module.
+   * POST request for handling the addition of a completely new Question module.
    */
   public static class QuestionAddHandler implements Route {
     @Override
@@ -1244,8 +1233,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1290,8 +1278,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1302,8 +1289,8 @@ public class GUICommand {
           // check if question module is in map
           if (lang.getModule(StorageType.QUESTION, questionID) != null) {
             // update the module
-            Question questionToUpdate = (Question)
-                    lang.getModule(StorageType.QUESTION, questionID);
+            Question questionToUpdate = (Question) lang
+                .getModule(StorageType.QUESTION, questionID);
             questionToUpdate.update(questionUpdate);
             variables.put("updatedQuestion", questionToUpdate);
             // update successful variables
@@ -1344,8 +1331,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1356,8 +1342,8 @@ public class GUICommand {
           // check if module is in user map
           if (lang.getModule(StorageType.QUESTION, questionId) != null) {
             // remove the question module
-            Question questionToRemove = (Question)
-                    lang.getModule(StorageType.QUESTION, questionId);
+            Question questionToRemove = (Question) lang
+                .getModule(StorageType.QUESTION, questionId);
             lang.removeModule(StorageType.QUESTION, questionToRemove);
             // update successful variables
             successful = true;
@@ -1397,7 +1383,8 @@ public class GUICommand {
    */
   public static class TagPageHandler implements TemplateViewRoute {
     @Override
-    public ModelAndView handle(Request req, Response res) throws DriveApiException {
+    public ModelAndView handle(Request req, Response res)
+        throws DriveApiException {
       String userId = req.session().attribute("user_id");
 
       // successful variables
@@ -1453,8 +1440,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1462,8 +1448,10 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
         // check if current lang is not null
         if (lang != null) {
-          //add new tag
-          lang.addTag(tagVal);
+          // add new tag
+          if (!lang.hasTag(tagVal)) {
+            lang.addTag(new Tag(tagVal));
+          }
           // update successful variables
           successful = true;
           message = "successfully added tag";
@@ -1500,8 +1488,7 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables =
-              new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1536,7 +1523,6 @@ public class GUICommand {
       return GSON.toJson(variables.build());
     }
   }
-
 
   /*
    * -------------------------------------------------------------------------
@@ -1744,7 +1730,6 @@ public class GUICommand {
 
   // TODO create a set handler for all things reviewable
 
-
   /*
    * -------------------------------------------------------------------------
    * -- REVIEW HANDLERS ------------------------------------------------------
@@ -1833,8 +1818,7 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(FreeNote note) {
 
-    ImmutableMap.Builder<String, Object> noteData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.FREE_NOTE);
     noteData.put("title", note.getTitle());
 
@@ -1869,6 +1853,16 @@ public class GUICommand {
 
     toData(vocab, vocabData);
 
+
+    // prepare map of content
+    /*
+     * Map<String, String> vocabContentList = new HashMap<>();
+     * vocabContentList.put("vocabTerm", vocab.getPair().getTerm());
+     * vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
+     * vocabData.put("vocabContent", vocabContentList);
+     */
+
+
     vocabData.put("term", vocab.getPair().getTerm());
     vocabData.put("def", vocab.getPair().getDefinition());
     vocabData.put("rating", vocab.getRating());
@@ -1877,7 +1871,8 @@ public class GUICommand {
 
   /**
    * Converts a Conjugation module into a data map for JSON.
-   * @param conjugation the Conjugation module to convert
+   * @param conjugation
+   *          the Conjugation module to convert
    * @return a map of data from the FreeNote object
    */
   private static Map<String, Object> toData(Conjugation conjugation) {
@@ -1904,7 +1899,8 @@ public class GUICommand {
 
   /**
    * Converts a Tag module into a data map for JSON.
-   * @param tag the Tag module to convert
+   * @param tag
+   *          the Tag module to convert
    * @return a map of data from the Tag object
    */
   private static Map<String, Object> toData(Tag tag) {
@@ -1916,12 +1912,12 @@ public class GUICommand {
 
   /**
    * Converts an AlertExclamation into a data map for JSON.
-   * @param alert the AlertExclamation object to convert
+   * @param alert
+   *          the AlertExclamation object to convert
    * @return a map of data from the AlertExclamation object
    */
   private static Map<String, Object> toData(AlertExclamation alert) {
-    ImmutableMap.Builder<String, Object> alertData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> alertData = new ImmutableMap.Builder<String, Object>();
     alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(alert, alertData);
     alertData.put("alertContent", alert.getText());
@@ -1930,12 +1926,12 @@ public class GUICommand {
 
   /**
    * Converts a Question module into a data map for JSON.
-   * @param question the Question object to convert
+   * @param question
+   *          the Question object to convert
    * @return a map of dating storing the Question information
    */
   private static Map<String, Object> toData(Question question) {
-    ImmutableMap.Builder<String, Object> questionData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> questionData = new ImmutableMap.Builder<String, Object>();
     questionData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(question, questionData);
     questionData.put("questionContent", question.getText());
@@ -1944,12 +1940,12 @@ public class GUICommand {
 
   /**
    * Converts a Note into a data map for JSON.
-   * @param note the Note object to convert
+   * @param note
+   *          the Note object to convert
    * @return the ImmutableMap to add the data to
    */
   private static Map<String, Object> toData(Note note) {
-    ImmutableMap.Builder<String, Object> noteData =
-            new ImmutableMap.Builder<String, Object>();
+    ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.NOTE);
     toData(note, noteData);
     noteData.put("noteContent", note.getText());
@@ -1959,8 +1955,10 @@ public class GUICommand {
 
   /**
    * Converts any generic Module data into a data map for JSON.
-   * @param module the generic Module object to convert
-   * @param map the ImmutableMap to add the data information to
+   * @param module
+   *          the generic Module object to convert
+   * @param map
+   *          the ImmutableMap to add the data information to
    */
   private static void toData(Module module,
       ImmutableMap.Builder<String, Object> map) {

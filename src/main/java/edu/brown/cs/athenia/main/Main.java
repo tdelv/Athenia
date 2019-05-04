@@ -120,19 +120,38 @@ public class Main {
     Spark.post("/removeLanguage", new GUICommand.LanguageRemoveHandler());
     Spark.post("/changeCurrentLanguage", new GUICommand.LanguageChangeHandler());
 
-    //Spark.get("/bacon/actor", new BaconActorHandler(), freeMarker);
-
     // freenotes spark handlers
     Spark.get("/notes", new GUICommand.FreeNotesPageHandler(), freeMarker);
     Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
 
-    // module specific spark handlers
+    // vocabulary module specific spark handlers
     Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
     Spark.post("/vocabularyAdd", new GUICommand.VocabularyAddHandler());
     Spark.post("/vocabularyUpdate", new GUICommand.VocabularyUpdateHandler());
     Spark.post("/vocabularyRemove", new GUICommand.VocabularyRemoveHandler());
 
+    // conjugation module specific spark handlers
     Spark.get("/conjugations", new GUICommand.ConjugationPageHandler(), freeMarker);
+    Spark.post("/conjugationAdd", new GUICommand.ConjugationAddHandler());
+    Spark.post("/conjugationEntryAdd", new GUICommand.ConjugationAddEntryHandler());
+    Spark.post("/conjugationEntryUpdate", new GUICommand.ConjugationEntryUpdateHandler());
+    Spark.post("/conjugationEntryRemove", new GUICommand.ConjugationRemoveEntryHandler());
+    Spark.post("/conjugationRemove", new GUICommand.ConjugationRemoveHandler());
+
+    // note module specific spark handlers
+    Spark.post("/noteAdd", new GUICommand.NoteAddHandler());
+    Spark.post("/noteUpdate", new GUICommand.NoteUpdateHandler());
+    Spark.post("/noteRemover", new GUICommand.NoteRemoveHandler());
+
+    // alert exclamation specific spark handlers
+    Spark.post("/alertAdd", new GUICommand.AlertAddHandler());
+    Spark.post("/alertUpdate", new GUICommand.AlertUpdateHandler());
+    Spark.post("/alertRemove", new GUICommand.AlertRemoveHandler());
+
+    // question specific spark handlers
+    Spark.post("/questionAdd", new GUICommand.QuestionAddHandler());
+    Spark.post("/questionUpdate", new GUICommand.QuestionUpdateHandler());
+    Spark.post("/questionRemove", new GUICommand.QuestionRemoveHandler());
 
   }
 

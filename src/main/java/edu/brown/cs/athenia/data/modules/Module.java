@@ -67,8 +67,8 @@ public abstract class Module {
     return tags.values();
   }
 
-  public void addTag(String t) {
-    tags.put(t, new Tag(t));
+  public void addTag(Tag t) {
+    tags.put(t.getTag(), t);
   }
 
   public Tag removeTag(String t) {
@@ -77,6 +77,10 @@ public abstract class Module {
 
   public boolean hasTag(String tag) {
     return tags.containsKey(tag);
+  }
+
+  public Tag getTag(String tag) {
+    return tags.get(tag);
   }
 
   /**
