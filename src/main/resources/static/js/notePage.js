@@ -1,19 +1,11 @@
 
-// INSERT VOCAB BUTTON JQUERY ELEMENT
-const ivb = $("#insertVocabButton");
-
-
 $( document ).ready(function() {
 
-    const tt = new Tooltip($("#insertTextButton"), {
+    let tt = new Tooltip($("#insertTextButton"), {
         placement: "right",
         title: "Top",
         trigger: "hover"
     });
-
-    // ivb.hover(function(){
-    //     console.log("yeet");
-    //     tt.show()});
 
     $("#insertTextButton").click(insertText);
     $("#insertVocabButton").click(insertVocab);
@@ -22,14 +14,14 @@ $( document ).ready(function() {
     $("#insertQuestionButton").click(insertQuestion);
 });
 
-function renderText(content) {
-    $("#noteBody").append(`<p>${content}</p>`);
-}
-
 function insertText() {
     console.log("inserting text");
+    // TODO: post request which generates the text in the backend
+    // pull info from post request to generate the text object in the front end
+    const newText = new TextModule("id123weee", "date created", "date modified", "sample content");
+    $("#noteBody").append(newText.toHTML());
+    newText.setUp();
 
-    renderText("write here!");
 }
 
 function insertVocab() {
@@ -37,7 +29,7 @@ function insertVocab() {
     // vocabularyAdd
     // VocabularyAddHandler
 
-    const postParameters = {id: "hackergirlxoxo", newTerm: "term", newDef: "definition"};
+    const postParameters = {newTerm: "term", newDef: "definition"};
 
     $.post("/vocabularyAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);

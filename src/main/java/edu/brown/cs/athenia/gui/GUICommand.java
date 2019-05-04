@@ -1795,7 +1795,6 @@ public class GUICommand {
    * @return a map of data from the Vocab object
    */
   private static Map<String, Object> toData(Vocab vocab) {
-    System.out.println("got here C");
 
     ImmutableMap.Builder<String, Object> vocabData = new ImmutableMap.Builder<String, Object>();
     // pull information of vocab
