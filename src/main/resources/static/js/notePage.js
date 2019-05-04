@@ -14,28 +14,35 @@ $( document ).ready(function() {
     $("#insertQuestionButton").click(insertQuestion);
 });
 
-function insertText() {
-    console.log("inserting text");
-    // TODO: post request which generates the text in the backend
-    // pull info from post request to generate the text object in the front end
-    const newText = new TextModule("id123weee", "date created", "date modified", "sample content");
-    $("#noteBody").append(newText.toHTML());
-    newText.setUp();
+function insertModule(module) {
+    $("#noteBody").append(module.toHTML());
+    module.setUp();
+}
 
+function insertNote() {
+    console.log("inserting text");
+    const postParameters = {newTerm: "content"};
+    $.post("noteAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newNote = responseObject.newNoteModule;
+            const newNoteModule = new Vocabulary(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            insertModule(newNoteModule);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
 }
 
 function insertVocab() {
     console.log("inserting vocab");
-    // vocabularyAdd
-    // VocabularyAddHandler
-
     const postParameters = {newTerm: "term", newDef: "definition"};
-
     $.post("/vocabularyAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newGirl = responseObject.newVocabModule;
-            console.log("here she is: " + newGirl);
+            const newVocab = responseObject.newVocabModule;
+            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def);
+            insertModule(newVocabModule);
         } else {
             console.log("message: " + responseObject.message);
         }

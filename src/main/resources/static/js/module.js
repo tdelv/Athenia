@@ -1,8 +1,24 @@
+/*
+ * THE BIG DADDY
+ */
 class Module {
+
+    /**
+     * a constructor for a Module
+     * @param id the module's id, generated in backend
+     * @param dateCreated
+     * @param dateModified
+     */
     constructor(id, dateCreated, dateModified) {
         this.id = id;
         this.dateCreated = dateCreated;
         this.dateModified = dateModified;
+    }
+
+    setUp() {
+        const selector = "#" + this.id;
+        $(selector).hover(Module.prototype.onModuleHover, Module.prototype.onModuleLeave);
+        $(selector).click(Module.prototype.onModuleHover);
     }
 
     onModuleHover() {
@@ -35,12 +51,6 @@ class TextModule extends Module {
     toHTML() {
         return `<p id=\"${this.id}\">${this.content}</p>`;
     }
-
-    setUp() {
-        const selector = "#" + this.id;
-        $(selector).hover(Module.prototype.onModuleHover, Module.prototype.onModuleLeave);
-        $(selector).click(Module.prototype.onModuleHover);
-    }
 }
 
 class Exclamation extends TextModule {
@@ -61,6 +71,10 @@ class Vocabulary extends Module {
         this.term = term;
         this.def = def;
     }
+
+    toHTML() {
+        return `<p id=\"${this.id}\">${this.term} ${this.def}</p>`;
+    }
 }
 
 class ConjugationTable extends Module {
@@ -68,6 +82,5 @@ class ConjugationTable extends Module {
         super(id, dateCreated, dateModified);
         this.pairList = pairList;
         this.tableHeight = tableHeight;
-
     }
 }

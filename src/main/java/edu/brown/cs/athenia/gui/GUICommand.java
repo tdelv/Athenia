@@ -379,9 +379,13 @@ public class GUICommand {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
 
+        variables.put("username", ""); // TODO get the name
+
         if (lang != null) {
           Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
           List<Map<String, Object>> vocabList = new ArrayList<>();
+
+          variables.put("currentLanguage", lang.getName());
 
           // translate vocab objects to JSON
           for (Map.Entry<String, Module> vocab : vocabMap.entrySet()) {
@@ -573,10 +577,14 @@ public class GUICommand {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
 
+        variables.put("username", ""); // TODO get username
+
         if (lang != null) {
           Map<String, Module> conjMap = lang
               .getModuleMap(StorageType.CONJUGATION);
           List<Map<String, Object>> conjList = new ArrayList<>();
+
+          variables.put("currentLanguage", lang.getName());
 
           // translate conj objects to JSON
           for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
@@ -1576,16 +1584,49 @@ public class GUICommand {
   public static class FreeNotesPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      String currentLanguage = qm.value("currentLanguage");
-      // TODO: recognize user wants to visit landing page of FreeNotes
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("currentLanguage", currentLanguage).build();
-      // TODO: pull out all information about each separate FreeNotes page
-      // of the user and format it appropriately for the user to
-      // view
-      return new ModelAndView(variables, "notes.ftl");
+            throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      String currentLanguage = "";
+      String username = ""; // TODO get the user's name
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+
+        if (lang != null) {
+
+          currentLanguage = lang.getName();
+
+          List<Map<String, Object>> recentNotes = new ArrayList<>();
+          for (FreeNote note : lang.getRecentFreeNotes()) {
+            recentNotes.add(toDataNoModules(note));
+          }
+
+          variables.put("recentNote", recentNotes);
+          successful = true;
+          message = "successfully retrieved FreeNotes";
+
+        } else {
+          message = "current language null in freenotes page handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in free notes page handler";
+      }
+
+      variables.put("title", "FreeNotes");
+      variables.put("username", username);
+      variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return new ModelAndView(variables.build(), "notes.ftl");
     }
   }
 
@@ -1614,6 +1655,9 @@ public class GUICommand {
         // send modules and other relevant data (note title, date, etc)
         variables.put("title", "TODO"); // TODO: put note title
       }
+
+      // TODO LOOK AT notes.js for the variables names
+
 
       variables.put("username", "temp");
       variables.put("currentLanguage", currentLanguage);
@@ -1746,6 +1790,27 @@ public class GUICommand {
    */
 
   /**
+   * Converts a FreeNote into a data map for JSON, excluding all of the
+   * sub-modules' information.
+   * @param note the FreeNote to convert
+   * @return a map containing the superficial information of a FreeNote
+   */
+  private static Map<String, Object> toDataNoModules(FreeNote note) {
+    ImmutableMap.Builder<String, Object> variables =
+            new ImmutableMap.Builder<>();
+    variables.put("noteId", note.getId());
+    variables.put("dateCreated", note.getDateCreated());
+    variables.put("dateModified", note.getDateModified());
+    variables.put("title", note.getTitle());
+    List<String> tags = new ArrayList<>();
+    for (Tag t : note.getTags()) {
+      tags.add(t.getTag());
+    }
+    variables.put("tags", tags);
+    return variables.build();
+  }
+
+  /**
    * Converts a FreeNote into a data map for JSON.
    * @param note
    *          the FreeNote object to convert
@@ -1786,8 +1851,8 @@ public class GUICommand {
     // pull information of vocab
     vocabData.put("modtype", StorageType.VOCAB);
 
-    // TODO bug
     toData(vocab, vocabData);
+
 
     // prepare map of content
     /*
@@ -1796,6 +1861,7 @@ public class GUICommand {
      * vocabContentList.put("vocabDef", vocab.getPair().getDefinition());
      * vocabData.put("vocabContent", vocabContentList);
      */
+
 
     vocabData.put("term", vocab.getPair().getTerm());
     vocabData.put("def", vocab.getPair().getDefinition());
