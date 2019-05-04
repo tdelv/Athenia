@@ -1,5 +1,7 @@
 package edu.brown.cs.athenia.data;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,8 +28,8 @@ public class FreeNote {
   private String title;
   private String id;
 
-  public FreeNote(String t, String id) {
-    this.id = id;
+  public FreeNote(String t) {
+    this.id = new BigInteger(130, new SecureRandom()).toString(32);
     this.modules = new ArrayList<Module>();
     this.tags = new HashMap<String, Tag>();
     this.created = new Date();
