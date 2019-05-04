@@ -5,7 +5,7 @@
     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
 
-        <span>${currentLanguage}</span>
+        <span id="currentLanguage">${currentLanguage}</span>
 
 
         <!-- Topbar Navbar -->
@@ -79,8 +79,8 @@
             </a>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item newNoteButton" href="#">New Note</a>
-                    <a class="collapse-item" href="TBD">View Notes</a>
+                    <a class="collapse-item newNoteButton" href="noteEditor?id=new&currentLanguage=${currentLanguage}">New Note</a>
+                    <a class="collapse-item" href="notes?currentLanguage=${currentLanguage}">View Notes</a>
                 </div>
             </div>
         </li>
@@ -95,14 +95,14 @@
 
         <!-- Nav Item - Vocabulary -->
         <li class="nav-item">
-            <a class="nav-link" href="TBD">
+            <a class="nav-link" href="vocabulary?currentLanguage=${currentLanguage}">
                 <i class="fas fa-fw fa-list"></i>
                 <span>Vocabulary</span></a>
         </li>
 
         <!-- Nav Item - Conjugations -->
         <li class="nav-item">
-            <a class="nav-link" href="TBD">
+            <a class="nav-link" href="conjugations?currentLanguage=${currentLanguage}">
                 <i class="fas fa-fw fa-table"></i>
                 <span>Conjugations</span></a>
         </li>
@@ -113,7 +113,7 @@
         <!-- Nav Item - Review Mode -->
         <!-- TODO: Differentiate this -->
         <li class="nav-item">
-            <a class="nav-link" href="TBD">
+            <a class="nav-link" href="reviewMode?currentLanguage=${currentLanguage}">
                 <i class="fas fa-fw fa-clipboard-list"></i>
                 <span>Review Mode</span></a>
         </li>

@@ -1592,9 +1592,10 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
+      String currentLanguage = qm.value("currentLanguage");
       // TODO: recognize user wants to visit landing page of FreeNotes
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
+          .put("currentLanguage", currentLanguage).build();
       // TODO: pull out all information about each separate FreeNotes page
       // of the user and format it appropriately for the user to
       // view
@@ -1612,8 +1613,10 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       QueryParamsMap qm = req.queryMap();
-      // TODO: send id through the url in the js (for mia from mia lol)
       String noteId = qm.value("id");
+      String currentLanguage = qm.value("currentLanguage");
+
+      System.out.println("curr lang: " + currentLanguage);
 
       ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
 
@@ -1626,9 +1629,8 @@ public class GUICommand {
         variables.put("title", "TODO"); // TODO: put note title
       }
 
-      // Will just retain this info in the front end
-      variables.put("currentLanguage", "temp");
       variables.put("username", "temp");
+      variables.put("currentLanguage", currentLanguage);
 
       // update any info about last date viewed and stuff if we have it
 
