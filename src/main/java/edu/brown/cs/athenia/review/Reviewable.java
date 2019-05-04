@@ -17,4 +17,6 @@ public interface Reviewable {
 
   public Date getDateLastReviewed(); // needs to have for reviewing
 
+  public void setDateLastReviewed(Date m); // needs to have for reviewing
+
 }
