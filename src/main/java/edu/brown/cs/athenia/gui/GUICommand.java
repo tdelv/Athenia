@@ -1710,6 +1710,8 @@ public class GUICommand {
             FreeNote newFreeNote = new FreeNote("Note Title");
             lang.addFreeNote(newFreeNote);
             variables.put("newFreeNote", newFreeNote);
+            variables.put("freeNoteId", newFreeNote.getId());
+            variables.put("title", newFreeNote.getTitle());
             successful = true;
             message = "successfully added new freenote";
           } else {
@@ -1717,8 +1719,10 @@ public class GUICommand {
 
             if (lang.containsFreeNote(noteId)) {
 
-              FreeNote oldNote = lang.getFreeNote(noteId);
-              variables.put("oldFreeNote", oldNote);
+              FreeNote oldFreeNote = lang.getFreeNote(noteId);
+              variables.put("oldFreeNote", oldFreeNote);
+              variables.put("freeNoteId", oldFreeNote.getId());
+              variables.put("title", oldFreeNote.getTitle());
               successful = true;
               message = "successfully pulled old freenote";
 
@@ -1735,7 +1739,6 @@ public class GUICommand {
         message = "user not in database in free note editor handler";
       }
 
-      variables.put("title", "Note Page Editor");
       variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
       variables.put("successful", successful);

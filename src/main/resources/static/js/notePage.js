@@ -38,8 +38,13 @@ function insertNote() {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
             const newNote = responseObject.newNoteModule;
-            console.log("new note content: " + newNote.noteContent);
-            const newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            let newNoteModule;
+            //TODO: add this to all other stuff
+            if (moduleMap.has(newNote.id)) {
+                newNoteModule = moduleMap.get(currVocab.id);
+            } else {
+                newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            }
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
