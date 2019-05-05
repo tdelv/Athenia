@@ -162,6 +162,9 @@ public class Main {
     Spark.post("/addTagToModule", new GUICommand.AddTagToModule());
     Spark.post("/removeTagFromModule", new GUICommand.RemoveTagFromModule());
 
+    // setting the rating of a module handler
+    Spark.post("/setRating", new GUICommand.SetRatingHandler());
+
   }
 
   /**
