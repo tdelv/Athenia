@@ -1511,7 +1511,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1737,6 +1738,12 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
+      // TODO - do this in the front end (to mia, from jason)
+
+      String moduleId = qm.value("moduleId");
+      String modtype = qm.value("modtype");
+      String tagToRemove = qm.value("tagToRemove");
+
       // success variables
       boolean successful = false;
       String message = "";
@@ -1751,13 +1758,88 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
 
+          // check for vocab module and update accordingly
+          if (modtype.equals(StorageType.VOCAB.toString())) {
+            if (lang.getModule(StorageType.VOCAB, moduleId) != null) {
+              Vocab vocabToUpdate = (Vocab)
+                      lang.getModule(StorageType.VOCAB, moduleId);
+              vocabToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map " + moduleId;
+            }
+
+            // check for alert exclamation module and update accordingly
+          } else if (modtype.equals(StorageType.ALERT_EXCLAMATION.toString())) {
+            if (lang.getModule(StorageType.ALERT_EXCLAMATION, moduleId) != null) {
+              AlertExclamation alertToUpdate = (AlertExclamation)
+                      lang.getModule(StorageType.ALERT_EXCLAMATION, moduleId);
+              alertToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for conjugation module and update accordingly
+          } else if (modtype.equals(StorageType.CONJUGATION.toString())) {
+            if (lang.getModule(StorageType.CONJUGATION, moduleId) != null) {
+              Conjugation conjToUpdate = (Conjugation)
+                      lang.getModule(StorageType.CONJUGATION, moduleId);
+              conjToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for free note module and update accordingly
+          } else if (modtype.equals(StorageType.FREE_NOTE.toString())) {
+            if (lang.getFreeNote(moduleId) != null) {
+              lang.getFreeNote(moduleId).removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for note module and update accordingly
+          } else if (modtype.equals(StorageType.NOTE.toString())) {
+            if (lang.getModule(StorageType.NOTE, moduleId) != null) {
+              Note noteToUpdate = (Note)
+                      lang.getModule(StorageType.NOTE, moduleId);
+              noteToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully remove tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for question module and update accordingly
+          } else if (modtype.equals(StorageType.QUESTION.toString())) {
+            if (lang.getModule(StorageType.QUESTION, moduleId) != null) {
+              Question questionToUpdate = (Question)
+                      lang.getModule(StorageType.QUESTION, moduleId);
+              questionToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // catch all other cases
+          } else {
+            message = "modtype not recognized " + modtype;
+          }
+
           // catch if current lang is null
         } else {
-          message = "";
+          message = "language in remove tag from module handler";
         }
         // catch if user not found in database
       } catch (DatabaseParserException e) {
-        message = "";
+        message = "user not in database in remove tag from module handler";
       }
 
       // prepare variables to send to front end
