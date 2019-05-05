@@ -39,12 +39,7 @@ function insertNote() {
         if (responseObject.successful) {
             const newNote = responseObject.newNoteModule;
             let newNoteModule;
-            //TODO: add this to all other stuff
-            if (moduleMap.has(newNote.id)) {
-                newNoteModule = moduleMap.get(currVocab.id);
-            } else {
-                newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
-            }
+            newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -69,6 +64,18 @@ function insertVocab() {
 
 function insertConjugation() {
     console.log("inserting conjugation");
+    const postParameters = {};
+    $.post("/conjugationAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newConjugation = responseObject.newConjugationModule;
+            const newConjugationModule = new ConjugationTable(newConjugation.id, newConjugation.dateCreated, newConjugation.dateModified, newConjugation.header, new List(), 3);
+            insertModule(newConjugationModule);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
+
 }
 
 function insertExclamation() {

@@ -657,11 +657,9 @@ public class GUICommand {
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String conjugationId = qm.value("conjId");
-      String newHeader = qm.value("header"); // just a string
-      String newContent = qm.value("content"); // list of lists of strings
 
-      // TODO check for freenote id
+      // TODO check for freenote id (done <3 mia)
+      String freeNoteId = qm.value("freeNoteId");
 
       boolean successful = false;
       String message = "";
@@ -674,8 +672,11 @@ public class GUICommand {
 
         if (lang != null) {
 
+          // TODO: add the freeNoteId to the new Conjugation?
           Conjugation conjToAdd = new Conjugation();
-          conjToAdd.setHeader(newHeader);
+          conjToAdd.setHeader("Table Header");
+          variables.put("newConjugationModule", conjToAdd);
+
 
           // TODO : parse out how newContent is formatted and translate
 
