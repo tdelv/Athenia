@@ -1543,8 +1543,6 @@ public class GUICommand {
     }
   }
 
-  // TODO maybe? an update tag handler
-
   /**
    * POST request for removing a tag from the user map.
    */
@@ -1597,23 +1595,13 @@ public class GUICommand {
 
   /*
    * -------------------------------------------------------------------------
-   * -- GENERIC MODULE HANDLERS ----------------------------------------------
+   * -- GENERIC MODULE & TAG HANDLERS ----------------------------------------
    * -------------------------------------------------------------------------
    */
 
-  /**
-   * POST request handler for updating a module's tag set, particularly adding
-   * or removing a tag to or from the module. Called wherever a module's tag can
-   * be edited -- including on the vocabulary, conjugation, and FreeNotes
-   * landing, and more importantly, individual pages as well as the tag landing
-   * and individual pages.
-   */
-  public static class ModuleTagUpdateHandler implements Route {
-    @Override
-    public String handle(Request req, Response res) throws DriveApiException {
-      return null; // TODO THIS BULLSHIT
-    }
-  }
+  
+
+
 
   /*
    * -------------------------------------------------------------------------
@@ -1746,28 +1734,6 @@ public class GUICommand {
       variables.put("message", message);
 
       return new ModelAndView(variables.build(), "notePageEdit.ftl");
-    }
-  }
-
-  /**
-   * POST request handler for adding a new module to an individual FreeNotes
-   * page. These modules include a vocabulary module, a conjugation module, a
-   * text box, or a note. Generates this module in the backend, adds it to the
-   * areas in the backend where appropriate and inserts the information into the
-   * database. Sends to the front-end the information necessary for the user to
-   * use that module.
-   */
-  public static class AddModuleToFreeNotesHandler implements Route {
-    @Override
-    public String handle(Request req, Response res) throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      // TODO: determine which module (vocab, conjugation, text, etc.) the
-      // user wishes to create
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: generate the information for that module and add to the database
-      // for accessing with the above methods
-      return GSON.toJson(variables);
     }
   }
 
