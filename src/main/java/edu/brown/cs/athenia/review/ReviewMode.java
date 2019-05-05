@@ -33,6 +33,11 @@ public class ReviewMode {
     this.endDateCreated = endDateCreated;
   }
 
+  /**
+   * ReviewMode's review finds the Reviewable modules we want to review based on
+   * the tags, and creation date range we want to review.
+   * @return : Returns an unranked (unsorted) List of Reviewable modules.
+   */
   public List<Reviewable> review() {
 
     List<Reviewable> modulesToReview = new ArrayList<Reviewable>();

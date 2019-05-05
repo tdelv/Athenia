@@ -159,6 +159,28 @@ class Vocabulary extends Module {
         this.rating = rating;
     }
 
+    // TODO: attach this handler to onBlur
+    updateVocabularyModule() {
+
+        // if need be, id can be stored in the event target. event would be parameter to this method
+
+        // TODO: store the new values in this object if that hasn't been done already
+
+        const freeNoteId = "TODO";
+
+        const postParameters = {vocabId: this.id, updatedTerm: this.term, updatedDef: this.def, updatedRating: this.rating, freeNote: freeNoteId};
+        $.post("/vocabularyUpdate", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            if (responseObject.successful) {
+                // TODO: nothing?
+
+            } else {
+                console.log("message: " + responseObject.message);
+            }
+        });
+
+    }
+
     toHTML() {
 
         const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate" 
@@ -170,7 +192,6 @@ class Vocabulary extends Module {
             `<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +
 
             // TODO somehow allow for rating changes
-
             `<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
             `</div>` +
             `<small>Date Modified: ${this.dateModified}</small>` +
@@ -179,10 +200,6 @@ class Vocabulary extends Module {
         return form;
     }
 
-}
-
-function updateVocab() {
-    console.log("IDK");
 }
 
 

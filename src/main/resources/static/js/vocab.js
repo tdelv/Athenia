@@ -7,12 +7,9 @@ $( document ).ready(function() {
         insertVocab();
     })
 
-    $(".vocabSubmit").on("click", function(e) {
-        e.preventDefault();
-        alert("SAVING?");
-    })
-
 });
+
+
 
 function getVocabList() {
     const postParameters = {};
