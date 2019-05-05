@@ -40,4 +40,7 @@ public class Conjugation extends Table implements Reviewable {
     return this.header;
   }
 
+  public StorageType getType(){
+    return StorageType.CONJUGATION;
+  }
 }

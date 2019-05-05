@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.brown.cs.athenia.data.FreeNote;
+import edu.brown.cs.athenia.data.modules.module.StorageType;
 
 /**
  * Module is a class that stipulates all modules have a set of tags, add and
@@ -23,6 +24,7 @@ public abstract class Module {
   private String id;
   private FreeNote freeNote;
   private Date dateLastReviewed;
+  private StorageType type;
 
   public Module() {
     this.freeNote = null;
@@ -126,5 +128,7 @@ public abstract class Module {
   public Date getDateLastReviewed() {
     return this.dateLastReviewed;
   }
+
+  public abstract StorageType getType();
 
 }

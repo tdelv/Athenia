@@ -44,4 +44,7 @@ public class Vocab extends Module implements Reviewable {
     this.rating = r;
   }
 
+  public StorageType getType(){
+    return StorageType.VOCAB;
+  }
 }

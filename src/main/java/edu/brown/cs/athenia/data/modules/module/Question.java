@@ -18,4 +18,7 @@ public class Question extends Text {
     super(q, f);
   }
 
+  public StorageType getType(){
+    return StorageType.QUESTION;
+  }
 }

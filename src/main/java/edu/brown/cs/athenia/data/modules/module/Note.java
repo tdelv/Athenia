@@ -35,4 +35,7 @@ public class Note extends Text implements Reviewable {
     this.rating = r;
   }
 
+  public StorageType getType(){
+    return StorageType.NOTE;
+  }
 }

@@ -5,6 +5,7 @@ import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.Language;
 import edu.brown.cs.athenia.data.modules.Module;
 
+import edu.brown.cs.athenia.data.modules.Pair;
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.*;
 import edu.brown.cs.athenia.driveapi.UnauthenticatedUserException;
@@ -20,6 +21,7 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * DatabaseParser will hold our SQL parsing information.
@@ -391,9 +393,9 @@ public class DatabaseParser {
                 Language language = user.getCurrLanguage();
 
                 updateTags(conn, language);
-//                updateFreeNotes(conn, language);
-//                updateModules(conn, language);
-//                updateFreeNoteModules(conn, language);
+                updateFreeNotes(conn, language);
+                updateModules(conn, language);
+                updateFreeNoteModules(conn, language);
             }
 
         } catch (IOException | SQLException | ClassNotFoundException e) {
@@ -515,6 +517,407 @@ public class DatabaseParser {
             }
 
             statement.executeBatch();
+        }
+    }
+
+    private static void updateFreeNotes(Connection conn, Language language) throws SQLException {
+        Set<String> oldFreeNotes = new HashSet<>();
+        Collection<FreeNote> newFreeNotes = language.getFreeNotes();
+
+        // Find old and new freenotes
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT  fn.id fn_id " +
+                "FROM freenotes fn, languages l " +
+                "WHERE fn.language_id = l.id " +
+                "AND l.language = ?")) {
+            statement.setString(1, language.getName());
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String freeNoteId = rs.getString("fn_id");
+                    if (language.containsFreeNote(freeNoteId)) {
+                        newFreeNotes.remove(language.getFreeNote(freeNoteId));
+                    } else {
+                        oldFreeNotes.add(freeNoteId);
+                    }
+                }
+            }
+        }
+
+        // Add new freenotes into database
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO freenotes " +
+                        "(id, language_id, title, created, last_modified) VALUES " +
+                        "(?, ?, ?, ?, ?)")) {
+            for (FreeNote freeNote : newFreeNotes) {
+                statement.setString(1, freeNote.getId());
+                statement.setString(2, language.getName());
+                statement.setString(3, freeNote.getTitle());
+                statement.setLong(4, freeNote.getDateCreated().getTime());
+                statement.setLong(5, freeNote.getDateModified().getTime());
+
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        // Remove old freenotes from database
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM freenotes " +
+                        "WHERE id = ?")) {
+            for (String langName : oldFreeNotes) {
+                statement.setString(1, langName);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        // Update all current freenotes in database
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE freenotes " +
+                "SET title = ?, last_modified = ?")) {
+            for (FreeNote freeNote : language.getFreeNotes()) {
+                statement.setString(1, freeNote.getTitle());
+                statement.setLong(2, freeNote.getDateModified().getTime());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        // Update freenote tags
+        for (FreeNote freeNote : language.getFreeNotes()) {
+            updateFreeNoteTags(conn, freeNote, language);
+        }
+    }
+
+    private static void updateFreeNoteTags(Connection conn, FreeNote freeNote, Language language) throws SQLException {
+        Set<String> oldTags = new HashSet<>();
+        Collection<Tag> newTags = language.getTags();
+
+        // Get old and new tags
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT tag.name tag_name " +
+                        "FROM freenote_tags ft, tags t " +
+                        "WHERE ft.tag_id = tag.id " +
+                        "AND ft.freenote_id = ?")) {
+            statement.setString(1, freeNote.getId());
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String tagName = rs.getString("tag_name");
+                    if (freeNote.hasTag(tagName)) {
+                        newTags.remove(language.getTag(tagName));
+                    } else {
+                        oldTags.add(tagName);
+                    }
+                }
+            }
+        }
+
+        // Add new tags
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO freenote_tags " +
+                        "(freenote_id, tag_id) VALUES " +
+                        "(?, ?)")) {
+            for (Tag tag : newTags) {
+                statement.setString(1, freeNote.getId());
+                statement.setString(2, tag.getTag());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        // Remove old tags
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM freenote_tags " +
+                        "WHERE freenote_id = ? " +
+                        "AND tag_id = ?")) {
+            for (String tagName : oldTags) {
+                statement.setString(1, freeNote.getId());
+                statement.setString(2, tagName);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+    }
+
+    private static void updateModules(Connection conn, Language language) throws SQLException, DatabaseParserException {
+        Collection<Module> newModules = language.getModules();
+        Set<String> oldModules = new HashSet<>();
+
+        if (newModules.contains(null)) {
+            throw new DatabaseParserException("Null module.");
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT m.id m_id, m.type m_type " +
+                "FROM modules m, languages l " +
+                "WHERE m.language_id = l.id " +
+                "AND l.language = ?")) {
+            statement.setString(1, language.getName());
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    StorageType type = StorageType.valueOf(rs.getString("m_type"));
+                    String moduleId = rs.getString("m_id");
+                    Module module = language.getModule(type, moduleId);
+                    if (module != null) {
+                        newModules.remove(module);
+                    } else {
+                        oldModules.add(moduleId);
+                    }
+                }
+            }
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO modules " +
+                "(id, type, language_id, created, last_modified) VALUES " +
+                "(?, ?, (SELECT id FROM languages WHERE language = ?), ?, ?)")) {
+            for (Module module : newModules) {
+                statement.setString(1, module.getId());
+                statement.setString(2, module.getType().toString());
+                statement.setString(3, language.getName());
+                statement.setLong(4, module.getDateCreated().getTime());
+                statement.setLong(5, module.getDateModified().getTime());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM modules WHERE id = ?")) {
+            for (String moduleId : oldModules) {
+                statement.setString(1, moduleId);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        for (Module module : language.getModules()) {
+            updateModule(conn, module, language);
+            updateModuleTags(conn, module, language);
+        }
+    }
+
+    private static void updateModule(Connection conn, Module module, Language language)
+            throws SQLException, DatabaseParserException {
+        Date lastUpdated;
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT last_modified FROM modules WHERE id = ?")) {
+            statement.setString(1, module.getId());
+            try (ResultSet rs = statement.executeQuery()) {
+                if (!rs.next()) {
+                    throw new DatabaseParserException("Bad data.");
+                }
+                lastUpdated = new Date(rs.getInt("last_modified"));
+            }
+        }
+
+        if (lastUpdated.equals(module.getDateModified())) {
+            return;
+        }
+
+        switch (module.getType()) {
+            case NOTE:
+                updateNoteModule(conn, (Note) module, language);
+                break;
+            case VOCAB:
+                updateVocabModule(conn, (Vocab) module, language);
+                break;
+            case CONJUGATION:
+                updateConjugationModule(conn, (Conjugation) module, language);
+                break;
+            case QUESTION:
+                updateQuestionModule(conn, (Question) module, language);
+                break;
+            case ALERT_EXCLAMATION:
+                updateAlertModule(conn, (AlertExclamation) module, language);
+                break;
+            default:
+                throw new DatabaseParserException("Bad data.");
+        }
+    }
+
+    private static void updateNoteModule(Connection conn, Note module, Language language) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE note_modules " +
+                "SET body = ?, rating = ? " +
+                "WHERE id = ?")) {
+            statement.setString(1, module.getText());
+            statement.setInt(2, module.getRating());
+            statement.setString(3, module.getId());
+            statement.execute();
+        }
+    }
+
+    private static void updateVocabModule(Connection conn, Vocab module, Language language) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE vocab_modules " +
+                "SET term = ?, definition = ?, rating = ? " +
+                "WHERE id = ?")) {
+            statement.setString(1, module.getPair().getTerm());
+            statement.setString(2, module.getPair().getDefinition());
+            statement.setInt(2, module.getRating());
+            statement.setString(3, module.getId());
+            statement.execute();
+        }
+    }
+
+    private static void updateConjugationModule(Connection conn, Conjugation module, Language language) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE conjugation_modules " +
+                        "SET header = ?, rating = ?, height = ? " +
+                        "WHERE id = ?")) {
+            statement.setString(1, module.getHeader());
+            statement.setInt(2, module.getRating());
+            statement.setInt(3, module.getHeight());
+            statement.setString(4, module.getId());
+            statement.execute();
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM conjugation_rows WHERE module_id = ?")) {
+            statement.setString(1, module.getId());
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO conjugation_rows " +
+                "(module_id, col1, col2, position) VALUES " +
+                "(?, ?, ?, ?)")) {
+            for (Pair pair : module.getTable()) {
+                statement.setString(1, module.getId());
+                statement.setString(2, pair.getTerm());
+                statement.setString(3, pair.getDefinition());
+                statement.setInt(4, module.getTable().indexOf(pair));
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+    }
+
+    private static void updateQuestionModule(Connection conn, Question module, Language language) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE question_modules " +
+                        "SET body = ? " +
+                        "WHERE id = ?")) {
+            statement.setString(1, module.getText());
+            statement.setString(2, module.getId());
+            statement.execute();
+        }
+    }
+
+    private static void updateAlertModule(Connection conn, AlertExclamation module, Language language) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE alert_exclamation_modules " +
+                        "SET body = ? " +
+                        "WHERE id = ?")) {
+            statement.setString(1, module.getText());
+            statement.setString(2, module.getId());
+            statement.execute();
+        }
+    }
+
+    private static void updateModuleTags(Connection conn, Module module, Language language) throws SQLException {
+        Set<String> oldTags = new HashSet<>();
+        Collection<Tag> newTags = module.getTags();
+
+        // Get old and new tags
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT tag.name tag_name " +
+                        "FROM module_tags mt, tags t " +
+                        "WHERE mt.tag_id = tag.id " +
+                        "AND mt.module_id = ?")) {
+            statement.setString(1, module.getId());
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String tagName = rs.getString("tag_name");
+                    if (module.hasTag(tagName)) {
+                        newTags.remove(language.getTag(tagName));
+                    } else {
+                        oldTags.add(tagName);
+                    }
+                }
+            }
+        }
+
+        // Add new tags
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO module_tags " +
+                        "(module_id, tag_id) VALUES " +
+                        "(?, ?)")) {
+            for (Tag tag : newTags) {
+                statement.setString(1, module.getId());
+                statement.setString(2, tag.getTag());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        // Remove old tags
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM module_tags " +
+                        "WHERE module_id = ? " +
+                        "AND tag_id = ?")) {
+            for (String tagName : oldTags) {
+                statement.setString(1, module.getId());
+                statement.setString(2, tagName);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+    }
+
+    private static void updateFreeNoteModules(Connection conn, Language language) throws SQLException {
+        for (FreeNote freeNote : language.getFreeNotes()) {
+            List<String> moduleOrder = new ArrayList<>();
+
+            try (PreparedStatement statement = conn.prepareStatement(
+                    "SELECT m.id m_id FROM modules m, freenote_modules fm " +
+                    "WHERE fm.freenote_id = ? " +
+                    "AND fm.module_id = m.id " +
+                    "ORDER BY fm.position")) {
+
+                statement.setString(1, freeNote.getId());
+                try (ResultSet rs = statement.executeQuery()) {
+                    moduleOrder.add(rs.getString("m_id"));
+                }
+            }
+
+            List<String> currentModuleIds =
+                    freeNote.getModules()
+                            .stream()
+                            .map(Module::getId)
+                            .collect(Collectors.toList());
+
+            if (moduleOrder.equals(currentModuleIds)) {
+                continue;
+            }
+
+            try (PreparedStatement statement = conn.prepareStatement(
+                    "DELETE FROM freenote_modules " +
+                    "WHERE freenote_id = ?")) {
+                statement.setString(1, freeNote.getId());
+                statement.execute();
+            }
+
+            try (PreparedStatement statement = conn.prepareStatement(
+                    "INSERT INTO freenote_modules " +
+                    "(freenote_id, module_id, position) VALUES " +
+                    "(?, ?, ?)")) {
+                for (Module module : freeNote.getModules()) {
+                    statement.setString(1, freeNote.getId());
+                    statement.setString(2, module.getId());
+                    statement.setInt(3, freeNote.getModules().indexOf(module));
+                }
+            }
         }
     }
 }

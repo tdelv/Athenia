@@ -18,4 +18,7 @@ public class AlertExclamation extends Text {
     super(a, f);
   }
 
+  public StorageType getType(){
+    return StorageType.ALERT_EXCLAMATION;
+  }
 }
