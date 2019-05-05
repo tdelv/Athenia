@@ -1955,7 +1955,7 @@ public class GUICommand {
             if (lang.containsFreeNote(noteId)) {
 
               FreeNote oldFreeNote = lang.getFreeNote(noteId);
-              variables.put("oldFreeNote", oldFreeNote);
+              variables.put("oldFreeNote", toData(oldFreeNote));
               variables.put("freeNoteId", oldFreeNote.getId());
               variables.put("title", oldFreeNote.getTitle());
               successful = true;
