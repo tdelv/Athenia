@@ -18,8 +18,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Date;
 
 /**
@@ -32,13 +31,17 @@ public class DatabaseParser {
     private static final Map<String, Athenia> USER_MAP = new HashMap<>();
     private static final Map<String, Date> LAST_UPDATED_MAP = new HashMap<>();
 
-    private static Connection getConnection(String filePath) throws ClassNotFoundException, SQLException {
+    private static Connection connectToDatabase(String filePath) throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
         String url = "jdbc:sqlite:" + filePath;
-        return DriverManager.getConnection(url);
+        Connection conn = DriverManager.getConnection(url);
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("PRAGMA foreign_keys = ON");
+        }
+        return conn;
     }
 
-    private static Connection loadConnection(String userId)
+    private static Connection getConnection(String userId)
             throws SQLException, ClassNotFoundException, IOException, DriveApiException {
         File file = GoogleDriveApi.getDataBase(userId);
 
@@ -46,7 +49,7 @@ public class DatabaseParser {
             setup(file);
         }
 
-        return getConnection(file.getPath());
+        return connectToDatabase(file.getPath());
     }
 
     private static void setup(File file) throws IOException, SQLException, ClassNotFoundException {
@@ -60,7 +63,7 @@ public class DatabaseParser {
         String[] queries = data.split(";");
 
         file.createNewFile();
-        try (Connection conn = getConnection(file.getPath());
+        try (Connection conn = connectToDatabase(file.getPath());
              Statement statement = conn.createStatement()) {
             for (String query : queries) {
                 statement.addBatch(query);
@@ -79,7 +82,7 @@ public class DatabaseParser {
         USER_MAP.put(userId, user);
         LAST_UPDATED_MAP.put(userId, new Date());
 
-        try (Connection conn = loadConnection(userId)) {
+        try (Connection conn = getConnection(userId)) {
             // Get meta data for user
             getUserData(conn, user);
 
@@ -369,6 +372,149 @@ public class DatabaseParser {
                     fn.addModule(module);
                 }
             }
+        }
+    }
+
+    public static void updateUser(String userId) throws DatabaseParserException {
+        if (!USER_MAP.containsKey(userId)) {
+            throw new DatabaseParserException("No such user.");
+        }
+
+        Athenia user = USER_MAP.get(userId);
+
+        try (Connection conn = getConnection(userId)) {
+            updateUserData(conn, user);
+            updateLanguages(conn, user);
+
+            for (String langName : user.getLanguages()) {
+                user.setCurrLang(langName);
+                Language language = user.getCurrLanguage();
+
+                updateTags(conn, language);
+//                updateFreeNotes(conn, language);
+//                updateModules(conn, language);
+//                updateFreeNoteModules(conn, language);
+            }
+
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (DriveApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void updateUserData(Connection conn, Athenia user) throws SQLException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE user_data " +
+                "SET username = ?, joined = ?, last_update = ?")) {
+            statement.setString(1, "");
+            statement.setLong(2, new Date().getTime());
+            statement.setLong(3, new Date().getTime());
+
+            statement.execute();
+        }
+    }
+
+    private static void updateLanguages(Connection conn, Athenia user) throws SQLException {
+        Set<String> oldLanguages = new HashSet<>();
+        Collection<String> newLanguages = user.getLanguages();
+
+        try (Statement statement = conn.createStatement();
+             ResultSet rs = statement.executeQuery(
+                     "SELECT * FROM languages")) {
+            while (rs.next()) {
+                String langName = rs.getString("language");
+                if (newLanguages.contains(langName)) {
+                    newLanguages.remove(langName);
+                } else {
+                    oldLanguages.add(langName);
+                }
+            }
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO languages " +
+                "(id, language) VALUES " +
+                "(?, ?)")) {
+            for (String langName : newLanguages) {
+                statement.setString(1, langName);
+                statement.setString(2, langName);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM languages " +
+                "WHERE id = ?")) {
+            for (String langName : oldLanguages) {
+                statement.setString(1, langName);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+    }
+
+    private static void updateTags(Connection conn, Language language) throws SQLException {
+        Set<String> oldTags = new HashSet<>();
+        Collection<Tag> newTags = language.getTags();
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT tag.name tag_name " +
+                "FROM languages l, language_tags lt, tags t " +
+                "WHERE lt.tag_id = tag.id " +
+                "AND lt.language_id = l.id " +
+                "AND l.language = ?")) {
+            statement.setString(1, language.getName());
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String tagName = rs.getString("tag_name");
+                    if (language.hasTag(tagName)) {
+                        newTags.remove(language.getTag(tagName));
+                    } else {
+                        oldTags.add(tagName);
+                    }
+                }
+            }
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO tags " +
+                        "(id, name) VALUES " +
+                        "(?, ?)")) {
+            for (Tag tag : newTags) {
+                statement.setString(1, tag.getTag());
+                statement.setString(2, tag.getTag());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO language_tags " +
+                "(language_id, tag_id) VALUES " +
+                "((SELECT id FROM languages WHERE language = ?), ?)")) {
+            for (Tag tag : newTags) {
+                statement.setString(1, language.getName());
+                statement.setString(2, tag.getTag());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "DELETE FROM tags " +
+                        "WHERE id = ?")) {
+            for (String tagName : oldTags) {
+                statement.setString(1, tagName);
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
         }
     }
 }
