@@ -1,4 +1,6 @@
 
+// TODO: add modtype!!!!!!
+
 const moduleMap = new Map();
 
 /*
@@ -92,14 +94,29 @@ class Vocabulary extends Module {
     }
 }
 
+/**
+ * pairList is a list of pairs, which is a list of length 2
+ */
 class ConjugationTable extends Module {
-    constructor(id, dateCreated, dateModified, pairList, tableHeight) {
+    constructor(id, dateCreated, dateModified, header, pairList, tableHeight) {
         super(id, dateCreated, dateModified);
+        this.header = header;
         this.pairList = pairList;
         this.tableHeight = tableHeight;
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">${this.pairList}</p>`;
+
+        let htmlString = "";
+
+        for (let i = 0; i < this.pairList.length; i++) {
+            htmlString = htmlString + `<p id=\"${this.id}\">${this.pairList[i]}</p>`
+        }
+
+        return htmlString;
+    }
+
+    toMap() {
+        return JSON.stringify(this);
     }
 }
