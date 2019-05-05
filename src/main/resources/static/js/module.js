@@ -26,9 +26,57 @@ class Module {
     }
 
     setUp() {
+
+        const alert = this;
+
         const selector = "#" + this.id;
-        $(selector).hover(Module.prototype.onModuleHover, Module.prototype.onModuleLeave);
-        $(selector).click(Module.prototype.onModuleHover);
+        $(selector).hover(this.onModuleHover, this.onModuleLeave);
+        $(selector).click(this.onModuleHover);
+
+        const editableSelector = selector + " .editable";
+
+        $(editableSelector).hover(this.onEditHover, this.onEditLeave);
+        //$(editableSelector).click(function(){this.onEditClick(alert)});
+    }
+
+    onEditHover() {
+        document.body.style.cursor = "pointer";
+    }
+
+    onEditLeave() {
+        document.body.style.cursor = "default";
+    }
+
+    onEditClick(alert) {
+
+        //TODO: this should be moved to the alert class
+
+        const ph = $(this).val();
+
+        const html = `<input type="text" name="edit" placeholder="${ph}" class="userInput">`;
+
+        $(alert).append(html);
+
+        $(this).remove();
+
+        $(".userInput").keyup(function(event){
+            if (event.which == 13) {
+                const value = $(this).val();
+
+                const postParameters = {alertId: alert.id, alertUpdate: value};
+                $.post("/alertUpdate", postParameters, responseJSON => {
+                    const responseObject = JSON.parse(responseJSON);
+                    if (responseObject.successful) {
+                        alert.content = responseObject.updatedAlert.alertContent;
+
+                    } else {
+                        console.log("message: " + responseObject.message);
+                    }
+                });
+
+            }
+        });
+
     }
 
     onModuleHover() {
@@ -36,13 +84,11 @@ class Module {
         // TODO: use animation instead of css
         const selector = "#" + this.id;
         $(selector).css("backgroundColor", "#f2f2f2");
-        document.body.style.cursor = "pointer";
     }
 
     onModuleLeave() {
         const selector = "#" + this.id;
         $(selector).css("backgroundColor", "white");
-        document.body.style.cursor = "default";
     }
 
     onModuleClick() {
@@ -67,7 +113,14 @@ class Exclamation extends Note {
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">!!! ${this.content}</p>`;
+
+        const icon = "<i class=\"fa fa-exclamation\"></i>";
+
+        const content = `<span class="editable">${this.content}</span>`;
+
+        const div = `<div class="noteModule" id="${this.id}">${icon} ${content}</div>`;
+
+        return div;
     }
 
 }
