@@ -2227,7 +2227,12 @@ public class GUICommand {
         if (lang != null) {
           currentLanguage = lang.getName();
 
-          List<Tag> tags = (List<Tag>) lang.getTags();
+          List<String> tags = new ArrayList<>();
+          for (Tag t : lang.getTags()) {
+            tags.add(t.getTag());
+          }
+          tags.add("test");
+          tags.add("test2");
           variables.put("allTags", tags);
 
           // update successful variables

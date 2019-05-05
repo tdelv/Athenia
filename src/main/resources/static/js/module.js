@@ -170,7 +170,6 @@ class Vocabulary extends Module {
             `<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +
 
             // TODO somehow allow for rating changes
-
             `<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
             `</div>` +
             `<small>Date Modified: ${this.dateModified}</small>` +
@@ -179,10 +178,6 @@ class Vocabulary extends Module {
         return form;
     }
 
-}
-
-function updateVocab() {
-    console.log("IDK");
 }
 
 
