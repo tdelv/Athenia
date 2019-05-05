@@ -7,6 +7,9 @@ function getVocabList() {
     const postParameters = {};
     $.post("getVocabList", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
+
+        console.log("vocab response: " + responseObject);
+
         if (responseObject.successful) {
             const vocabContent = responseObject.vocabContent;
             for (let i = 0; i < vocabContent.length; i++) {

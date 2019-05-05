@@ -425,6 +425,11 @@ public class GUICommand {
 
         if (lang != null) {
           Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
+
+          // TODO get rid of these because these are just tests
+          Vocab vocab1 = new Vocab("test", "test");
+          lang.addModule(StorageType.VOCAB, vocab1);
+
           List<Map<String, Object>> vocabList = new ArrayList<>();
 
           // translate vocab objects to JSON
@@ -443,6 +448,8 @@ public class GUICommand {
         message = "error getting user from database in vocabulary page handler";
       }
 
+      variables.put("message", message);
+      variables.put("successful", successful);
       return GSON.toJson(variables.build());
     }
   }
@@ -621,19 +628,8 @@ public class GUICommand {
         variables.put("username", ""); // TODO get username
 
         if (lang != null) {
-          Map<String, Module> conjMap = lang
-              .getModuleMap(StorageType.CONJUGATION);
-          List<Map<String, Object>> conjList = new ArrayList<>();
-
           variables.put("currentLanguage", lang.getName());
 
-          // translate conj objects to JSON
-          for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
-            conjList.add(toData((Conjugation) conj.getValue()));
-          }
-
-          // add content and update success messages
-          variables.put("content", conjList);
           successful = true;
           message = "successfully pulled conjugation information";
         } else {
@@ -649,6 +645,64 @@ public class GUICommand {
       return new ModelAndView(variables.build(), "conjugations.ftl");
     }
   }
+
+  public static class GetConjugationContentHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // TODO check for freenote id (done <3 mia)
+      String freeNoteId = qm.value("freeNoteId");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          Map<String, Module> conjMap = lang
+                  .getModuleMap(StorageType.CONJUGATION);
+          List<Map<String, Object>> conjList = new ArrayList<>();
+
+          variables.put("currentLanguage", lang.getName());
+
+          // TODO get rid of this because it's a test
+          Conjugation test = new Conjugation();
+          test.setHeader("testtesttest");
+          test.add("test1", "test1");
+          test.add("test2", "test2");
+          test.add("test3", "test3");
+          lang.addModule(StorageType.CONJUGATION, test);
+
+          // translate conj objects to JSON
+          for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
+            conjList.add(toData((Conjugation) conj.getValue()));
+          }
+
+          // add content and update success messages
+          variables.put("conjugationContent", conjList);
+          successful = true;
+          message = "successfully pulled conjugation information";
+
+        } else {
+          message = "current language null in conjugation add handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation add handler";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
 
   /**
    * POST request which adds a completely new conjugation module.
@@ -2315,6 +2369,7 @@ public class GUICommand {
       List<String> pairData = new ArrayList<>();
       pairData.add(p.getTerm());
       pairData.add(p.getDefinition());
+
       conjPairData.add(pairData);
     }
 

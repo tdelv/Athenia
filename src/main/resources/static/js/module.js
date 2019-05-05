@@ -143,31 +143,76 @@ class Vocabulary extends Module {
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">${this.term} ${this.def}</p>`;
+
+        const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate" method="post" onsubmit="return updateVocab()">` +
+            `<div class="input-group">` +
+            `<input type="text" class="form-control" placeholder="${this.term}">` +
+            `<input type="text" class="form-control" placeholder="${this.def}">` +
+            `<input type="submit" class="btn btn-primary" value="Save"/>` +
+            `</div>` +
+            `<small>Date Modified: ${this.dateModified}</small>` +
+            `</form>`;
+
+        return form;
+
+        // const divStart = `<div class=\"card\"><div class=\"card-body\">`;
+        // const vocabInfo = `<p id=\\" ${this.id} \\"><b><u>${this.term}</u></b> ${this.def}</p>`;
+        // const dateCreatedInfo = `<p style=\"font-size: 0.5rem">Date Created: ${this.dateCreated}</p>`;
+        // const dateModifiedInfo = `<p style=\"font-size: 0.5rem\">${this.dateModified}</p>`;
+        // const divEnd = `</div></div>`;
+        //
+        // return `${divStart}${vocabInfo}${dateCreatedInfo}${dateModifiedInfo}${divEnd}`;
     }
+
 }
+
+function updateVocab() {
+    console.log("IDK");
+}
+
 
 /**
  * pairList is a list of pairs, which is a list of length 2
  */
 class ConjugationTable extends Module {
-    constructor(id, dateCreated, dateModified, header, pairList, tableHeight) {
+    constructor(id, dateCreated, dateModified, header, pairList) {
         super(id, dateCreated, dateModified);
         this.header = header;
         this.pairList = pairList;
-        this.tableHeight = tableHeight;
     }
 
     toHTML() {
 
-        let htmlString = "";
+        // TODO GET BACK TO THIS AFTER VOCAB HAS BEEN WORKED OUT
+        let form = `<form id="{this.id}" name="form-${this.id}" action="/" class="\mb-5\">` +
+            // form group
+            `<div class=\"form-group\">`;
 
+        // ADD THE HEADER & DATE INFORMATION
+        form += `<div class=\"input-group\">` +
+            `<input type=\"text\" class=\"form-control mb-1\" placeholder=\"${this.header}\"></div>` +
+            `<small style="float: left;">Date Modified: ${this.dateModified}</small>` +
+            `<small style="float: right">Date Created: ${this.dateCreated}</small>` +
+            `</div><div class=\"form-group\">`;
+
+        // ADD ALL THE PAIRS
         for (let i = 0; i < this.pairList.length; i++) {
-            htmlString = htmlString + `<p id=\"${this.id}\">${this.pairList[i]}</p>`
+            const currPair = this.pairList[i];
+            form += `<div class=\"input-group\">`
+            form += `<input type=\"text\" class=\"form-control\" placeholder=\"${currPair[0]}\">` +
+                `<input type=\"text\" class=\"form-control\" placeholder=\"${currPair[1]}\"></div>`;
         }
 
-        return htmlString;
+        // ADD THE SUBMIT BUTTON FOR EDITS
+        form += `<button type="submit" id="sub-butt-${this.id}" class="btn conjSave btn-primary mt-2">Save</button>`;
+
+        form += `</div></form>`;
+
+        return form;
+
     }
+
+
 
     toMap() {
         return JSON.stringify(this);

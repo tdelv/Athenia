@@ -133,6 +133,7 @@ public class Main {
 
     // conjugation module specific spark handlers
     Spark.get("/conjugations", new GUICommand.ConjugationPageHandler(), freeMarker);
+    Spark.post("/getConjugationList", new GUICommand.GetConjugationContentHandler());
     Spark.post("/conjugationAdd", new GUICommand.ConjugationAddHandler());
     Spark.post("/conjugationEntryAdd", new GUICommand.ConjugationAddEntryHandler());
     Spark.post("/conjugationEntryUpdate", new GUICommand.ConjugationEntryUpdateHandler());

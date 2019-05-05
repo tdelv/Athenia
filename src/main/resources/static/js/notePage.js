@@ -69,7 +69,7 @@ function insertConjugation() {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
             const newConjugation = responseObject.newConjugationModule;
-            const newConjugationModule = new ConjugationTable(newConjugation.id, newConjugation.dateCreated, newConjugation.dateModified, newConjugation.header, new List(), 3);
+            const newConjugationModule = new ConjugationTable(newConjugation.id, newConjugation.dateCreated, newConjugation.dateModified, newConjugation.header, new List());
             insertModule(newConjugationModule);
         } else {
             console.log("message: " + responseObject.message);
