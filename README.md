@@ -208,3 +208,13 @@ Note: any reference to "app" means a form of web app, not a phone app (although 
    - [x] Be awesome!
  - Makayla
    - [x] Be awesome!
+   
+   
+   
+### UPDATE -- May 5, 2019
+(pre-demo day)
+project features some bugs - specifically in frontend display
+We used Google API for database management and gradle for back-back end management
+Sign-in is through Google account
+conjugation was mostly cut as a portion due to complications in display, but is established in backend
+freenotes and vocab are set up as pages in frontend but "view notes" is buggy
