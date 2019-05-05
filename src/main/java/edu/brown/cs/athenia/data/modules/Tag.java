@@ -14,15 +14,25 @@ public class Tag {
     tag = t;
   }
 
+  /**
+   * Getter for String of tag.
+   * @return : The String of Tag.
+   */
   public String getTag() {
     return tag;
   }
 
+  /**
+   * Equals override for Tag - checks String.
+   */
   @Override
   public boolean equals(Object o) {
     return tag.equals((String) o);
   }
 
+  /**
+   * Override for HashCode - hashes on String tag.
+   */
   @Override
   public int hashCode() {
     return tag.hashCode();

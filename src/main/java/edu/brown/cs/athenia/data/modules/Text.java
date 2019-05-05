@@ -14,12 +14,24 @@ public abstract class Text extends Module {
 
   private String text;
 
+  /**
+   * Constructor for Text made in text's page.
+   * @param text
+   *          : the text to return.
+   */
   public Text(String text) {
     // TODO: store in database and generate (and set) id
     super();
     this.text = text;
   }
 
+  /**
+   * Constructor for Text made in a FreeNote.
+   * @param text
+   *          : the String text.
+   * @param f
+   *          : the FreeNote the text is in.
+   */
   public Text(String text, FreeNote f) {
     // TODO: store in database and generate (and set) id
     super(f);
