@@ -26,6 +26,7 @@ import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
+import edu.brown.cs.athenia.review.*;
 import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -33,6 +34,7 @@ import spark.Response;
 import spark.Route;
 import spark.TemplateViewRoute;
 
+import javax.management.*;
 import javax.xml.crypto.*;
 
 /**
@@ -304,7 +306,6 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
@@ -424,6 +425,11 @@ public class GUICommand {
 
         if (lang != null) {
           Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
+
+          // TODO get rid of these because these are just tests
+//          Vocab vocab1 = new Vocab("test", "test");
+//          lang.addModule(StorageType.VOCAB, vocab1);
+
           List<Map<String, Object>> vocabList = new ArrayList<>();
 
           // translate vocab objects to JSON
@@ -442,6 +448,8 @@ public class GUICommand {
         message = "error getting user from database in vocabulary page handler";
       }
 
+      variables.put("message", message);
+      variables.put("successful", successful);
       return GSON.toJson(variables.build());
     }
   }
@@ -509,6 +517,7 @@ public class GUICommand {
       String vocabId = qm.value("vocabId");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
+      String updatedRating = qm.value("updatedRating");
 
       // TODO check for freenote id
 
@@ -620,19 +629,8 @@ public class GUICommand {
         variables.put("username", ""); // TODO get username
 
         if (lang != null) {
-          Map<String, Module> conjMap = lang
-              .getModuleMap(StorageType.CONJUGATION);
-          List<Map<String, Object>> conjList = new ArrayList<>();
-
           variables.put("currentLanguage", lang.getName());
 
-          // translate conj objects to JSON
-          for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
-            conjList.add(toData((Conjugation) conj.getValue()));
-          }
-
-          // add content and update success messages
-          variables.put("content", conjList);
           successful = true;
           message = "successfully pulled conjugation information";
         } else {
@@ -648,6 +646,64 @@ public class GUICommand {
       return new ModelAndView(variables.build(), "conjugations.ftl");
     }
   }
+
+  public static class GetConjugationContentHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // TODO check for freenote id (done <3 mia)
+      String freeNoteId = qm.value("freeNoteId");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          Map<String, Module> conjMap = lang
+                  .getModuleMap(StorageType.CONJUGATION);
+          List<Map<String, Object>> conjList = new ArrayList<>();
+
+          variables.put("currentLanguage", lang.getName());
+
+          // TODO get rid of this because it's a test
+          Conjugation test = new Conjugation();
+          test.setHeader("testtesttest");
+          test.add("test1", "test1");
+          test.add("test2", "test2");
+          test.add("test3", "test3");
+          lang.addModule(StorageType.CONJUGATION, test);
+
+          // translate conj objects to JSON
+          for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
+            conjList.add(toData((Conjugation) conj.getValue()));
+          }
+
+          // add content and update success messages
+          variables.put("conjugationContent", conjList);
+          successful = true;
+          message = "successfully pulled conjugation information";
+
+        } else {
+          message = "current language null in conjugation add handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in conjugation add handler";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
 
   /**
    * POST request which adds a completely new conjugation module.
@@ -1511,7 +1567,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
 
       // try to get user from database
       try {
@@ -1737,6 +1794,12 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
+      // TODO - do this in the front end (to mia, from jason)
+
+      String moduleId = qm.value("moduleId");
+      String modtype = qm.value("modtype");
+      String tagToRemove = qm.value("tagToRemove");
+
       // success variables
       boolean successful = false;
       String message = "";
@@ -1751,13 +1814,88 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
 
+          // check for vocab module and update accordingly
+          if (modtype.equals(StorageType.VOCAB.toString())) {
+            if (lang.getModule(StorageType.VOCAB, moduleId) != null) {
+              Vocab vocabToUpdate = (Vocab)
+                      lang.getModule(StorageType.VOCAB, moduleId);
+              vocabToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map " + moduleId;
+            }
+
+            // check for alert exclamation module and update accordingly
+          } else if (modtype.equals(StorageType.ALERT_EXCLAMATION.toString())) {
+            if (lang.getModule(StorageType.ALERT_EXCLAMATION, moduleId) != null) {
+              AlertExclamation alertToUpdate = (AlertExclamation)
+                      lang.getModule(StorageType.ALERT_EXCLAMATION, moduleId);
+              alertToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for conjugation module and update accordingly
+          } else if (modtype.equals(StorageType.CONJUGATION.toString())) {
+            if (lang.getModule(StorageType.CONJUGATION, moduleId) != null) {
+              Conjugation conjToUpdate = (Conjugation)
+                      lang.getModule(StorageType.CONJUGATION, moduleId);
+              conjToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for free note module and update accordingly
+          } else if (modtype.equals(StorageType.FREE_NOTE.toString())) {
+            if (lang.getFreeNote(moduleId) != null) {
+              lang.getFreeNote(moduleId).removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for note module and update accordingly
+          } else if (modtype.equals(StorageType.NOTE.toString())) {
+            if (lang.getModule(StorageType.NOTE, moduleId) != null) {
+              Note noteToUpdate = (Note)
+                      lang.getModule(StorageType.NOTE, moduleId);
+              noteToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully remove tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for question module and update accordingly
+          } else if (modtype.equals(StorageType.QUESTION.toString())) {
+            if (lang.getModule(StorageType.QUESTION, moduleId) != null) {
+              Question questionToUpdate = (Question)
+                      lang.getModule(StorageType.QUESTION, moduleId);
+              questionToUpdate.removeTag(tagToRemove);
+              successful = true;
+              message = "succesfully removed tag from " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // catch all other cases
+          } else {
+            message = "modtype not recognized " + modtype;
+          }
+
           // catch if current lang is null
         } else {
-          message = "";
+          message = "language in remove tag from module handler";
         }
         // catch if user not found in database
       } catch (DatabaseParserException e) {
-        message = "";
+        message = "user not in database in remove tag from module handler";
       }
 
       // prepare variables to send to front end
@@ -1873,7 +2011,7 @@ public class GUICommand {
             if (lang.containsFreeNote(noteId)) {
 
               FreeNote oldFreeNote = lang.getFreeNote(noteId);
-              variables.put("oldFreeNote", oldFreeNote);
+              variables.put("oldFreeNote", toData(oldFreeNote));
               variables.put("freeNoteId", oldFreeNote.getId());
               variables.put("title", oldFreeNote.getTitle());
               successful = true;
@@ -1907,7 +2045,99 @@ public class GUICommand {
    * -------------------------------------------------------------------------
    */
 
-  // TODO create a set handler for all things reviewable
+  /**
+   * POST request for setting the rating of a reviewable module.
+   */
+  public static class SetRatingHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // pull information from front end
+      String moduleId = qm.value("moduleId");
+      String newRating = qm.value("newRating");
+      String modtype = qm.value("modtype");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+
+          try {
+
+            // parse out the new rating
+            int newRatingInt = Integer.parseInt(newRating);
+
+            // check for vocab module and update accordingly
+            if (modtype.equals(StorageType.VOCAB.toString())) {
+              if (lang.getModule(StorageType.VOCAB, moduleId) != null) {
+                Vocab vocabToUpdate = (Vocab)
+                        lang.getModule(StorageType.VOCAB, moduleId);
+                vocabToUpdate.setRating(newRatingInt);
+                successful = true;
+                message = "succesfully set rating of " + moduleId;
+              } else {
+                message = "module not in map " + moduleId;
+              }
+
+              // check for conjugation module and update accordingly
+            } else if (modtype.equals(StorageType.CONJUGATION.toString())) {
+              if (lang.getModule(StorageType.CONJUGATION, moduleId) != null) {
+                Conjugation conjToUpdate = (Conjugation)
+                        lang.getModule(StorageType.CONJUGATION, moduleId);
+                conjToUpdate.setRating(newRatingInt);
+                successful = true;
+                message = "succesfully set rating of " + moduleId;
+              } else {
+                message = "module not in map: " + moduleId;
+              }
+
+              // check for note module and update accordingly
+            } else if (modtype.equals(StorageType.NOTE.toString())) {
+              if (lang.getModule(StorageType.NOTE, moduleId) != null) {
+                Note noteToUpdate = (Note)
+                        lang.getModule(StorageType.NOTE, moduleId);
+                noteToUpdate.setRating(newRatingInt);
+                successful = true;
+                message = "succesfully set rating of " + moduleId;
+              } else {
+                message = "module not in map: " + moduleId;
+              }
+
+              // check for question module and update accordingly
+            } else {
+              message = "modtype not recognized " + modtype;
+            }
+
+          } catch (NumberFormatException e) {
+            message = "new rating specified is not in integer";
+          }
+
+          // catch if current lang is null
+        } else {
+          message = "current language null in set rating handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in set rating handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
 
   /*
    * -------------------------------------------------------------------------
@@ -1916,50 +2146,113 @@ public class GUICommand {
    */
 
   /**
-   * GET request handler for the Review landing page which pulls all of the tags
-   * the user has created from the database and backend and formats this
-   * information to send to the front-end for the user to choose from the
-   * different options that they want to review. Information pulled includes the
-   * tag names, the date they were created, the date they were edited, and their
-   * rating.
+   * GET request handler which pulls out all of the information of the modules
+   * they should review and sets a list of reviewables back to the front end.
    */
-  public static class ReviewModeLandingHandler implements TemplateViewRoute {
+  public static class ReviewModeHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      // TODO: grab all tags and format to send to front end
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: grab all tags, their date created/started, date edited
-      // format to send to front end
-      return new ModelAndView(variables, "...");
+            throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      // global info to pass to frontend
+      String username = "";
+      String currentLanguage = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        username = ""; // TODO get the username
+        Language lang = user.getCurrLanguage();
+        // check if current language not null
+        if (lang != null) {
+          currentLanguage = lang.getName();
+
+          List<Tag> tags = (List<Tag>) lang.getTags();
+          variables.put("allTags", tags);
+
+          // update successful variables
+          successful = true;
+          message = "successfully pulled tags from lang object";
+
+        } else {
+          message = "current language null in review mode handler";
+        }
+
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in review mode handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("title", "Review");
+      variables.put("username", username);
+      variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return new ModelAndView(variables.build(), "review.ftl");
     }
   }
 
   /**
-   * GET request handler for an individual Review page which pulls all of the
-   * information of the modules and tags the user has chosen to review, packages
-   * it, and formats it to send to the front-end to display to the user.
-   * Retrieves all information including content, type, and rating. Sends all of
-   * this info to the front-end in the ordered rating according to the
-   * algorithm.
+   * GET request handler for populating the desired items to review.
    */
-  public static class ReviewModeIndividualHandler implements TemplateViewRoute {
+  public static class ReviewingHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      // TODO: parse out the options the user has chosen to review
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: pull out this information from the backend and format
-      // to send to the user to review
-      // > sends all of this info to the front end which then decides
-      // how to present this info according to the ratings of the
-      // modules
-      return new ModelAndView(variables, "...");
+      throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+
+      boolean successful = false;
+      String message = "";
+
+      // global info to pass to frontend
+      String username = "";
+      String currentLanguage = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        username = ""; // TODO get username
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+          currentLanguage = lang.getName();
+          List<Tag> tags = (List<Tag>) lang.getTags();
+
+          // TODO parse out the startCreatedDate & endCreateDate from front-end
+
+          // TODO prepare the ReviewMode object
+
+          // TODO iterate through the list of reviewables generated
+
+          // TODO prep and send to front-end
+
+        } else {
+          message = "current language null reviewing handler";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in reviewing handler";
+      }
+
+      variables.put("title", "Reviewing");
+      variables.put("username", username);
+      variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return new ModelAndView(variables.build(), "reviewing.ftl");
     }
+
   }
 
   /*
@@ -2077,6 +2370,7 @@ public class GUICommand {
       List<String> pairData = new ArrayList<>();
       pairData.add(p.getTerm());
       pairData.add(p.getDefinition());
+
       conjPairData.add(pairData);
     }
 

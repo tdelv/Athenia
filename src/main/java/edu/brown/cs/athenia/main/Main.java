@@ -133,6 +133,7 @@ public class Main {
 
     // conjugation module specific spark handlers
     Spark.get("/conjugations", new GUICommand.ConjugationPageHandler(), freeMarker);
+    Spark.post("/getConjugationList", new GUICommand.GetConjugationContentHandler());
     Spark.post("/conjugationAdd", new GUICommand.ConjugationAddHandler());
     Spark.post("/conjugationEntryAdd", new GUICommand.ConjugationAddEntryHandler());
     Spark.post("/conjugationEntryUpdate", new GUICommand.ConjugationEntryUpdateHandler());
@@ -154,9 +155,16 @@ public class Main {
     Spark.post("/questionUpdate", new GUICommand.QuestionUpdateHandler());
     Spark.post("/questionRemove", new GUICommand.QuestionRemoveHandler());
 
-    // tag specific spark handlers
+    // general tag spark handlers
+    Spark.post("/addGlobalTag", new GUICommand.TagAddHandler());
+    Spark.post("/removeGlobalTag", new GUICommand.TagRemoveHandler());
+
+    // adding / removing tags from modules specific spark handlers
     Spark.post("/addTagToModule", new GUICommand.AddTagToModule());
     Spark.post("/removeTagFromModule", new GUICommand.RemoveTagFromModule());
+
+    // setting the rating of a module handler
+    Spark.post("/setRating", new GUICommand.SetRatingHandler());
 
   }
 

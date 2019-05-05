@@ -14,7 +14,7 @@
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="d-lg-inline text-gray-600 small" style="margin-right: 2vw;"> tests ${username}</span>
+                    <span class="d-lg-inline text-gray-600 small mr-2">${username}</span>
                     <i class="fas fa-user"></i>
                 </a>
                 <!-- Dropdown - User Information -->
