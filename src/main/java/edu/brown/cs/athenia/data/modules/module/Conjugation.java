@@ -16,6 +16,10 @@ public class Conjugation extends Table implements Reviewable {
 
   private String header;
 
+  public Conjugation() {
+    super();
+  }
+
   /**
    * Getter for the rating from 0 (easy) to 2 (hard).
    * @return Returns int rating.

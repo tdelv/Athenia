@@ -1,3 +1,6 @@
+// TODO: for all add/delete/update post requests, send the current note id
+
+let freeNoteId = null;
 
 $( document ).ready(function() {
 
@@ -14,6 +17,15 @@ $( document ).ready(function() {
     $("#insertQuestionButton").click(insertQuestion);
 });
 
+function getFreeNoteId() {
+
+    if (freeNoteId == null) {
+        freeNoteId = $(".invisible").html();
+    }
+
+    return freeNoteId;
+}
+
 function insertModule(module) {
     $("#noteBody").append(module.toHTML());
     module.setUp();
@@ -21,13 +33,13 @@ function insertModule(module) {
 
 function insertNote() {
     console.log("inserting note");
-    const postParameters = {noteString: "content"};
+    const postParameters = {noteString: "content", freeNoteId: getFreeNoteId()};
     $.post("noteAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
             const newNote = responseObject.newNoteModule;
-            console.log("new note content: " + newNote.noteContent);
-            const newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            let newNoteModule;
+            newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -37,7 +49,7 @@ function insertNote() {
 
 function insertVocab() {
     console.log("inserting vocab");
-    const postParameters = {newTerm: "term", newDef: "definition"};
+    const postParameters = {newTerm: "term", newDef: "definition", freeNoteId: getFreeNoteId()};
     $.post("/vocabularyAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
@@ -52,11 +64,23 @@ function insertVocab() {
 
 function insertConjugation() {
     console.log("inserting conjugation");
+    const postParameters = {};
+    $.post("/conjugationAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newConjugation = responseObject.newConjugationModule;
+            const newConjugationModule = new ConjugationTable(newConjugation.id, newConjugation.dateCreated, newConjugation.dateModified, newConjugation.header, new List(), 3);
+            insertModule(newConjugationModule);
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
+
 }
 
 function insertExclamation() {
     console.log("inserting exclamation");
-    const postParameters = {alertString: "content"};
+    const postParameters = {alertString: "content", freeNoteId: getFreeNoteId()};
     $.post("alertAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
@@ -71,7 +95,7 @@ function insertExclamation() {
 
 function insertQuestion() {
     console.log("inserting question");
-    const postParameters = {questionString: "content"};
+    const postParameters = {questionString: "content", freeNoteId: getFreeNoteId()};
     $.post("questionAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {

@@ -1,3 +1,8 @@
+
+// TODO: add modtype!!!!!!
+
+const moduleMap = new Map();
+
 /*
  * THE BIG DADDY
  */
@@ -13,6 +18,11 @@ class Module {
         this.id = id;
         this.dateCreated = dateCreated;
         this.dateModified = dateModified;
+        if (moduleMap.has(id)) {
+            console.log("a module with id:" + id + " already exists");
+        } else {
+            moduleMap.set(id, this);
+        }
     }
 
     setUp() {
@@ -84,10 +94,29 @@ class Vocabulary extends Module {
     }
 }
 
+/**
+ * pairList is a list of pairs, which is a list of length 2
+ */
 class ConjugationTable extends Module {
-    constructor(id, dateCreated, dateModified, pairList, tableHeight) {
+    constructor(id, dateCreated, dateModified, header, pairList, tableHeight) {
         super(id, dateCreated, dateModified);
+        this.header = header;
         this.pairList = pairList;
         this.tableHeight = tableHeight;
+    }
+
+    toHTML() {
+
+        let htmlString = "";
+
+        for (let i = 0; i < this.pairList.length; i++) {
+            htmlString = htmlString + `<p id=\"${this.id}\">${this.pairList[i]}</p>`
+        }
+
+        return htmlString;
+    }
+
+    toMap() {
+        return JSON.stringify(this);
     }
 }

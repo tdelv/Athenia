@@ -126,6 +126,7 @@ public class Main {
 
     // vocabulary module specific spark handlers
     Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
+    Spark.post("/getVocabList", new GUICommand.getVocabularyModulesHandler());
     Spark.post("/vocabularyAdd", new GUICommand.VocabularyAddHandler());
     Spark.post("/vocabularyUpdate", new GUICommand.VocabularyUpdateHandler());
     Spark.post("/vocabularyRemove", new GUICommand.VocabularyRemoveHandler());
@@ -152,6 +153,10 @@ public class Main {
     Spark.post("/questionAdd", new GUICommand.QuestionAddHandler());
     Spark.post("/questionUpdate", new GUICommand.QuestionUpdateHandler());
     Spark.post("/questionRemove", new GUICommand.QuestionRemoveHandler());
+
+    // tag specific spark handlers
+    Spark.post("/addTagToModule", new GUICommand.AddTagToModule());
+    Spark.post("/removeTagFromModule", new GUICommand.RemoveTagFromModule());
 
   }
 
