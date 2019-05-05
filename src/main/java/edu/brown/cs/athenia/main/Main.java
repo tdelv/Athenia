@@ -154,6 +154,10 @@ public class Main {
     Spark.post("/questionUpdate", new GUICommand.QuestionUpdateHandler());
     Spark.post("/questionRemove", new GUICommand.QuestionRemoveHandler());
 
+    // tag specific spark handlers
+    Spark.post("/addTagToModule", new GUICommand.AddTagToModule());
+    Spark.post("/removeTagFromModule", new GUICommand.RemoveTagFromModule());
+
   }
 
   /**
