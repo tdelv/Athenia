@@ -1598,9 +1598,173 @@ public class GUICommand {
    * -------------------------------------------------------------------------
    */
 
-  
+  /**
+   * POST request for adding a tag to a module.
+   */
+  public static class AddTagToModule implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
 
+      // TODO - do this in the front end (to mia, from jason)
 
+      String moduleId = qm.value("moduleId");
+      String modtype = qm.value("modtype");
+      String tagToAdd = qm.value("tagToAdd");
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+
+          // pull tag information
+          Tag tag;
+          if (lang.hasTag(tagToAdd)) {
+            tag = lang.getTag(tagToAdd);
+          } else {
+            tag = new Tag(tagToAdd);
+            lang.addTag(tag);
+          }
+
+          // check for vocab module and update accordingly
+          if (modtype.equals(StorageType.VOCAB.toString())) {
+            if (lang.getModule(StorageType.VOCAB, moduleId) != null) {
+              Vocab vocabToUpdate = (Vocab)
+                      lang.getModule(StorageType.VOCAB, moduleId);
+              vocabToUpdate.addTag(tag);
+              successful = true;
+              message = "successfully added tag to " + moduleId;
+            } else {
+              message = "module not in map " + moduleId;
+            }
+
+            // check for alert exclamation module and update accordingly
+          } else if (modtype.equals(StorageType.ALERT_EXCLAMATION.toString())) {
+            if (lang.getModule(StorageType.ALERT_EXCLAMATION, moduleId) != null) {
+              AlertExclamation alertToUpdate = (AlertExclamation)
+                      lang.getModule(StorageType.ALERT_EXCLAMATION, moduleId);
+              alertToUpdate.addTag(tag);
+              successful = true;
+              message = "successfully added tag to " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for conjugation module and update accordingly
+          } else if (modtype.equals(StorageType.CONJUGATION.toString())) {
+            if (lang.getModule(StorageType.CONJUGATION, moduleId) != null) {
+              Conjugation conjToUpdate = (Conjugation)
+                      lang.getModule(StorageType.CONJUGATION, moduleId);
+              conjToUpdate.addTag(tag);
+              successful = true;
+              message = "successfully added tag to " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for free note module and update accordingly
+          } else if (modtype.equals(StorageType.FREE_NOTE.toString())) {
+              if (lang.getFreeNote(moduleId) != null) {
+                lang.getFreeNote(moduleId).addTag(tag);
+                successful = true;
+                message = "successfully added tag to " + moduleId;
+              } else {
+                message = "module not in map: " + moduleId;
+              }
+
+            // check for note module and update accordingly
+          } else if (modtype.equals(StorageType.NOTE.toString())) {
+            if (lang.getModule(StorageType.NOTE, moduleId) != null) {
+              Note noteToUpdate = (Note)
+                      lang.getModule(StorageType.NOTE, moduleId);
+              noteToUpdate.addTag(tag);
+              successful = true;
+              message = "succesfully added tag to " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+
+            // check for question module and update accordingly
+          } else if (modtype.equals(StorageType.QUESTION.toString())) {
+            if (lang.getModule(StorageType.QUESTION, moduleId) != null) {
+              Question questionToUpdate = (Question)
+                      lang.getModule(StorageType.QUESTION, moduleId);
+              questionToUpdate.addTag(tag);
+              successful = true;
+              message = "succesfully added tag to " + moduleId;
+            } else {
+              message = "module not in map: " + moduleId;
+            }
+            
+            // catch all other cases
+          } else {
+            message = "modtype not recognized " + modtype;
+          }
+
+          // catch if current lang is null
+        } else {
+          message = "language in add tag to module handler";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "user not in database in add tag to module handler";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  /**
+   * POST request for removing a tag from a module.
+   */
+  public static class RemoveTagFromModule implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // success variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+        // check if current lang is not null
+        if (lang != null) {
+
+          // catch if current lang is null
+        } else {
+          message = "";
+        }
+        // catch if user not found in database
+      } catch (DatabaseParserException e) {
+        message = "";
+      }
+
+      // prepare variables to send to front end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
 
   /*
    * -------------------------------------------------------------------------
