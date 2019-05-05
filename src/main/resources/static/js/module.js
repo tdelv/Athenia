@@ -48,6 +48,7 @@ class Module {
         document.body.style.cursor = "default";
     }
 
+    /*
     onEditClick(alert) {
 
         //TODO: this should be moved to the alert class
@@ -79,6 +80,7 @@ class Module {
         });
 
     }
+    */
 
     onModuleHover() {
         // slight shadow background
