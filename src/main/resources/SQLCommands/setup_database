@@ -55,7 +55,7 @@ CREATE TABLE conjugation_rows (
   module_id TEXT,
   col1 TEXT,
   col2 TEXT,
-  index INTEGER,
+  position INTEGER,
   FOREIGN KEY (module_id) REFERENCES conjugation_modules(module_id)
 );
 
