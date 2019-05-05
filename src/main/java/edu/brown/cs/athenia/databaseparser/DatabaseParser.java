@@ -377,7 +377,7 @@ public class DatabaseParser {
         }
     }
 
-    public static void updateUser(String userId) throws DatabaseParserException {
+    public static void updateUser(String userId) throws DatabaseParserException, DriveApiException {
         if (!USER_MAP.containsKey(userId)) {
             throw new DatabaseParserException("No such user.");
         }
@@ -403,6 +403,10 @@ public class DatabaseParser {
         } catch (DriveApiException e) {
             e.printStackTrace();
         }
+
+        File file = new java.io.File(
+                "src/main/resources/userData/" + userId + ".sqlite3");
+        GoogleDriveApi.setDataBase(userId, file);
     }
 
     private static void updateUserData(Connection conn, Athenia user) throws SQLException {
