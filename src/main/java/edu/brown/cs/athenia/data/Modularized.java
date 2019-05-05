@@ -10,8 +10,15 @@ import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.StorageType;
 
+/**
+ * Modularized is an abstract class that represents something with a ModuleMap.
+ * @author makaylamurphy
+ *
+ */
 public abstract class Modularized {
 
+  // Module map maps StorageTypes to a map of String-Modules, so Modules and
+  // their ids (created upon Module generation).
   private Map<StorageType, Map<String, Module>> moduleMap;
 
   public Modularized() {
