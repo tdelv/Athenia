@@ -412,7 +412,7 @@ public class GUICommand {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
       String userId = req.session().attribute("user_id");
-      //QueryParamsMap qm = req.queryMap();
+      // QueryParamsMap qm = req.queryMap();
 
       boolean successful = false;
       String message = "";
@@ -469,6 +469,7 @@ public class GUICommand {
       String newDef = qm.value("newDef");
 
       // TODO check for freenote id
+      String freeNoteId = qm.value("freeNoteId");
 
       boolean successful = false;
       String message = "";
@@ -485,6 +486,11 @@ public class GUICommand {
 
           // call to data on new object
           variables.put("newVocabModule", toData(newVocab));
+
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(newVocab);
+          }
 
           // edit success message
           successful = true;
@@ -520,6 +526,7 @@ public class GUICommand {
       String updatedRating = qm.value("updatedRating");
 
       // TODO check for freenote id
+      String freeNoteId = qm.value("freeNote");
 
       // successful messages
       boolean successful = false;
@@ -536,6 +543,11 @@ public class GUICommand {
             Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
             vocabToUpdate.getPair().updatePair(updatedTerm, updatedDef);
+            // add to freenote
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.addModule(vocabToUpdate);
+            }
             // convert to JSON for frontend
             variables.put("updatedVocabModule", toData(vocabToUpdate));
             // update successful message
@@ -1938,6 +1950,47 @@ public class GUICommand {
         if (lang != null) {
 
           currentLanguage = lang.getName();
+          successful = true;
+          message = "successfully opened freenotes";
+
+        } else {
+          message = "current language null in freenotes page handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in free notes page handler";
+      }
+
+      variables.put("title", "FreeNotes");
+      variables.put("username", username);
+      variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return new ModelAndView(variables.build(), "notes.ftl");
+    }
+  }
+
+  public static class GetFreeNotesList implements Route {
+    @Override
+    public String handle(Request req, Response res)
+            throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      String currentLanguage = "";
+      String username = ""; // TODO get the user's name
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          currentLanguage = lang.getName();
 
           List<Map<String, Object>> recentNotes = new ArrayList<>();
           for (FreeNote note : lang.getRecentFreeNotes()) {
@@ -1955,12 +2008,11 @@ public class GUICommand {
         message = "user not found in database in free notes page handler";
       }
 
-      variables.put("title", "FreeNotes");
       variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
       variables.put("successful", successful);
       variables.put("message", message);
-      return new ModelAndView(variables.build(), "notes.ftl");
+      return GSON.toJson(variables.build());
     }
   }
 
