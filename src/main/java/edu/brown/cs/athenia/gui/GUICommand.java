@@ -382,10 +382,47 @@ public class GUICommand {
         variables.put("username", ""); // TODO get the name
 
         if (lang != null) {
-          Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
-          List<Map<String, Object>> vocabList = new ArrayList<>();
 
           variables.put("currentLanguage", lang.getName());
+          // edit success messages
+          successful = true;
+          message = "successfully pulled vocab information";
+        } else {
+          message = "current language null in vocabulary page handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database in vocabulary page handler";
+      }
+
+      variables.put("title", "Vocabulary");
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return new ModelAndView(variables.build(), "vocab.ftl");
+    }
+  }
+
+  /**
+   * POST request handler for adding a new Vocab object to the user's current
+   * Language.
+   */
+  public static class getVocabularyModulesHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      //QueryParamsMap qm = req.queryMap();
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+          Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
+          List<Map<String, Object>> vocabList = new ArrayList<>();
 
           // translate vocab objects to JSON
           for (Map.Entry<String, Module> vocab : vocabMap.entrySet()) {
@@ -403,12 +440,11 @@ public class GUICommand {
         message = "error getting user from database in vocabulary page handler";
       }
 
-      variables.put("title", "Vocabulary");
-      variables.put("successful", successful);
-      variables.put("message", message);
-      return new ModelAndView(variables.build(), "vocab.ftl");
+      return GSON.toJson(variables.build());
     }
   }
+
+
 
   /**
    * POST request handler for adding a new Vocab object to the user's current
