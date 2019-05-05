@@ -81,6 +81,8 @@
     </div>
     <#-- End of Row to contain all of this page's content -->
 
+    <div class="invisible">${freeNoteId}</div>
+
 </div>
 
 </#assign>

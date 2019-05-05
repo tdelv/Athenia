@@ -90,4 +90,8 @@ class ConjugationTable extends Module {
         this.pairList = pairList;
         this.tableHeight = tableHeight;
     }
+
+    toHTML() {
+        return `<p id=\"${this.id}\">${this.pairList}</p>`;
+    }
 }

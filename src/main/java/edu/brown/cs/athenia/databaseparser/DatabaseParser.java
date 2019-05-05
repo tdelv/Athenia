@@ -60,7 +60,7 @@ public class DatabaseParser {
 
         file.createNewFile();
         try (Connection conn = getConnection(file.getPath());
-                Statement statement = conn.createStatement()) {
+             Statement statement = conn.createStatement()) {
             for (String query : queries) {
                 statement.addBatch(query);
             }
@@ -76,7 +76,7 @@ public class DatabaseParser {
 
         Athenia user = new Athenia(userId);
         USER_MAP.put(userId, user);
-
+        /*
 
         try (Connection conn = loadConnection(userId)) {
             // Get meta data for user
@@ -93,6 +93,7 @@ public class DatabaseParser {
                 getTags(conn, language);
                 getFreeNotes(conn, language);
                 getModules(conn, language);
+                getFreeNoteModules(conn, language);
             }
 
         } catch (SQLException | ClassNotFoundException | IOException e) {
@@ -100,7 +101,7 @@ public class DatabaseParser {
         } catch (DriveApiException e) {
             throw new DatabaseParserException(e);
         }
-
+        */
 
         return user;
     }
@@ -126,10 +127,10 @@ public class DatabaseParser {
     private static void getTags(Connection conn, Language language) throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT tag.name tag_name " +
-                "FROM languages l, language_tags lt, tags t " +
-                "WHERE lt.tag_id = tag.id " +
-                "AND lt.language_id = l.id " +
-                "AND l.language = ?")) {
+                        "FROM languages l, language_tags lt, tags t " +
+                        "WHERE lt.tag_id = tag.id " +
+                        "AND lt.language_id = l.id " +
+                        "AND l.language = ?")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -139,23 +140,25 @@ public class DatabaseParser {
         }
     }
 
-    private static void getFreeNotes(Connection conn, Language language) throws SQLException {
+    private static void getFreeNotes(Connection conn, Language language) throws SQLException, DatabaseParserException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT  fn.title title, " +
-                "fn.id fn_id, " +
-                "fn.created created, " +
-                "fn.last_modified last_modified " +
-                "FROM freenotes fn, languages l, tags t, language_tags lt " +
-                "WHERE fn.language_id = l.id " +
-                "AND l.language = ? " +
-                "AND t.id = lt.tag_id " +
-                "AND lt.language_id = l.id")) {
+                        "fn.id fn_id, " +
+                        "fn.created created, " +
+                        "fn.last_modified last_modified " +
+                        "FROM freenotes fn, languages l, tags t, language_tags lt " +
+                        "WHERE fn.language_id = l.id " +
+                        "AND l.language = ? " +
+                        "AND t.id = lt.tag_id " +
+                        "AND lt.language_id = l.id")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     FreeNote fn = new FreeNote(
                             rs.getString("title"),
                             rs.getString("fn_id"));
+
+                    getFreeNoteTags(conn, fn, language);
                     fn.setDateCreated(new Date(rs.getInt("created")));
                     fn.setDateModified(new Date(rs.getInt("last_modified")));
                 }
@@ -163,12 +166,27 @@ public class DatabaseParser {
         }
     }
 
+    private static void getFreeNoteTags(Connection conn, FreeNote fn, Language language) throws SQLException, DatabaseParserException {
+        try (PreparedStatement statement = conn.prepareStatement(
+                "SELECT * FROM freenote_tags WHERE module_id = ?")) {
+            statement.setString(1, fn.getId());
+            try (ResultSet rs = statement.executeQuery()) {
+                String tagId = rs.getString("id");
+                if (!language.hasTag(tagId)) {
+                    throw new DatabaseParserException("Bad data.");
+                }
+
+                fn.addTag(language.getTag(tagId));
+            }
+        }
+    }
+
     private static void getModules(Connection conn, Language language) throws SQLException, DatabaseParserException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT m.* " +
-                "FROM modules m, languages l " +
-                "WHERE m.language_id = l.id " +
-                "AND l.language = ?")) {
+                        "FROM modules m, languages l " +
+                        "WHERE m.language_id = l.id " +
+                        "AND l.language = ?")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -178,28 +196,26 @@ public class DatabaseParser {
                         case NOTE:
                             module = getNoteModule(conn, rs.getString("id"));
                             break;
-                        case VOCAB :
+                        case VOCAB:
                             module = getVocabModule(conn, rs.getString("id"));
                             break;
-                        case CONJUGATION :
+                        case CONJUGATION:
                             module = getConjugationModule(conn, rs.getString("id"));
                             break;
-                        case QUESTION :
+                        case QUESTION:
                             module = getQuestionModule(conn, rs.getString("id"));
                             break;
-                        case ALERT_EXCLAMATION :
+                        case ALERT_EXCLAMATION:
                             module = getAlertModule(conn, rs.getString("id"));
                             break;
-                        default :
+                        default:
                             throw new DatabaseParserException("Bad data.");
                     }
 
                     language.addModule(type, module);
 
-                    // Add freenote
                     getModuleTags(conn, module, language);
 
-                    getModuleFreenote(conn, module, language);
                 }
             }
         }
@@ -209,13 +225,14 @@ public class DatabaseParser {
         Note module;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM note_modules " +
-                "WHERE module_id = ?")) {
+                        "WHERE module_id = ?")) {
             statement.setString(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
                     throw new DatabaseParserException("Bad data.");
                 }
                 module = new Note(rs.getString("body"));
+                module.setRating(rs.getInt("rating"));
                 if (rs.next()) {
                     throw new DatabaseParserException("Bad data.");
                 }
@@ -250,7 +267,7 @@ public class DatabaseParser {
     private static Conjugation getConjugationModule(Connection conn, String id) throws SQLException, DatabaseParserException {
         Conjugation module;
         try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT * FROM vocab_modules " +
+                "SELECT * FROM conjugation_modules " +
                         "WHERE module_id = ?")) {
             statement.setString(1, id);
             try (ResultSet rs = statement.executeQuery()) {
@@ -258,6 +275,7 @@ public class DatabaseParser {
                     throw new DatabaseParserException("Bad data.");
                 }
                 module = new Conjugation();
+                module.setHeight(rs.getInt("height"));
                 if (rs.next()) {
                     throw new DatabaseParserException("Bad data.");
                 }
@@ -266,8 +284,8 @@ public class DatabaseParser {
 
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM conjugation_rows " +
-                "WHERE module_id = ? " +
-                "ORDER BY index")) {
+                        "WHERE module_id = ? " +
+                        "ORDER BY index")) {
             statement.setString(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -334,7 +352,21 @@ public class DatabaseParser {
         }
     }
 
-    public static void getModuleFreenote(Connection conn, Module module, Language language) {
-
+    public static void getFreeNoteModules(Connection conn, Language language) throws SQLException {
+        for (FreeNote fn : language.getFreeNotes()) {
+            try (PreparedStatement statement = conn.prepareStatement(
+                    "SELECT m.* FROM modules m, freenote_modules fm " +
+                    "WHERE fm.freenote_id = ? " +
+                    "AND fm.module_id = m.id " +
+                    "ORDER BY fm.position")) {
+                statement.setString(1, fn.getId());
+                try (ResultSet rs = statement.executeQuery()) {
+                    StorageType type = StorageType.valueOf(rs.getString("type"));
+                    String moduleId = rs.getString("id");
+                    Module module = language.getModule(type, moduleId);
+                    fn.addModule(module);
+                }
+            }
+        }
     }
 }

@@ -126,6 +126,7 @@ public class Main {
 
     // vocabulary module specific spark handlers
     Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
+    Spark.post("/getVocabList", new GUICommand.getVocabularyModulesHandler());
     Spark.post("/vocabularyAdd", new GUICommand.VocabularyAddHandler());
     Spark.post("/vocabularyUpdate", new GUICommand.VocabularyUpdateHandler());
     Spark.post("/vocabularyRemove", new GUICommand.VocabularyRemoveHandler());

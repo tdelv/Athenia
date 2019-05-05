@@ -30,6 +30,7 @@ CREATE TABLE modules (
 CREATE TABLE note_modules (
   module_id TEXT PRIMARY KEY,
   body TEXT,
+  rating INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
@@ -37,12 +38,15 @@ CREATE TABLE vocab_modules (
   module_id TEXT PRIMARY KEY,
   term TEXT,
   definition TEXT,
+  rating INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
 CREATE TABLE conjugation_modules (
   module_id TEXT PRIMARY KEY,
   header TEXT,
+  rating INTEGER,
+  height INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id)
 );
 
