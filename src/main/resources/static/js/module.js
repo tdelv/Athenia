@@ -136,32 +136,31 @@ class Question extends Note {
 }
 
 class Vocabulary extends Module {
-    constructor(id, dateCreated, dateModified, term, def) {
+    constructor(id, dateCreated, dateModified, term, def, rating) {
         super(id, dateCreated, dateModified);
         this.term = term;
         this.def = def;
+        this.rating = rating;
     }
 
     toHTML() {
 
-        const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate" method="post" onsubmit="return updateVocab()">` +
+        const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate" 
+                        method="post">` +
             `<div class="input-group">` +
-            `<input type="text" class="form-control" placeholder="${this.term}">` +
-            `<input type="text" class="form-control" placeholder="${this.def}">` +
-            `<input type="submit" class="btn btn-primary" value="Save"/>` +
+            `<input type="text" name="vocabId" value="${this.id}" style="display:none">` +
+            `<input type="text" name="updatedTerm" class="form-control" placeholder="${this.term}">` +
+            `<input type="text" name="updatedDef" class="form-control" placeholder="${this.def}">` +
+            `<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +
+
+            // TODO somehow allow for rating changes
+
+            `<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
             `</div>` +
             `<small>Date Modified: ${this.dateModified}</small>` +
             `</form>`;
 
         return form;
-
-        // const divStart = `<div class=\"card\"><div class=\"card-body\">`;
-        // const vocabInfo = `<p id=\\" ${this.id} \\"><b><u>${this.term}</u></b> ${this.def}</p>`;
-        // const dateCreatedInfo = `<p style=\"font-size: 0.5rem">Date Created: ${this.dateCreated}</p>`;
-        // const dateModifiedInfo = `<p style=\"font-size: 0.5rem\">${this.dateModified}</p>`;
-        // const divEnd = `</div></div>`;
-        //
-        // return `${divStart}${vocabInfo}${dateCreatedInfo}${dateModifiedInfo}${divEnd}`;
     }
 
 }

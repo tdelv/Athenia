@@ -1,6 +1,17 @@
 $( document ).ready(function() {
     const vocabList = $("#vocabContent").html();
     getVocabList(vocabList);
+
+    $("#addVocab").on("click", function(e) {
+        e.preventDefault();
+        insertVocab();
+    })
+
+    $(".vocabSubmit").on("click", function(e) {
+        e.preventDefault();
+        alert("SAVING?");
+    })
+
 });
 
 function getVocabList() {
@@ -18,10 +29,30 @@ function getVocabList() {
                 if (moduleMap.has(currVocab.id)) {
                     newVocab = moduleMap.get(currVocab.id);
                 } else {
-                    newVocab = new Vocabulary(currVocab.id, currVocab.dateCreated, currVocab.dateModified, currVocab.term, currVocab.def);
+                    console.log(currVocab);
+                    console.log(currVocab.rating);
+                    newVocab = new Vocabulary(currVocab.id, currVocab.dateCreated, currVocab.dateModified, currVocab.term, currVocab.def, currVocab.rating);
+                    moduleMap.set(currVocab.id, newVocab);
                 }
                 $("#vocabularyContainer").append(newVocab.toHTML());
             }
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
+}
+
+function insertVocab() {
+    console.log("inserting vocab");
+    const postParameters = {newTerm: "term", newDef: "definition"};
+    $.post("/vocabularyAdd", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            const newVocab = responseObject.newVocabModule;
+            console.log(newVocab);
+            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def);
+            $("#vocabularyContainer").prepend(newVocabModule.toHTML());
+            // newVocabModule.setUp();
         } else {
             console.log("message: " + responseObject.message);
         }

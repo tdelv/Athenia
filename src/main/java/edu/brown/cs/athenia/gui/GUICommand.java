@@ -427,8 +427,8 @@ public class GUICommand {
           Map<String, Module> vocabMap = lang.getModuleMap(StorageType.VOCAB);
 
           // TODO get rid of these because these are just tests
-          Vocab vocab1 = new Vocab("test", "test");
-          lang.addModule(StorageType.VOCAB, vocab1);
+//          Vocab vocab1 = new Vocab("test", "test");
+//          lang.addModule(StorageType.VOCAB, vocab1);
 
           List<Map<String, Object>> vocabList = new ArrayList<>();
 
@@ -517,6 +517,7 @@ public class GUICommand {
       String vocabId = qm.value("vocabId");
       String updatedTerm = qm.value("updatedTerm");
       String updatedDef = qm.value("updatedDef");
+      String updatedRating = qm.value("updatedRating");
 
       // TODO check for freenote id
 

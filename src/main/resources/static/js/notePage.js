@@ -15,6 +15,7 @@ $( document ).ready(function() {
     $("#insertConjugationButton").click(insertConjugation);
     $("#insertExclamationButton").click(insertExclamation);
     $("#insertQuestionButton").click(insertQuestion);
+
 });
 
 function getFreeNoteId() {
@@ -54,7 +55,7 @@ function insertVocab() {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
             const newVocab = responseObject.newVocabModule;
-            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def);
+            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def, 1);
             insertModule(newVocabModule);
         } else {
             console.log("message: " + responseObject.message);
