@@ -7,7 +7,7 @@ import edu.brown.cs.athenia.data.modules.Tag;
 public class Language extends Modularized {
   private String name;
   private Map<String, Tag> tags;
-  private Map<String, FreeNote> freenotesMap;
+  private Map<String, FreeNote> freeNotesMap;
   private List<FreeNote> freeNotes;
 
   // TODO: some sort of recent list storing the most recent
@@ -20,7 +20,7 @@ public class Language extends Modularized {
   public Language(String name) {
     this.name = name;
     this.tags = new HashMap<String, Tag>();
-    this.freenotesMap = new HashMap<>();
+    this.freeNotesMap = new HashMap<>();
     this.freeNotes = new ArrayList<FreeNote>();
   }
 
@@ -53,16 +53,16 @@ public class Language extends Modularized {
   }
 
   public void addFreeNote(FreeNote note) {
-    freenotesMap.put(note.getId(), note);
+    freeNotesMap.put(note.getId(), note);
     freeNotes.add(note);
   }
 
   public boolean containsFreeNote(String id) {
-    return freenotesMap.containsKey(id);
+    return freeNotesMap.containsKey(id);
   }
 
   public FreeNote getFreeNote(String id) {
-    return freenotesMap.get(id);
+    return freeNotesMap.get(id);
   }
 
   public List<FreeNote> getFreeNotes() {

@@ -1,5 +1,6 @@
 
 // TODO: add modtype!!!!!!
+// TODO: when an input is not being edited, remove the border
 
 const moduleMap = new Map();
 
@@ -47,6 +48,7 @@ class Module {
         document.body.style.cursor = "default";
     }
 
+    /*
     onEditClick(alert) {
 
         //TODO: this should be moved to the alert class
@@ -78,6 +80,7 @@ class Module {
         });
 
     }
+    */
 
     onModuleHover() {
         // slight shadow background
@@ -103,7 +106,9 @@ class Note extends Module {
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">${this.content}</p>`;
+        const input = `<input type="text" class="form-control mb-3" placeholder="${this.content}">`;
+        const div = `<div class="noteModule" id="${this.id}">${input}</div>`;
+        return div;
     }
 }
 
@@ -116,10 +121,16 @@ class Exclamation extends Note {
 
         const icon = "<i class=\"fa fa-exclamation\"></i>";
 
+        /* OLD
         const content = `<span class="editable">${this.content}</span>`;
 
         const div = `<div class="noteModule" id="${this.id}">${icon} ${content}</div>`;
 
+        return div;
+        */
+
+        const input = `<input type="text" class="form-control mb-3 ml-2 d-inline w-75" placeholder="${this.content}">`;
+        const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
         return div;
     }
 
@@ -131,7 +142,12 @@ class Question extends Note {
     }
 
     toHTML() {
-        return `<p id=\"${this.id}\">??? ${this.content}</p>`;
+        const icon = `<i class="fa fa-question"></i>`;
+        const input = `<input type="text" class="form-control mb-3 ml-1 d-inline w-75" placeholder="${this.content}">`;
+        const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
+        return div;
+
+        return div;
     }
 }
 
