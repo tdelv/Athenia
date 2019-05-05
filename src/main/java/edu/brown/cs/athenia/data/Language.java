@@ -12,6 +12,7 @@ public class Language extends Modularized {
   private String name;
   private Map<String, Tag> tags;
   private List<FreeNote> freenotes;
+  private Map<String, FreeNote> freenotesMap;
 
   // TODO: some sort of recent list storing the most recent
   // free notes according to some date value
@@ -24,7 +25,7 @@ public class Language extends Modularized {
     this.name = name;
     this.tags = new HashMap<String, Tag>();
     this.freenotes = new ArrayList<FreeNote>();
-
+    this.freenotesMap = new HashMap<>();
   }
 
   /**
@@ -53,6 +54,19 @@ public class Language extends Modularized {
 
   public Tag getTag(String tag) {
     return tags.get(tag);
+  }
+
+  public void addFreeNote(FreeNote note) {
+    freenotesMap.put(note.getId(), note);
+    freenotes.add(note);
+  }
+
+  public boolean containsFreeNote(String id) {
+    return freenotesMap.containsKey(id);
+  }
+
+  public FreeNote getFreeNote(String id) {
+    return freenotesMap.get(id);
   }
 
   public List<FreeNote> getRecentFreeNotes() {

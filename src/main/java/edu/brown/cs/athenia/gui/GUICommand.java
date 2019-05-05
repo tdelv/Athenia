@@ -33,6 +33,8 @@ import spark.Response;
 import spark.Route;
 import spark.TemplateViewRoute;
 
+import javax.xml.crypto.*;
+
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
  * dynamic URLs to account for arbitrary number of "pages".
@@ -1572,33 +1574,7 @@ public class GUICommand {
   public static class ModuleTagUpdateHandler implements Route {
     @Override
     public String handle(Request req, Response res) throws DriveApiException {
-      QueryParamsMap qm = req.queryMap();
-      String type = qm.value("type");
-
-      // if (language != null) {
-      // if (type.equals("add")) {
-      //
-      // } else if (type.equals("update")) {
-      //
-      // } else if (type.equals("delete")) {
-      //
-      // } else {
-      // // TODO: throw error
-      // }
-      // }
-      // TODO pull in the information of the module, the tag, and the operation
-      // wanted:
-      // 1. add tag to the module
-      // 3. delete tag from the module
-      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("...", "...").build();
-      // TODO: update the appropriate tables in the database:
-      // 1. adding tag to module, add to that module's tag set
-      // 3. delete tag, remove tag from module's tag set
-      // > confirmations can be sent
-      // > be sure to handle edits to a tag page itself and do not
-      // present the information if the user chooses to delete it
-      return GSON.toJson(variables);
+      return null; // TODO THIS BULLSHIT
     }
   }
 
@@ -1670,39 +1646,65 @@ public class GUICommand {
     @Override
     public ModelAndView handle(Request req, Response res)
         throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("id");
-      String currentLanguage = qm.value("currentLanguage");
 
-      System.out.println("curr lang: " + currentLanguage);
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      String currentLanguage = "";
+      String username = ""; // TODO GET USERNAME
 
-      if (noteId.equals("new")) {
-        // send the default values to front end / empty lists and stuff
-        variables.put("title", "Note Title");
-      } else {
-        // TODO: use noteId to find the note in the database
-        // send modules and other relevant data (note title, date, etc)
-        variables.put("title", "TODO"); // TODO: put note title
+      // successful variables
+      String message = "";
+      boolean successful = false;
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        username = "temp"; // TODO GET USERNAME
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+          currentLanguage = lang.getName();
+
+          if (noteId.equals("new")) {
+            // create a new freenote
+            FreeNote newFreeNote = new FreeNote("Note Title");
+            lang.addFreeNote(newFreeNote);
+            variables.put("newFreeNote", newFreeNote);
+            successful = true;
+            message = "successfully added new freenote";
+          } else {
+            // pull an old one out
+
+            if (lang.containsFreeNote(noteId)) {
+
+              FreeNote oldNote = lang.getFreeNote(noteId);
+              variables.put("oldFreeNote", oldNote);
+              successful = true;
+              message = "successfully pulled old freenote";
+
+            } else {
+              message = "freenote id does not exist in language map";
+            }
+          }
+
+        } else {
+          message = "language null in freenotes editor handler";
+        }
+
+      } catch (DatabaseParserException e) {
+        message = "user not in database in free note editor handler";
       }
 
-      // TODO LOOK AT notes.js for the variables names
-
-
-      variables.put("username", "temp");
+      variables.put("title", "Note Page Editor");
+      variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
 
-      // update any info about last date viewed and stuff if we have it
-
-      // OLD NOTES:
-      // TODO: determine which free note the user wants to view and find in
-      // database
-      // TODO: pull out all of the information (modules, text, etc.) of the
-      // landing page from the database, add to appropriate areas in the
-      // backend, and format and send to the front end for display
-      // > involves a lot of module storing (a cache in both front end and
-      // backend?)
       return new ModelAndView(variables.build(), "notePageEdit.ftl");
     }
   }
