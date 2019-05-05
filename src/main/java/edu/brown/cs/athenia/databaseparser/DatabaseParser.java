@@ -7,6 +7,7 @@ import edu.brown.cs.athenia.data.modules.Module;
 
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.*;
+import edu.brown.cs.athenia.driveapi.UnauthenticatedUserException;
 import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
@@ -29,7 +30,7 @@ import java.util.Date;
 public class DatabaseParser {
 
     private static final Map<String, Athenia> USER_MAP = new HashMap<>();
-
+    private static final Map<String, Date> LAST_UPDATED_MAP = new HashMap<>();
 
     private static Connection getConnection(String filePath) throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
@@ -42,13 +43,13 @@ public class DatabaseParser {
         File file = GoogleDriveApi.getDataBase(userId);
 
         if (!file.exists()) {
-            setup(userId, file);
+            setup(file);
         }
 
         return getConnection(file.getPath());
     }
 
-    private static void setup(String userId, File file) throws IOException, SQLException, ClassNotFoundException {
+    private static void setup(File file) throws IOException, SQLException, ClassNotFoundException {
         File queryFile = new File("src/main/resources/SQLCommands/setup_database");
 
         String data;
@@ -76,7 +77,7 @@ public class DatabaseParser {
 
         Athenia user = new Athenia(userId);
         USER_MAP.put(userId, user);
-        /*
+        LAST_UPDATED_MAP.put(userId, new Date());
 
         try (Connection conn = loadConnection(userId)) {
             // Get meta data for user
@@ -97,11 +98,12 @@ public class DatabaseParser {
             }
 
         } catch (SQLException | ClassNotFoundException | IOException e) {
+            e.printStackTrace();
             throw new DatabaseParserException(e);
         } catch (DriveApiException e) {
+            e.printStackTrace();
             throw new DatabaseParserException(e);
         }
-        */
 
         return user;
     }
@@ -285,7 +287,7 @@ public class DatabaseParser {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM conjugation_rows " +
                         "WHERE module_id = ? " +
-                        "ORDER BY index")) {
+                        "ORDER BY position")) {
             statement.setString(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -352,7 +354,7 @@ public class DatabaseParser {
         }
     }
 
-    public static void getFreeNoteModules(Connection conn, Language language) throws SQLException {
+    private static void getFreeNoteModules(Connection conn, Language language) throws SQLException {
         for (FreeNote fn : language.getFreeNotes()) {
             try (PreparedStatement statement = conn.prepareStatement(
                     "SELECT m.* FROM modules m, freenote_modules fm " +
