@@ -1,3 +1,6 @@
+
+const moduleMap = new Map();
+
 /*
  * THE BIG DADDY
  */
@@ -13,6 +16,11 @@ class Module {
         this.id = id;
         this.dateCreated = dateCreated;
         this.dateModified = dateModified;
+        if (moduleMap.has(id)) {
+            console.log("a module with id:" + id + " already exists");
+        } else {
+            moduleMap.set(id, this);
+        }
     }
 
     setUp() {
