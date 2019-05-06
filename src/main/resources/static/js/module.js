@@ -1,4 +1,9 @@
 
+
+// TODO: update vocab the same way you update text
+// TODO: set up link on dashbord
+// TODO: display recent notes on homepage/dashbaord
+
 // TODO: add modtype!!!!!!
 // TODO: when an input is not being edited, remove the border
 
@@ -164,12 +169,45 @@ class Question extends Note {
 }
 
 class Vocabulary extends Module {
-    constructor(id, dateCreated, dateModified, term, def, rating) {
-        super(id, dateCreated, dateModified);
-        this.term = term;
-        this.def = def;
-        this.rating = rating;
+    constructor(newVocabData) {
+        super(newVocabData.id, newVocabData.dateCreated, newVocabData.dateModified);
+        this.term = newVocabData.term;
+        this.def = newVocabData.def;
+        this.rating = 1;
     }
+
+    setUp() {
+        const selector = "#" + this.id + " input";
+        const thisOlThing = this;
+        $(selector).blur(function(){thisOlThing.update(thisOlThing);});
+    }
+
+    update(thisOlThing) {
+        // TODO:
+        // for each text input, store the value in this object
+        // use a post request and these new values to update this module in the backend
+
+    }
+
+    /*
+        update(thisOlThing) {
+            const selector = "#" + thisOlThing.id + " input";
+            const newNoteContent = $(selector).val();
+
+            const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
+            $.post("/noteUpdate", postParameters, responseJSON => {
+                const responseObject = JSON.parse(responseJSON);
+                if (responseObject.successful) {
+                    // TODO: check that responseObject.updatedNote matches this object
+                    console.log("new content " + responseObject.updatedNote.noteContent);
+                } else {
+                    console.log("message: " + responseObject.message);
+                }
+            });
+        }
+
+
+        */
 
     // TODO: attach this handler to onBlur
     updateVocabularyModule() {

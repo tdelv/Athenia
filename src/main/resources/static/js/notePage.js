@@ -74,8 +74,8 @@ function insertVocab() {
     $.post("/vocabularyAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newVocab = responseObject.newVocabModule;
-            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def, 1);
+            const newVocabData = responseObject.newVocabModule;
+            const newVocabModule = new Vocabulary(newVocabData);
             insertModule(newVocabModule);
         } else {
             console.log("message: " + responseObject.message);
