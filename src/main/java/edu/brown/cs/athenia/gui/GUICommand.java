@@ -322,7 +322,7 @@ public class GUICommand {
           int noteCount = lang.getModuleCount(StorageType.NOTE);
           int conjugationCount = lang.getModuleCount(StorageType.CONJUGATION);
 
-          List<Map<String, Object>> recentList = new ArrayList<>();
+          List<String> recentList = new ArrayList<>();
           // pull all recent notes from language
 
           for (FreeNote note : lang.getRecentFreeNotes()) {
@@ -2156,8 +2156,7 @@ public class GUICommand {
             FreeNote newFreeNote = new FreeNote("Note Title");
             lang.addFreeNote(newFreeNote);
             title = newFreeNote.getTitle();
-
-            variables.put("newFreeNote", newFreeNote);
+            variables.put("freeNote", toData(newFreeNote));
             variables.put("freeNoteId", newFreeNote.getId());
             successful = true;
             message = "successfully added new freenote";
@@ -2167,7 +2166,7 @@ public class GUICommand {
             if (lang.containsFreeNote(noteId)) {
 
               FreeNote oldFreeNote = lang.getFreeNote(noteId);
-              variables.put("oldFreeNote", toData(oldFreeNote));
+              variables.put("freeNote", toData(oldFreeNote));
               variables.put("freeNoteId", oldFreeNote.getId());
               title = oldFreeNote.getTitle();
               successful = true;
@@ -2451,7 +2450,7 @@ public class GUICommand {
    *          the FreeNote object to convert
    * @return a map of data from the FreeNote object
    */
-  private static Map<String, Object> toData(FreeNote note) {
+  private static String toData(FreeNote note) {
 
     ImmutableMap.Builder<String, Object> noteData =
             new ImmutableMap.Builder<String, Object>();
@@ -2490,7 +2489,7 @@ public class GUICommand {
 
     // put module data into map
     noteData.put("moduleContent", modulesList);
-    return noteData.build();
+    return GSON.toJson(noteData.build());
   }
 
   /**

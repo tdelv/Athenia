@@ -1,6 +1,7 @@
 // TODO: for all add/delete/update post requests, send the current note id
 
 let freeNoteId = null;
+let freeNote = null;
 
 $( document ).ready(function() {
 
@@ -10,6 +11,16 @@ $( document ).ready(function() {
         title: "Top",
         trigger: "hover"
     });
+
+    freeNoteId = $(".invisible").html();
+
+    const freeNoteObject = $("#freeNote").html();
+    freeNote = JSON.parse(freeNoteObject);
+
+    renderModules();
+
+    //console.log("free note: " + $("#freeNote"));
+    //console.log("free note name: " + $("#freeNote").html().noteTitle);
 
     // BUTTON HANDLERS
     $("#insertTextButton").click(insertNote);
@@ -21,6 +32,46 @@ $( document ).ready(function() {
     $("#notePageTitle").blur(updateNoteTitle);
 
 });
+
+function renderModules() {
+
+    const modules = freeNote.moduleContent;
+
+    for (let i = 0; i < modules.length; i++) {
+        let currentModule = modules[i];
+        let id = modules[i].id;
+        let html;
+        if (moduleMap.has(id)) {
+            // it wont for right now
+            let mod = moduleMap.get(id);
+            html = mod.toHTML();
+        } else {
+
+            let newMod;
+
+            switch(currentModule.modtype) {
+                case "NOTE":
+                    newMod = new Note(currentModule);
+                    break;
+                case "VOCAB":
+                    newMod = new Vocabulary(currentModule);
+                    break;
+                case "ALERT_EXCLAMATION":
+                    newMod = new Exclamation(currentModule);
+                    break;
+                case "QUESTION":
+                    newMod = new Question(currentModule);
+                    break;
+                default:
+                    console.log("uhhh");
+            }
+
+            html = newMod.toHTML();
+        }
+        $("#noteBody").append(html);
+
+    }
+}
 
 function updateNoteTitle() {
 
@@ -41,9 +92,6 @@ function updateNoteTitle() {
 }
 
 function getFreeNoteId() {
-    if (freeNoteId == null) {
-        freeNoteId = $(".invisible").html();
-    }
     return freeNoteId;
 }
 
