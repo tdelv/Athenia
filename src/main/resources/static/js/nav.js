@@ -4,7 +4,6 @@ $( document ).ready(function() {
 });
 
 function getCurrentLanguage() {
-    console.log("the thing" + $("#currentLanguage").html());
     return $("#currentLanguage").html();
 }
 

@@ -1,8 +1,7 @@
 
-
-// TODO: update vocab the same way you update text
 // TODO: set up link on dashbord
 // TODO: display recent notes on homepage/dashbaord
+// TODO: when an old note is opened, render all the modules
 
 // TODO: add modtype!!!!!!
 // TODO: when an input is not being edited, remove the border
