@@ -26,7 +26,7 @@ function updateNoteTitle() {
 
     const newTitle = $(this).val();
 
-    const postParameters = {freeNoteId: freeNoteId, newTitle: newTitle};
+    const postParameters = {freeNoteId: getFreeNoteId(), newTitle: newTitle};
     $.post("/updateNoteTitle", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
