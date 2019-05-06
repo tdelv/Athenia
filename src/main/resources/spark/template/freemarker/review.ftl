@@ -1,15 +1,42 @@
 <#assign pagecontent>
 
+
+    const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate"
+                        method="post">` +
+    `<div class="input-group">` +
+        `<input type="text" name="vocabId" value="${this.id}" style="display:none">` +
+        `<input type="text" name="updatedTerm" class="form-control" placeholder="${this.term}">` +
+        `<input type="text" name="updatedDef" class="form-control" placeholder="${this.def}">` +
+        `<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +
+
+        // TODO somehow allow for rating changes
+        `<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
+        `</div>` +
+    `<small>Date Modified: ${this.dateModified}</small>` +
+    `</form>`;
+
+
     <div class="container-fluid">
 
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Review</h1>
         </div>
 
+        <div class="row">
+            <div class="col">
+                <form id="reviewForm" name="reviewForm" action="" method="get">
+                    <div class="input-group">
+                        <input type="text" name="tag1">
+                        <input type="text" name="tag2">
+                        <input type="text" name="tag3">
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Content Row -->
         <div class="row">
             <div class="col">
-                <p> to do :-) </p>
                 <ol>
                     <#list allTags as tag>
                         <li>${tag}</li>

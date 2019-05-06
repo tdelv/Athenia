@@ -44,6 +44,10 @@ public abstract class Module {
     this.tags = new HashMap<String, Tag>();
   }
 
+  public void setFreeNote(FreeNote note) {
+    this.freeNote = note;
+  }
+
   public FreeNote getFreeNote() {
     return this.freeNote;
   }
