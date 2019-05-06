@@ -28,7 +28,7 @@ function getVocabList() {
                 } else {
                     console.log(currVocab);
                     console.log(currVocab.rating);
-                    newVocab = new Vocabulary(currVocab.id, currVocab.dateCreated, currVocab.dateModified, currVocab.term, currVocab.def, currVocab.rating);
+                    newVocab = new Vocabulary(currVocab);
                     moduleMap.set(currVocab.id, newVocab);
                 }
                 const newVocabHTML = newVocab.toHTML();

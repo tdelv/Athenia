@@ -239,6 +239,8 @@ class Vocabulary extends Module {
 
     toHTML() {
 
+        console.log("this: " + this.id);
+
         const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate" 
                         method="post">` +
             `<div class="input-group">` +
