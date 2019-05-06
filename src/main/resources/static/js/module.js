@@ -103,7 +103,7 @@ class Note extends Module {
 
     constructor(newNoteData) {
         super(newNoteData.id, newNoteData.dateCreated, newNoteData.dateModified);
-        this.content = newNoteData.noteContent;
+        this.content = newNoteData.content;
         this.setUp();
     }
 
@@ -137,22 +137,12 @@ class Note extends Module {
 }
 
 class Exclamation extends Note {
-    constructor(id, dateCreated, dateModified, content) {
-        super(id, dateCreated, dateModified, content);
+    constructor(newExclamationData) {
+        super(newExclamationData);
     }
 
     toHTML() {
-
         const icon = "<i class=\"fa fa-exclamation\"></i>";
-
-        /* OLD
-        const content = `<span class="editable">${this.content}</span>`;
-
-        const div = `<div class="noteModule" id="${this.id}">${icon} ${content}</div>`;
-
-        return div;
-        */
-
         const input = `<input type="text" class="form-control mb-3 ml-2 d-inline w-75" placeholder="${this.content}">`;
         const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
         return div;
@@ -161,16 +151,14 @@ class Exclamation extends Note {
 }
 
 class Question extends Note {
-    constructor(id, dateCreated, dateModified, content) {
-        super(id, dateCreated, dateModified, content);
+    constructor(newQuestionData) {
+        super(newQuestionData);
     }
 
     toHTML() {
         const icon = `<i class="fa fa-question"></i>`;
         const input = `<input type="text" class="form-control mb-3 ml-1 d-inline w-75" placeholder="${this.content}">`;
         const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
-        return div;
-
         return div;
     }
 }

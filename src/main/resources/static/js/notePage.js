@@ -84,8 +84,8 @@ function insertExclamation() {
     $.post("alertAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newExclamation = responseObject.newAlertModule;
-            const newExclamationModule = new Exclamation(newExclamation.id, newExclamation.dateCreated, newExclamation.dateModified, newExclamation.alertContent);
+            const newExclamationData = responseObject.newAlertModule;
+            const newExclamationModule = new Exclamation(newExclamationData);
             insertModule(newExclamationModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -99,8 +99,8 @@ function insertQuestion() {
     $.post("questionAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newQuestion = responseObject.newQuestionModule;
-            const newQuestionModule = new Question(newQuestion.id, newQuestion.dateCreated, newQuestion.dateModified, newQuestion.questionContent);
+            const newQuestionData = responseObject.newQuestionModule;
+            const newQuestionModule = new Question(newQuestionData);
             insertModule(newQuestionModule);
         } else {
             console.log("message: " + responseObject.message);
