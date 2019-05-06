@@ -210,15 +210,21 @@ class Vocabulary extends Module {
         */
 
     // TODO: attach this handler to onBlur
-    updateVocabularyModule() {
+    update(thisOlThing) {
 
         // if need be, id can be stored in the event target. event would be parameter to this method
 
         // TODO: store the new values in this object if that hasn't been done already
 
-        const freeNoteId = "TODO";
+        const newTerm = $("input[name='updatedTerm']").val();
+        const newDef = $("input[name='updatedDef']").val();
+        const newRating = $("input[name='updatedRating']").val();
 
-        const postParameters = {vocabId: this.id, updatedTerm: this.term, updatedDef: this.def, updatedRating: this.rating, freeNote: freeNoteId};
+        thisOlThing.term = newTerm;
+        thisOlThing.def = newDef;
+        thisOlThing.rating = newRating;
+
+        const postParameters = {vocabId: thisOlThing.id, updatedTerm: newTerm, updatedDef: newDef, updatedRating: newRating, freeNoteId: getFreeNoteId()};
         $.post("/vocabularyUpdate", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
             if (responseObject.successful) {
