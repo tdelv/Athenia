@@ -17,7 +17,19 @@ $( document ).ready(function() {
     $("#insertExclamationButton").click(insertExclamation);
     $("#insertQuestionButton").click(insertQuestion);
 
+    //TODO:
+    // title.onblur -> post request to update the title of this free note;a'
+    $("#notePageTitle").blur(updateNoteTitle);
+
 });
+
+function updateNoteTitle() {
+    const newTitle = $(this).val();
+    console.log("new title: " + newTitle);
+
+    //TODO: post request
+
+}
 
 function getFreeNoteId() {
     if (freeNoteId == null) {
