@@ -2136,6 +2136,7 @@ public class GUICommand {
 
       String currentLanguage = "";
       String username = ""; // TODO GET USERNAME
+      String title = "";
 
       // successful variables
       String message = "";
@@ -2154,10 +2155,10 @@ public class GUICommand {
             // create a new freenote
             FreeNote newFreeNote = new FreeNote("Note Title");
             lang.addFreeNote(newFreeNote);
+            title = newFreeNote.getTitle();
 
             variables.put("newFreeNote", newFreeNote);
             variables.put("freeNoteId", newFreeNote.getId());
-            variables.put("title", newFreeNote.getTitle());
             successful = true;
             message = "successfully added new freenote";
           } else {
@@ -2168,7 +2169,7 @@ public class GUICommand {
               FreeNote oldFreeNote = lang.getFreeNote(noteId);
               variables.put("oldFreeNote", toData(oldFreeNote));
               variables.put("freeNoteId", oldFreeNote.getId());
-              variables.put("title", oldFreeNote.getTitle());
+              title = oldFreeNote.getTitle();
               successful = true;
               message = "successfully pulled old freenote";
 
@@ -2185,6 +2186,7 @@ public class GUICommand {
         message = "user not in database in free note editor handler";
       }
 
+      variables.put("title", title);
       variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
       variables.put("successful", successful);
