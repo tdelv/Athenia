@@ -46,6 +46,10 @@ public class FreeNote {
     this.title = t;
   }
 
+  public void setTitle(String newTitle) {
+    this.title = newTitle;
+  }
+
   public String getId() {
     return this.id;
   }

@@ -1510,7 +1510,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionId = qm.value("questionId");
 
-      // TODO check for freenoteId
+      // get freenote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1530,6 +1531,14 @@ public class GUICommand {
             Question questionToRemove = (Question) lang
                 .getModule(StorageType.QUESTION, questionId);
             lang.removeModule(StorageType.QUESTION, questionToRemove);
+
+            // remove the question from the freenotes
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(questionToRemove);
+              questionToRemove.removeFreeNote();
+            }
+
             // update successful variables
             successful = true;
             message = "successfully removed question module";
@@ -2037,11 +2046,11 @@ public class GUICommand {
           currentLanguage = lang.getName();
 
           List<Map<String, Object>> recentNotes = new ArrayList<>();
-          for (FreeNote note : lang.getRecentFreeNotes()) {
+          for (FreeNote note : lang.getFreeNotes()) {
             recentNotes.add(toDataNoModules(note));
           }
 
-          variables.put("recentNote", recentNotes);
+          variables.put("allNotes", recentNotes);
           successful = true;
           message = "successfully retrieved FreeNotes";
 
@@ -2054,6 +2063,54 @@ public class GUICommand {
 
       variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  public static class FreeNotesTitleEditorHandler implements Route {
+    @Override
+    public String handle(Request req, Response res)
+            throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // pull out information from query map
+      String freeNoteId = qm.value("freeNoteId");
+      String newTitle = qm.value("newTitle");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+          // check if freenote in the language map
+          if (lang.containsFreeNote(freeNoteId)) {
+
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.setTitle(newTitle);
+
+            successful = true;
+            message = "successfully changed title of freenote";
+
+          } else {
+            message = "language does not have freenote in it";
+          }
+
+        } else {
+          message = "current language null in freenotes title editor handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in free notes title editor handler";
+      }
+
       variables.put("successful", successful);
       variables.put("message", message);
       return GSON.toJson(variables.build());

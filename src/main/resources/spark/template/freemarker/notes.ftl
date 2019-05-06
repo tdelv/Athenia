@@ -9,8 +9,7 @@
 
         <!-- Content Row -->
         <div class="row">
-            <div class="col">
-                <p> to do :-) </p>
+            <div class="col" id="freeNoteContainer">
             </div>
         </div>
 

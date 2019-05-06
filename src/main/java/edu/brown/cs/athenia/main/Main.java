@@ -124,6 +124,7 @@ public class Main {
     Spark.get("/notes", new GUICommand.FreeNotesPageHandler(), freeMarker);
     Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
     Spark.post("/getNoteList", new GUICommand.GetFreeNotesList());
+    Spark.post("/updateNoteTitle", new GUICommand.FreeNotesTitleEditorHandler());
 
     // vocabulary module specific spark handlers
     Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
