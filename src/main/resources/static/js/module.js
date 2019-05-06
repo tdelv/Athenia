@@ -100,9 +100,33 @@ class Module {
 }
 
 class Note extends Module {
-    constructor(id, dateCreated, dateModified, content) {
-        super(id, dateCreated, dateModified);
-        this.content = content;
+
+    constructor(newNoteData) {
+        super(newNoteData.id, newNoteData.dateCreated, newNoteData.dateModified);
+        this.content = newNoteData.noteContent;
+        this.setUp();
+    }
+
+    setUp() {
+        const selector = "#" + this.id + " input";
+        const thisOlThing = this;
+        $(selector).blur(function(){thisOlThing.update(thisOlThing);});
+    }
+
+    update(thisOlThing) {
+        const selector = "#" + thisOlThing.id + " input";
+        const newNoteContent = $(selector).val();
+
+        const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
+        $.post("/noteUpdate", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            if (responseObject.successful) {
+                // TODO: check that responseObject.updatedNote matches this object
+                console.log("new content " + responseObject.updatedNote.noteContent);
+            } else {
+                console.log("message: " + responseObject.message);
+            }
+        });
     }
 
     toHTML() {

@@ -4,6 +4,7 @@ let freeNoteId = null;
 
 $( document ).ready(function() {
 
+    // can't get this working :--(
     let tt = new Tooltip($("#insertTextButton"), {
         placement: "right",
         title: "Top",
@@ -19,11 +20,9 @@ $( document ).ready(function() {
 });
 
 function getFreeNoteId() {
-
     if (freeNoteId == null) {
         freeNoteId = $(".invisible").html();
     }
-
     return freeNoteId;
 }
 
@@ -34,13 +33,13 @@ function insertModule(module) {
 
 function insertNote() {
     console.log("inserting note");
-    const postParameters = {noteString: "content", freeNoteId: getFreeNoteId()};
+    const postParameters = {noteString: "note content", freeNoteId: getFreeNoteId()};
     $.post("noteAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newNote = responseObject.newNoteModule;
-            let newNoteModule;
-            newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            const newNoteData = responseObject.newNoteModule;
+            let newNoteModule = new Note(newNoteData);
+            // newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
