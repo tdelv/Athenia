@@ -468,7 +468,7 @@ public class GUICommand {
       String newTerm = qm.value("newTerm");
       String newDef = qm.value("newDef");
 
-      // TODO check for freenote id
+      // get free note id
       String freeNoteId = qm.value("freeNoteId");
 
       boolean successful = false;
@@ -490,6 +490,7 @@ public class GUICommand {
           if (lang.containsFreeNote(freeNoteId)) {
             FreeNote freeNote = lang.getFreeNote(freeNoteId);
             freeNote.addModule(newVocab);
+            newVocab.setFreeNote(freeNote);
           }
 
           // edit success message
@@ -525,8 +526,8 @@ public class GUICommand {
       String updatedDef = qm.value("updatedDef");
       String updatedRating = qm.value("updatedRating");
 
-      // TODO check for freenote id
-      String freeNoteId = qm.value("freeNote");
+      // get free note id
+      String freeNoteId = qm.value("freeNoteId");
 
       // successful messages
       boolean successful = false;
@@ -543,11 +544,9 @@ public class GUICommand {
             Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
             vocabToUpdate.getPair().updatePair(updatedTerm, updatedDef);
-            // add to freenote
-            if (lang.containsFreeNote(freeNoteId)) {
-              FreeNote freeNote = lang.getFreeNote(freeNoteId);
-              freeNote.addModule(vocabToUpdate);
-            }
+
+            // TODO maybe something with freenote if it gets all weird
+
             // convert to JSON for frontend
             variables.put("updatedVocabModule", toData(vocabToUpdate));
             // update successful message
@@ -579,7 +578,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String vocabId = qm.value("vocabId");
 
-      // TODO check for freenote id
+      // get free note id
+      String freeNoteId = qm.value("freeNote");
 
       boolean successful = false;
       String message = "";
@@ -593,6 +593,13 @@ public class GUICommand {
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
             Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
+
+            // remove the module from the freenote it is in
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(vocabToRemove);
+            }
+
             lang.removeModule(StorageType.VOCAB, vocabToRemove);
             successful = true;
             message = "successfully removed vocab";
@@ -632,7 +639,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -665,9 +673,6 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
-      // TODO check for freenote id (done <3 mia)
-      String freeNoteId = qm.value("freeNoteId");
-
       boolean successful = false;
       String message = "";
 
@@ -684,14 +689,6 @@ public class GUICommand {
           List<Map<String, Object>> conjList = new ArrayList<>();
 
           variables.put("currentLanguage", lang.getName());
-
-          // TODO get rid of this because it's a test
-          Conjugation test = new Conjugation();
-          test.setHeader("testtesttest");
-          test.add("test1", "test1");
-          test.add("test2", "test2");
-          test.add("test3", "test3");
-          lang.addModule(StorageType.CONJUGATION, test);
 
           // translate conj objects to JSON
           for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
@@ -726,7 +723,7 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
-      // TODO check for freenote id (done <3 mia)
+      // get free note id
       String freeNoteId = qm.value("freeNoteId");
 
       boolean successful = false;
@@ -747,6 +744,8 @@ public class GUICommand {
 
 
           // TODO : parse out how newContent is formatted and translate
+
+          // TODO : add to free note
 
           // TODO : add content to conjToAdd and throw into map to present to
           // front-end
@@ -1042,7 +1041,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteStr = qm.value("noteString");
 
-      // TODO check for freenote id
+      // get FreeNote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1058,6 +1058,16 @@ public class GUICommand {
         if (lang != null) {
           // create new note and add to variables map
           Note note = new Note(noteStr);
+
+          lang.addModule(StorageType.NOTE, note);
+
+          // connecting everything to freenote if applicable
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(note);
+            note.setFreeNote(freeNote);
+          }
+
           variables.put("newNoteModule", toData(note));
           // edit successful variables
           successful = true;
@@ -1089,8 +1099,6 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
       String noteChange = qm.value("noteUpdate");
-
-      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1144,7 +1152,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
 
-      // TODO check for freenoteId
+      // get FreeNote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1162,6 +1171,14 @@ public class GUICommand {
           if (lang.getModule(StorageType.NOTE, noteId) != null) {
             Note noteToRemove = (Note) lang.getModule(StorageType.NOTE, noteId);
             lang.removeModule(StorageType.NOTE, noteToRemove);
+
+            // edit the freenote accordingly
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(noteToRemove);
+              noteToRemove.removeFreeNote();
+            }
+
             // edit successful messages
             successful = true;
             message = "successfully removed note";
@@ -1202,7 +1219,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertStr = qm.value("alertString");
 
-      // TODO check for freenoteId
+      // get free note id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1217,7 +1235,17 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
           AlertExclamation alert = new AlertExclamation(alertStr);
+          lang.addModule(StorageType.ALERT_EXCLAMATION, alert);
+
+          // set up connection to freenote
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(alert);
+            alert.setFreeNote(freeNote);
+          }
+
           variables.put("newAlertModule", toData(alert));
+
           // edit successful variables
           successful = true;
           message = "successfully added new alert";
@@ -1248,8 +1276,6 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
       String alertUpdate = qm.value("alertUpdate");
-
-      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1304,7 +1330,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
 
-      // TODO check for freenoteId
+      // get FreeNote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1324,6 +1351,14 @@ public class GUICommand {
             AlertExclamation alertToRemove = (AlertExclamation) lang
                 .getModule(StorageType.ALERT_EXCLAMATION, alertId);
             lang.removeModule(StorageType.ALERT_EXCLAMATION, alertToRemove);
+
+            // sort out everything with free note
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(alertToRemove);
+              alertToRemove.removeFreeNote();
+            }
+
             // edit successful variables
             successful = true;
             message = "successfully removed alert module";
@@ -1364,7 +1399,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionStr = qm.value("questionString");
 
-      // TODO check for freenoteId
+      // get freenote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1379,6 +1415,16 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
           Question question = new Question(questionStr);
+
+          lang.addModule(StorageType.QUESTION, question);
+
+          // handle all free note connections
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(question);
+            question.setFreeNote(freeNote);
+          }
+
           variables.put("newQuestionModule", toData(question));
           // edit successful variables
           successful = true;
@@ -1410,8 +1456,6 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionID = qm.value("questionId");
       String questionUpdate = qm.value("questionUpdate");
-
-      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
