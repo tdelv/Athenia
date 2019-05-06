@@ -11,21 +11,30 @@ $( document ).ready(function() {
         trigger: "hover"
     });
 
+    // BUTTON HANDLERS
     $("#insertTextButton").click(insertNote);
     $("#insertVocabButton").click(insertVocab);
     $("#insertConjugationButton").click(insertConjugation);
     $("#insertExclamationButton").click(insertExclamation);
     $("#insertQuestionButton").click(insertQuestion);
 
-    //TODO:
-    // title.onblur -> post request to update the title of this free note;a'
     $("#notePageTitle").blur(updateNoteTitle);
 
 });
 
 function updateNoteTitle() {
+
     const newTitle = $(this).val();
-    console.log("new title: " + newTitle);
+
+    const postParameters = {freeNoteId: freeNoteId, newTitle: newTitle};
+    $.post("/updateNoteTitle", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            // yay
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
 
     //TODO: post request
 
