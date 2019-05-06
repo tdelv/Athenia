@@ -170,6 +170,7 @@ public class Main {
 
     // setting for the ranking handlers
     Spark.get("/reviewMode", new GUICommand.ReviewModeHandler(), freeMarker);
+    Spark.get("/reviewingMode", new GUICommand.ReviewingHandler(), freeMarker);
 
   }
 

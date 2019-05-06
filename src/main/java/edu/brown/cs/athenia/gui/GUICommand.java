@@ -2337,6 +2337,13 @@ public class GUICommand {
           }
           tags.add("test");
           tags.add("test2");
+          tags.add("test3");
+          tags.add("test4");
+          tags.add("test5");
+          tags.add("test6");
+          tags.add("test7");
+          tags.add("test8");
+
           variables.put("allTags", tags);
 
           // update successful variables
@@ -2370,6 +2377,15 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
       throws DriveApiException {
       String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      String startDate = qm.value("startDate");
+      String endDate = qm.value("endDate");
+
+      System.out.println(qm.value("startDate"));
+      System.out.println(qm.value("endDate"));
+
+      System.out.println(qm.value("tagSelection"));
 
       boolean successful = false;
       String message = "";
@@ -2388,15 +2404,6 @@ public class GUICommand {
 
         if (lang != null) {
           currentLanguage = lang.getName();
-          List<Tag> tags = (List<Tag>) lang.getTags();
-
-          // TODO parse out the startCreatedDate & endCreateDate from front-end
-
-          // TODO prepare the ReviewMode object
-
-          // TODO iterate through the list of reviewables generated
-
-          // TODO prep and send to front-end
 
         } else {
           message = "current language null reviewing handler";
