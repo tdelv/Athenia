@@ -82,6 +82,7 @@
     <#-- End of Row to contain all of this page's content -->
 
     <div class="invisible">${freeNoteId}</div>
+    <div class="invisible" id="freeNote">${freeNote}</div>
 
 </div>
 

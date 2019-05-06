@@ -1,5 +1,4 @@
 
-// TODO: set up link on dashbord
 // TODO: display recent notes on homepage/dashbaord
 // TODO: when an old note is opened, render all the modules
 
@@ -20,6 +19,7 @@ class Module {
      * @param dateModified
      */
     constructor(id, dateCreated, dateModified) {
+
         this.id = id;
         this.dateCreated = dateCreated;
         this.dateModified = dateModified;
@@ -27,6 +27,7 @@ class Module {
             console.log("a module with id:" + id + " already exists");
         } else {
             moduleMap.set(id, this);
+            console.log("modmap size: " + moduleMap.size);
         }
     }
 
@@ -51,40 +52,6 @@ class Module {
     onEditLeave() {
         document.body.style.cursor = "default";
     }
-
-    /*
-    onEditClick(alert) {
-
-        //TODO: this should be moved to the alert class
-
-        const ph = $(this).val();
-
-        const html = `<input type="text" name="edit" placeholder="${ph}" class="userInput">`;
-
-        $(alert).append(html);
-
-        $(this).remove();
-
-        $(".userInput").keyup(function(event){
-            if (event.which == 13) {
-                const value = $(this).val();
-
-                const postParameters = {alertId: alert.id, alertUpdate: value};
-                $.post("/alertUpdate", postParameters, responseJSON => {
-                    const responseObject = JSON.parse(responseJSON);
-                    if (responseObject.successful) {
-                        alert.content = responseObject.updatedAlert.alertContent;
-
-                    } else {
-                        console.log("message: " + responseObject.message);
-                    }
-                });
-
-            }
-        });
-
-    }
-    */
 
     onModuleHover() {
         // slight shadow background
@@ -125,8 +92,8 @@ class Note extends Module {
         $.post("/noteUpdate", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
             if (responseObject.successful) {
-                // TODO: check that responseObject.updatedNote matches this object
-                console.log("new content " + responseObject.updatedNote.noteContent);
+                const updatedNote = responseObject.updatedNote;
+                console.log("new content " + updatedNote.content);
             } else {
                 console.log("message: " + responseObject.message);
             }
@@ -145,6 +112,22 @@ class Exclamation extends Note {
         super(newExclamationData);
     }
 
+    update(thisOlThing) {
+        const selector = "#" + thisOlThing.id + " input";
+        const newContent = $(selector).val();
+
+        const postParameters = {alertId: thisOlThing.id, alertUpdate: newContent};
+        $.post("/alertUpdate", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            if (responseObject.successful) {
+                const updatedAlert = responseObject.updatedAlert;
+                console.log("new content " + updatedAlert.content);
+            } else {
+                console.log("message: " + responseObject.message);
+            }
+        });
+    }
+
     toHTML() {
         const icon = "<i class=\"fa fa-exclamation\"></i>";
         const input = `<input type="text" class="form-control mb-3 ml-2 d-inline w-75" placeholder="${this.content}">`;
@@ -157,6 +140,22 @@ class Exclamation extends Note {
 class Question extends Note {
     constructor(newQuestionData) {
         super(newQuestionData);
+    }
+
+    update(thisOlThing) {
+        const selector = "#" + thisOlThing.id + " input";
+        const newContent = $(selector).val();
+
+        const postParameters = {questionId: thisOlThing.id, questionUpdate: newContent};
+        $.post("/questionUpdate", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            if (responseObject.successful) {
+                const updatedQuestion = responseObject.updatedQuestion;
+                console.log("new content " + updatedQuestion.content);
+            } else {
+                console.log("message: " + responseObject.message);
+            }
+        });
     }
 
     toHTML() {
