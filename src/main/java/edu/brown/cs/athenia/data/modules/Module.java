@@ -30,8 +30,8 @@ public abstract class Module {
     this.freeNote = null;
     this.id = new BigInteger(130, new SecureRandom()).toString(32);
     this.created = new Date();
-    this.dateModified = created;
-    this.dateLastReviewed = created;
+    this.dateModified = new Date();
+    this.dateLastReviewed = new Date();
     this.tags = new HashMap<String, Tag>();
   }
 
@@ -39,8 +39,8 @@ public abstract class Module {
     this.freeNote = f;
     this.id = new BigInteger(130, new SecureRandom()).toString(32);
     this.created = new Date();
-    this.dateModified = created;
-    this.dateLastReviewed = created;
+    this.dateModified = new Date();
+    this.dateLastReviewed = new Date();
     this.tags = new HashMap<String, Tag>();
   }
 

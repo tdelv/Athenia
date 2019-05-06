@@ -33,7 +33,7 @@ public class FreeNote {
     this.modules = new ArrayList<Module>();
     this.tags = new HashMap<String, Tag>();
     this.created = new Date();
-    this.dateModified = this.created;
+    this.dateModified = new Date();
     this.title = t;
   }
 
@@ -42,7 +42,7 @@ public class FreeNote {
     this.modules = new ArrayList<Module>();
     this.tags = new HashMap<String, Tag>();
     this.created = new Date();
-    this.dateModified = this.created;
+    this.dateModified = new Date();
     this.title = t;
   }
 

@@ -808,7 +808,7 @@ public class DatabaseParser {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE note_modules " +
                 "SET body = ?, rating = ? " +
-                "WHERE id = ?")) {
+                "WHERE module_id = ?")) {
             statement.setString(1, module.getText());
             statement.setInt(2, module.getRating());
             statement.setString(3, module.getId());
@@ -833,7 +833,7 @@ public class DatabaseParser {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE conjugation_modules " +
                         "SET header = ?, rating = ?, height = ? " +
-                        "WHERE id = ?")) {
+                        "WHERE module_id = ?")) {
             statement.setString(1, module.getHeader());
             statement.setInt(2, module.getRating());
             statement.setInt(3, module.getHeight());
@@ -866,7 +866,7 @@ public class DatabaseParser {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE question_modules " +
                         "SET body = ? " +
-                        "WHERE id = ?")) {
+                        "WHERE module_id = ?")) {
             statement.setString(1, module.getText());
             statement.setString(2, module.getId());
             statement.execute();
@@ -877,7 +877,7 @@ public class DatabaseParser {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE alert_exclamation_modules " +
                         "SET body = ? " +
-                        "WHERE id = ?")) {
+                        "WHERE module_id = ?")) {
             statement.setString(1, module.getText());
             statement.setString(2, module.getId());
             statement.execute();
@@ -948,7 +948,9 @@ public class DatabaseParser {
 
                 statement.setString(1, freeNote.getId());
                 try (ResultSet rs = statement.executeQuery()) {
-                    moduleOrder.add(rs.getString("m_id"));
+                    while (rs.next()) {
+                        moduleOrder.add(rs.getString("m_id"));
+                    }
                 }
             }
 
