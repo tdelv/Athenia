@@ -1,21 +1,5 @@
 <#assign pagecontent>
 
-
-    <#--const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate"-->
-                        <#--method="post">` +-->
-    <#--`<div class="input-group">` +-->
-        <#--`<input type="text" name="vocabId" value="${this.id}" style="display:none">` +-->
-        <#--`<input type="text" name="updatedTerm" class="form-control" placeholder="${this.term}">` +-->
-        <#--`<input type="text" name="updatedDef" class="form-control" placeholder="${this.def}">` +-->
-        <#--`<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +-->
-
-        <#--// TODO somehow allow for rating changes-->
-        <#--`<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +-->
-        <#--`</div>` +-->
-    <#--`<small>Date Modified: ${this.dateModified}</small>` +-->
-    <#--`</form>`;-->
-
-
     <div class="container-fluid">
 
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -24,7 +8,7 @@
 
         <div class="row">
             <div class="col">
-                <form id="reviewForm" name="reviewForm" action="/reviewingMode" method="get">
+                <form id="reviewForm" name="reviewForm">
                     <div class="form-group container-fluid">
 
                         <div class="row align-items-center">
@@ -50,7 +34,10 @@
                             </div>
 
                             <div class="col d-flex justify-content-center">
-                                <input type="submit" class="btn btn-primary" style="width:100%" value="Begin Reviewing">
+                                <#--<input type="submit" class="btn btn-primary" style="width:100%" value="Begin Reviewing">-->
+                                <button class="btn btn-primary" id="submitButton" style="width:100%">
+                                    Begin Reviewing
+                                </button>
                             </div>
 
                         </div>
