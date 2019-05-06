@@ -107,6 +107,7 @@ public class Main {
     try {
       Spark.get("/login", new GUICommand.LoginHandler());
       Spark.get("/validate", new GUICommand.ValidateHandler());
+      Spark.get("/logout", new GUICommand.LogoutHandler());
     } catch (Exception e) {
       e.printStackTrace();
     }

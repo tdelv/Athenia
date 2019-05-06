@@ -136,6 +136,29 @@ public class GUICommand {
     }
   }
 
+  /**
+   * Handles logout request, redirecting user to the landing
+   * page if not already logged in.
+   */
+  public static class LogoutHandler implements Route {
+
+    @Override
+    public ModelAndView handle(Request req, Response res)
+            throws DriveApiException, DatabaseParserException {
+      String userId = req.session().attribute("user_id");
+
+      DatabaseParser.updateUser(userId);
+
+      // Invalidate previous session and create a new one
+      req.session().invalidate();
+      req.session();
+
+      // Redirect to landing page
+      res.redirect("/");
+      return null;
+    }
+  }
+
   /*
    * -------------------------------------------------------------------------
    * -- LANGUAGE HANDLERS ----------------------------------------------------

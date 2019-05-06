@@ -24,6 +24,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 
 /**
  * A class for interacting with the Google Drive API. Has external interactions allowing:
@@ -113,18 +114,26 @@ public class GoogleDriveApi {
               "src/main/resources/userData/" + userId + ".sqlite3");
 
       Drive service = getService(userId);
-      if (service.files().list().containsKey("userData.sqlite3")) {
+
+      File driveFile = getDriveFile(service);
+//      service.files().delete(driveFile.getId()).execute();
+//      driveFile = null;
+      if (driveFile != null) {
+        System.out.println("what teh heck");
+        if (file.exists()) {
+          file.delete();
+        }
+        file.createNewFile();
         OutputStream outputStream = new FileOutputStream(file);
-        service.files().get("userData.sqlite3")
+        service.files().get(driveFile.getId())
                 .executeMediaAndDownloadTo(outputStream);
-      } else {
-        setupDriveFile(service);
       }
 
       FILE_MAP.put(userId, file);
 
       return file;
     } catch (IOException | GeneralSecurityException e) {
+      e.printStackTrace();
       throw new DriveApiException(e);
     }
   }
@@ -142,25 +151,25 @@ public class GoogleDriveApi {
     try {
       Drive service = getService(userId);
 
-      if (!service.files().list().containsKey("userData.sqlite3")) {
-        setupDriveFile(service);
+      File driveFile = getDriveFile(service);
+      if (driveFile != null) {
+        service.files().delete(driveFile.getId()).execute();
       }
 
-      File driveFile = service.files().get("userData.sqlite3").execute();
-
+      File fileMetadata = setupDriveFile(service);
       FileContent fileContent = new FileContent("application/x-sqlite3",
               dataBase);
 
-      service.files().update("userData.sqlite3", driveFile, fileContent);
+      service.files().create(fileMetadata, fileContent).execute();
     } catch (IOException | GeneralSecurityException e) {
       throw new DriveApiException(e);
     }
 
   }
-  
+
 
   // Internal helper methods for connecting with Google API.
-  
+
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
@@ -229,11 +238,31 @@ public class GoogleDriveApi {
    * Creates a new file on Drive for the user's database.
    * @param service the Drive service through which the new Drive file is created.
    * @throws IOException when something goes wrong creating the database file.
+   * @returns the id of the file created.
    */
-  private static void setupDriveFile(Drive service) throws IOException {
-    File metaData = new File().setName("userData.sqlite3")
-            .setId("userData.sqlite3");
+  private static File setupDriveFile(Drive service) throws IOException {
+    System.out.println("Setup");
+    File fileMetadata = new File();
+    fileMetadata.setName("userData.sqlite3");
+    fileMetadata.setMimeType("application/x-sqlite3");
+    fileMetadata.setParents(Collections.singletonList("appDataFolder"));
 
-    service.files().create(metaData);
+    return fileMetadata;
+  }
+
+  private static File getDriveFile(Drive service) throws IOException {
+    System.out.println("Get");
+    FileList files = service.files().list()
+            .setSpaces("appDataFolder")
+            .setFields("nextPageToken, files(id, name)")
+            .setPageSize(10)
+            .execute();
+    for (File file : files.getFiles()) {
+      if (file.getName().equals("userData.sqlite3")) {
+        return file;
+      }
+    }
+
+    return null;
   }
 }

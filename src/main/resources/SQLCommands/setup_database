@@ -16,6 +16,7 @@ CREATE TABLE freenotes (
   created INTEGER,
   last_modified INTEGER,
   FOREIGN KEY (language_id) REFERENCES languages(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE modules (
@@ -25,6 +26,7 @@ CREATE TABLE modules (
   created INTEGER,
   last_modified INTEGER,
   FOREIGN KEY (language_id) REFERENCES languages(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE note_modules (
@@ -32,6 +34,7 @@ CREATE TABLE note_modules (
   body TEXT,
   rating INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE vocab_modules (
@@ -40,6 +43,7 @@ CREATE TABLE vocab_modules (
   definition TEXT,
   rating INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE conjugation_modules (
@@ -48,6 +52,7 @@ CREATE TABLE conjugation_modules (
   rating INTEGER,
   height INTEGER,
   FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE conjugation_rows (
@@ -57,26 +62,31 @@ CREATE TABLE conjugation_rows (
   col2 TEXT,
   position INTEGER,
   FOREIGN KEY (module_id) REFERENCES conjugation_modules(module_id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE question_modules (
   module_id TEXT PRIMARY KEY,
   body TEXT,
   FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE alert_exclamation_modules (
   module_id TEXT PRIMARY KEY,
   body TEXT,
   FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE freenote_modules (
   freenote_id TEXT,
   module_id TEXT,
   position INTEGER,
-  FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
+  FOREIGN KEY (freenote_id) REFERENCES freenotes(id)
+  ON DELETE CASCADE,
   FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE tags (
@@ -87,20 +97,26 @@ CREATE TABLE tags (
 CREATE TABLE language_tags (
   language_id TEXT,
   tag_id TEXT,
-  FOREIGN KEY (language_id) REFERENCES languages(id),
+  FOREIGN KEY (language_id) REFERENCES languages(id)
+  ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE module_tags (
   module_id TEXT,
   tag_id TEXT,
-  FOREIGN KEY (module_id) REFERENCES modules(id),
+  FOREIGN KEY (module_id) REFERENCES modules(id)
+  ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE freenote_tags (
   freenote_id TEXT,
   tag_id TEXT,
-  FOREIGN KEY (freenote_id) REFERENCES freenotes(id),
+  FOREIGN KEY (freenote_id) REFERENCES freenotes(id)
+  ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id)
+  ON DELETE CASCADE
 );

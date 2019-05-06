@@ -39,8 +39,8 @@ public abstract class Modularized {
 
   public List<Module> getModules() {
     List<Module> modules = new ArrayList<Module>();
-    for (Module m : ((Map<String, Module>) moduleMap.values()).values()) {
-      modules.add(m);
+    for (Map<String, Module> map : moduleMap.values()) {
+      modules.addAll(map.values());
     }
     return modules;
   }

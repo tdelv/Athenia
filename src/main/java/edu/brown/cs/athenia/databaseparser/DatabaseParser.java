@@ -133,9 +133,9 @@ public class DatabaseParser {
 
     private static void getTags(Connection conn, Language language) throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT tag.name tag_name " +
+                "SELECT t.name tag_name " +
                         "FROM languages l, language_tags lt, tags t " +
-                        "WHERE lt.tag_id = tag.id " +
+                        "WHERE lt.tag_id = t.id " +
                         "AND lt.language_id = l.id " +
                         "AND l.language = ?")) {
             statement.setString(1, language.getName());
@@ -349,12 +349,14 @@ public class DatabaseParser {
                 "SELECT * FROM module_tags WHERE module_id = ?")) {
             statement.setString(1, module.getId());
             try (ResultSet rs = statement.executeQuery()) {
-                String tagId = rs.getString("id");
-                if (!language.hasTag(tagId)) {
-                    throw new DatabaseParserException("Bad data.");
-                }
+                while (rs.next()) {
+                    String tagId = rs.getString("id");
+                    if (!language.hasTag(tagId)) {
+                        throw new DatabaseParserException("Bad data.");
+                    }
 
-                module.addTag(language.getTag(tagId));
+                    module.addTag(language.getTag(tagId));
+                }
             }
         }
     }
@@ -368,10 +370,12 @@ public class DatabaseParser {
                     "ORDER BY fm.position")) {
                 statement.setString(1, fn.getId());
                 try (ResultSet rs = statement.executeQuery()) {
-                    StorageType type = StorageType.valueOf(rs.getString("type"));
-                    String moduleId = rs.getString("id");
-                    Module module = language.getModule(type, moduleId);
-                    fn.addModule(module);
+                    while (rs.next()) {
+                        StorageType type = StorageType.valueOf(rs.getString("type"));
+                        String moduleId = rs.getString("id");
+                        Module module = language.getModule(type, moduleId);
+                        fn.addModule(module);
+                    }
                 }
             }
         }
@@ -468,9 +472,9 @@ public class DatabaseParser {
         Collection<Tag> newTags = language.getTags();
 
         try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT tag.name tag_name " +
+                "SELECT t.name tag_name " +
                 "FROM languages l, language_tags lt, tags t " +
-                "WHERE lt.tag_id = tag.id " +
+                "WHERE lt.tag_id = t.id " +
                 "AND lt.language_id = l.id " +
                 "AND l.language = ?")) {
             statement.setString(1, language.getName());
@@ -580,10 +584,12 @@ public class DatabaseParser {
         // Update all current freenotes in database
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE freenotes " +
-                "SET title = ?, last_modified = ?")) {
+                "SET title = ?, last_modified = ? " +
+                "WHERE id = ?")) {
             for (FreeNote freeNote : language.getFreeNotes()) {
                 statement.setString(1, freeNote.getTitle());
                 statement.setLong(2, freeNote.getDateModified().getTime());
+                statement.setString(3, freeNote.getId());
                 statement.addBatch();
             }
 
@@ -602,9 +608,9 @@ public class DatabaseParser {
 
         // Get old and new tags
         try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT tag.name tag_name " +
+                "SELECT t.name tag_name " +
                         "FROM freenote_tags ft, tags t " +
-                        "WHERE ft.tag_id = tag.id " +
+                        "WHERE ft.tag_id = t.id " +
                         "AND ft.freenote_id = ?")) {
             statement.setString(1, freeNote.getId());
             try (ResultSet rs = statement.executeQuery()) {
@@ -685,11 +691,15 @@ public class DatabaseParser {
                 statement.setString(2, module.getType().toString());
                 statement.setString(3, language.getName());
                 statement.setLong(4, module.getDateCreated().getTime());
-                statement.setLong(5, module.getDateModified().getTime());
+                statement.setLong(5, 0);
                 statement.addBatch();
             }
 
             statement.executeBatch();
+
+            for (Module module : newModules) {
+                createModule(conn, module, language);
+            }
         }
 
         try (PreparedStatement statement = conn.prepareStatement(
@@ -705,6 +715,44 @@ public class DatabaseParser {
         for (Module module : language.getModules()) {
             updateModule(conn, module, language);
             updateModuleTags(conn, module, language);
+        }
+    }
+
+    private static void createModule(Connection conn, Module module, Language language) throws DatabaseParserException, SQLException {
+        String query;
+        switch (module.getType()) {
+            case NOTE:
+                query = "INSERT INTO note_modules " +
+                        "(module_id, body, rating) VALUES " +
+                        "(?, '', 0)";
+                break;
+            case VOCAB:
+                query = "INSERT INTO vocab_modules " +
+                        "(module_id, term, definition, rating) VALUES " +
+                        "(?, '', '', 0)";
+                break;
+            case CONJUGATION:
+                query = "INSERT INTO conjugation_modules " +
+                        "(module_id, header, rating, height) VALUES " +
+                        "(?, '', 0, 0)";
+                break;
+            case QUESTION:
+                query = "INSERT INTO question_modules " +
+                        "(module_id, body) VALUES " +
+                        "(?, '')";
+                break;
+            case ALERT_EXCLAMATION:
+                query = "INSERT INTO alert_exclamation_modules " +
+                        "(module_id, body) VALUES " +
+                        "(?, '')";
+                break;
+            default:
+                throw new DatabaseParserException("Bad data.");
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setString(1, module.getId());
+            statement.execute();
         }
     }
 
@@ -724,6 +772,15 @@ public class DatabaseParser {
 
         if (lastUpdated.equals(module.getDateModified())) {
             return;
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement(
+                "UPDATE modules " +
+                "SET last_modified = ? " +
+                "WHERE id = ?")) {
+            statement.setLong(1, module.getDateModified().getTime());
+            statement.setString(2, module.getId());
+            statement.execute();
         }
 
         switch (module.getType()) {
@@ -763,11 +820,11 @@ public class DatabaseParser {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE vocab_modules " +
                 "SET term = ?, definition = ?, rating = ? " +
-                "WHERE id = ?")) {
+                "WHERE module_id = ?")) {
             statement.setString(1, module.getPair().getTerm());
             statement.setString(2, module.getPair().getDefinition());
-            statement.setInt(2, module.getRating());
-            statement.setString(3, module.getId());
+            statement.setInt(3, module.getRating());
+            statement.setString(4, module.getId());
             statement.execute();
         }
     }
@@ -833,9 +890,9 @@ public class DatabaseParser {
 
         // Get old and new tags
         try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT tag.name tag_name " +
+                "SELECT t.name tag_name " +
                         "FROM module_tags mt, tags t " +
-                        "WHERE mt.tag_id = tag.id " +
+                        "WHERE mt.tag_id = t.id " +
                         "AND mt.module_id = ?")) {
             statement.setString(1, module.getId());
             try (ResultSet rs = statement.executeQuery()) {
