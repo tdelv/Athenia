@@ -2456,10 +2456,6 @@ public class GUICommand {
       String endDate = qm.value("endDate");
       String tagsSelected = qm.value("tagSelection");
 
-      System.out.println(startDate);
-      System.out.println(endDate);
-      System.out.println(tagsSelected);
-
       // successful variables
       boolean successful = false;
       String message = "";
@@ -2491,7 +2487,6 @@ public class GUICommand {
               // add tag to list if not null
               if (tempTag != null) {
                 tagList.add(tempTag);
-                System.out.println(tempTag.getTag());
               }
             }
 
