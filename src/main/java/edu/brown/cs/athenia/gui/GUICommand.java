@@ -184,7 +184,6 @@ public class GUICommand {
         // try to find the user in database and send the language name to
         // the front-end
         Athenia user = DatabaseParser.getUser(userId);
-        System.out.println(user.getLanguages());
         variables.put("languages", user.getLanguages());
         successful = true;
         message = "successful";
@@ -491,7 +490,7 @@ public class GUICommand {
       String newTerm = qm.value("newTerm");
       String newDef = qm.value("newDef");
 
-      // TODO check for freenote id
+      // get free note id
       String freeNoteId = qm.value("freeNoteId");
 
       boolean successful = false;
@@ -513,6 +512,7 @@ public class GUICommand {
           if (lang.containsFreeNote(freeNoteId)) {
             FreeNote freeNote = lang.getFreeNote(freeNoteId);
             freeNote.addModule(newVocab);
+            newVocab.setFreeNote(freeNote);
           }
 
           // edit success message
@@ -548,8 +548,8 @@ public class GUICommand {
       String updatedDef = qm.value("updatedDef");
       String updatedRating = qm.value("updatedRating");
 
-      // TODO check for freenote id
-      String freeNoteId = qm.value("freeNote");
+      // get free note id
+      String freeNoteId = qm.value("freeNoteId");
 
       // successful messages
       boolean successful = false;
@@ -566,11 +566,9 @@ public class GUICommand {
             Vocab vocabToUpdate = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
             vocabToUpdate.getPair().updatePair(updatedTerm, updatedDef);
-            // add to freenote
-            if (lang.containsFreeNote(freeNoteId)) {
-              FreeNote freeNote = lang.getFreeNote(freeNoteId);
-              freeNote.addModule(vocabToUpdate);
-            }
+
+            // TODO maybe something with freenote if it gets all weird
+
             // convert to JSON for frontend
             variables.put("updatedVocabModule", toData(vocabToUpdate));
             // update successful message
@@ -602,7 +600,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String vocabId = qm.value("vocabId");
 
-      // TODO check for freenote id
+      // get free note id
+      String freeNoteId = qm.value("freeNote");
 
       boolean successful = false;
       String message = "";
@@ -616,6 +615,13 @@ public class GUICommand {
           if (lang.getModule(StorageType.VOCAB, vocabId) != null) {
             Vocab vocabToRemove = (Vocab) lang.getModule(StorageType.VOCAB,
                 vocabId);
+
+            // remove the module from the freenote it is in
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(vocabToRemove);
+            }
+
             lang.removeModule(StorageType.VOCAB, vocabToRemove);
             successful = true;
             message = "successfully removed vocab";
@@ -655,7 +661,8 @@ public class GUICommand {
       boolean successful = false;
       String message = "";
 
-      ImmutableMap.Builder<String, Object> variables = new ImmutableMap.Builder<String, Object>();
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<String, Object>();
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -688,9 +695,6 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
-      // TODO check for freenote id (done <3 mia)
-      String freeNoteId = qm.value("freeNoteId");
-
       boolean successful = false;
       String message = "";
 
@@ -707,14 +711,6 @@ public class GUICommand {
           List<Map<String, Object>> conjList = new ArrayList<>();
 
           variables.put("currentLanguage", lang.getName());
-
-          // TODO get rid of this because it's a test
-          Conjugation test = new Conjugation();
-          test.setHeader("testtesttest");
-          test.add("test1", "test1");
-          test.add("test2", "test2");
-          test.add("test3", "test3");
-          lang.addModule(StorageType.CONJUGATION, test);
 
           // translate conj objects to JSON
           for (Map.Entry<String, Module> conj : conjMap.entrySet()) {
@@ -749,7 +745,7 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
-      // TODO check for freenote id (done <3 mia)
+      // get free note id
       String freeNoteId = qm.value("freeNoteId");
 
       boolean successful = false;
@@ -770,6 +766,8 @@ public class GUICommand {
 
 
           // TODO : parse out how newContent is formatted and translate
+
+          // TODO : add to free note
 
           // TODO : add content to conjToAdd and throw into map to present to
           // front-end
@@ -1065,7 +1063,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteStr = qm.value("noteString");
 
-      // TODO check for freenote id
+      // get FreeNote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1081,6 +1080,16 @@ public class GUICommand {
         if (lang != null) {
           // create new note and add to variables map
           Note note = new Note(noteStr);
+
+          lang.addModule(StorageType.NOTE, note);
+
+          // connecting everything to freenote if applicable
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(note);
+            note.setFreeNote(freeNote);
+          }
+
           variables.put("newNoteModule", toData(note));
           // edit successful variables
           successful = true;
@@ -1112,8 +1121,6 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
       String noteChange = qm.value("noteUpdate");
-
-      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1167,7 +1174,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
 
-      // TODO check for freenoteId
+      // get FreeNote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1185,6 +1193,14 @@ public class GUICommand {
           if (lang.getModule(StorageType.NOTE, noteId) != null) {
             Note noteToRemove = (Note) lang.getModule(StorageType.NOTE, noteId);
             lang.removeModule(StorageType.NOTE, noteToRemove);
+
+            // edit the freenote accordingly
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(noteToRemove);
+              noteToRemove.removeFreeNote();
+            }
+
             // edit successful messages
             successful = true;
             message = "successfully removed note";
@@ -1225,7 +1241,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertStr = qm.value("alertString");
 
-      // TODO check for freenoteId
+      // get free note id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1240,7 +1257,17 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
           AlertExclamation alert = new AlertExclamation(alertStr);
+          lang.addModule(StorageType.ALERT_EXCLAMATION, alert);
+
+          // set up connection to freenote
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(alert);
+            alert.setFreeNote(freeNote);
+          }
+
           variables.put("newAlertModule", toData(alert));
+
           // edit successful variables
           successful = true;
           message = "successfully added new alert";
@@ -1271,8 +1298,6 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
       String alertUpdate = qm.value("alertUpdate");
-
-      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1327,7 +1352,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
 
-      // TODO check for freenoteId
+      // get FreeNote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1347,6 +1373,14 @@ public class GUICommand {
             AlertExclamation alertToRemove = (AlertExclamation) lang
                 .getModule(StorageType.ALERT_EXCLAMATION, alertId);
             lang.removeModule(StorageType.ALERT_EXCLAMATION, alertToRemove);
+
+            // sort out everything with free note
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(alertToRemove);
+              alertToRemove.removeFreeNote();
+            }
+
             // edit successful variables
             successful = true;
             message = "successfully removed alert module";
@@ -1387,7 +1421,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionStr = qm.value("questionString");
 
-      // TODO check for freenoteId
+      // get freenote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1402,6 +1437,16 @@ public class GUICommand {
         // check if current lang is not null
         if (lang != null) {
           Question question = new Question(questionStr);
+
+          lang.addModule(StorageType.QUESTION, question);
+
+          // handle all free note connections
+          if (lang.containsFreeNote(freeNoteId)) {
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.addModule(question);
+            question.setFreeNote(freeNote);
+          }
+
           variables.put("newQuestionModule", toData(question));
           // edit successful variables
           successful = true;
@@ -1433,8 +1478,6 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionID = qm.value("questionId");
       String questionUpdate = qm.value("questionUpdate");
-
-      // TODO check for freenoteId
 
       // success variables
       boolean successful = false;
@@ -1489,7 +1532,8 @@ public class GUICommand {
       QueryParamsMap qm = req.queryMap();
       String questionId = qm.value("questionId");
 
-      // TODO check for freenoteId
+      // get freenote id
+      String freeNoteId = qm.value("freeNoteId");
 
       // success variables
       boolean successful = false;
@@ -1509,6 +1553,14 @@ public class GUICommand {
             Question questionToRemove = (Question) lang
                 .getModule(StorageType.QUESTION, questionId);
             lang.removeModule(StorageType.QUESTION, questionToRemove);
+
+            // remove the question from the freenotes
+            if (lang.containsFreeNote(freeNoteId)) {
+              FreeNote freeNote = lang.getFreeNote(freeNoteId);
+              freeNote.removeModule(questionToRemove);
+              questionToRemove.removeFreeNote();
+            }
+
             // update successful variables
             successful = true;
             message = "successfully removed question module";
@@ -2016,11 +2068,11 @@ public class GUICommand {
           currentLanguage = lang.getName();
 
           List<Map<String, Object>> recentNotes = new ArrayList<>();
-          for (FreeNote note : lang.getRecentFreeNotes()) {
+          for (FreeNote note : lang.getFreeNotes()) {
             recentNotes.add(toDataNoModules(note));
           }
 
-          variables.put("recentNote", recentNotes);
+          variables.put("allNotes", recentNotes);
           successful = true;
           message = "successfully retrieved FreeNotes";
 
@@ -2033,6 +2085,55 @@ public class GUICommand {
 
       variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
+  }
+
+  public static class FreeNotesTitleEditorHandler implements Route {
+    @Override
+    public String handle(Request req, Response res)
+            throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // pull out information from query map
+      String freeNoteId = qm.value("freeNoteId");
+      String newTitle = qm.value("newTitle");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        if (lang != null) {
+
+          // check if freenote in the language map
+          if (lang.containsFreeNote(freeNoteId)) {
+
+            FreeNote freeNote = lang.getFreeNote(freeNoteId);
+            freeNote.setTitle(newTitle);
+
+            successful = true;
+            message = "successfully changed title of freenote";
+
+          } else {
+            message = "language does not have freenote in it";
+          }
+
+        } else {
+          message = "current language null in freenotes title editor handler";
+        }
+      } catch (DatabaseParserException e) {
+        message = "user not found in database in free notes title editor handler";
+      }
+
       variables.put("successful", successful);
       variables.put("message", message);
       return GSON.toJson(variables.build());
@@ -2058,6 +2159,7 @@ public class GUICommand {
 
       String currentLanguage = "";
       String username = ""; // TODO GET USERNAME
+      String title = "";
 
       // successful variables
       String message = "";
@@ -2072,12 +2174,14 @@ public class GUICommand {
           currentLanguage = lang.getName();
 
           if (noteId.equals("new")) {
+
             // create a new freenote
             FreeNote newFreeNote = new FreeNote("Note Title");
             lang.addFreeNote(newFreeNote);
+            title = newFreeNote.getTitle();
+
             variables.put("newFreeNote", newFreeNote);
             variables.put("freeNoteId", newFreeNote.getId());
-            variables.put("title", newFreeNote.getTitle());
             successful = true;
             message = "successfully added new freenote";
           } else {
@@ -2088,7 +2192,7 @@ public class GUICommand {
               FreeNote oldFreeNote = lang.getFreeNote(noteId);
               variables.put("oldFreeNote", toData(oldFreeNote));
               variables.put("freeNoteId", oldFreeNote.getId());
-              variables.put("title", oldFreeNote.getTitle());
+              title = oldFreeNote.getTitle();
               successful = true;
               message = "successfully pulled old freenote";
 
@@ -2105,6 +2209,7 @@ public class GUICommand {
         message = "user not in database in free note editor handler";
       }
 
+      variables.put("title", title);
       variables.put("username", username);
       variables.put("currentLanguage", currentLanguage);
       variables.put("successful", successful);
@@ -2256,6 +2361,13 @@ public class GUICommand {
           }
           tags.add("test");
           tags.add("test2");
+          tags.add("test3");
+          tags.add("test4");
+          tags.add("test5");
+          tags.add("test6");
+          tags.add("test7");
+          tags.add("test8");
+
           variables.put("allTags", tags);
 
           // update successful variables
@@ -2289,6 +2401,15 @@ public class GUICommand {
     public ModelAndView handle(Request req, Response res)
       throws DriveApiException {
       String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      String startDate = qm.value("startDate");
+      String endDate = qm.value("endDate");
+
+      System.out.println(qm.value("startDate"));
+      System.out.println(qm.value("endDate"));
+
+      System.out.println(qm.value("tagSelection"));
 
       boolean successful = false;
       String message = "";
@@ -2307,15 +2428,6 @@ public class GUICommand {
 
         if (lang != null) {
           currentLanguage = lang.getName();
-          List<Tag> tags = (List<Tag>) lang.getTags();
-
-          // TODO parse out the startCreatedDate & endCreateDate from front-end
-
-          // TODO prepare the ReviewMode object
-
-          // TODO iterate through the list of reviewables generated
-
-          // TODO prep and send to front-end
 
         } else {
           message = "current language null reviewing handler";
@@ -2483,7 +2595,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> alertData = new ImmutableMap.Builder<String, Object>();
     alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(alert, alertData);
-    alertData.put("alertContent", alert.getText());
+    alertData.put("content", alert.getText());
     return alertData.build();
   }
 
@@ -2497,7 +2609,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> questionData = new ImmutableMap.Builder<String, Object>();
     questionData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(question, questionData);
-    questionData.put("questionContent", question.getText());
+    questionData.put("content", question.getText());
     return questionData.build();
   }
 
@@ -2511,7 +2623,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.NOTE);
     toData(note, noteData);
-    noteData.put("noteContent", note.getText());
+    noteData.put("content", note.getText());
     noteData.put("rating", note.getRating());
     return noteData.build();
   }

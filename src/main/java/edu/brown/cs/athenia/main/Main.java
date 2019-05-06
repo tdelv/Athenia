@@ -125,6 +125,7 @@ public class Main {
     Spark.get("/notes", new GUICommand.FreeNotesPageHandler(), freeMarker);
     Spark.get("/noteEditor", new GUICommand.FreeNotesEditorHandler(), freeMarker);
     Spark.post("/getNoteList", new GUICommand.GetFreeNotesList());
+    Spark.post("/updateNoteTitle", new GUICommand.FreeNotesTitleEditorHandler());
 
     // vocabulary module specific spark handlers
     Spark.get("/vocabulary", new GUICommand.VocabularyPageHandler(), freeMarker);
@@ -170,6 +171,7 @@ public class Main {
 
     // setting for the ranking handlers
     Spark.get("/reviewMode", new GUICommand.ReviewModeHandler(), freeMarker);
+    Spark.get("/reviewingMode", new GUICommand.ReviewingHandler(), freeMarker);
 
   }
 

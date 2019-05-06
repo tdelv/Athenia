@@ -1,4 +1,8 @@
 
+// TODO: set up link on dashbord
+// TODO: display recent notes on homepage/dashbaord
+// TODO: when an old note is opened, render all the modules
+
 // TODO: add modtype!!!!!!
 // TODO: when an input is not being edited, remove the border
 
@@ -100,9 +104,33 @@ class Module {
 }
 
 class Note extends Module {
-    constructor(id, dateCreated, dateModified, content) {
-        super(id, dateCreated, dateModified);
-        this.content = content;
+
+    constructor(newNoteData) {
+        super(newNoteData.id, newNoteData.dateCreated, newNoteData.dateModified);
+        this.content = newNoteData.content;
+        this.setUp();
+    }
+
+    setUp() {
+        const selector = "#" + this.id + " input";
+        const thisOlThing = this;
+        $(selector).blur(function(){thisOlThing.update(thisOlThing);});
+    }
+
+    update(thisOlThing) {
+        const selector = "#" + thisOlThing.id + " input";
+        const newNoteContent = $(selector).val();
+
+        const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
+        $.post("/noteUpdate", postParameters, responseJSON => {
+            const responseObject = JSON.parse(responseJSON);
+            if (responseObject.successful) {
+                // TODO: check that responseObject.updatedNote matches this object
+                console.log("new content " + responseObject.updatedNote.noteContent);
+            } else {
+                console.log("message: " + responseObject.message);
+            }
+        });
     }
 
     toHTML() {
@@ -113,22 +141,12 @@ class Note extends Module {
 }
 
 class Exclamation extends Note {
-    constructor(id, dateCreated, dateModified, content) {
-        super(id, dateCreated, dateModified, content);
+    constructor(newExclamationData) {
+        super(newExclamationData);
     }
 
     toHTML() {
-
         const icon = "<i class=\"fa fa-exclamation\"></i>";
-
-        /* OLD
-        const content = `<span class="editable">${this.content}</span>`;
-
-        const div = `<div class="noteModule" id="${this.id}">${icon} ${content}</div>`;
-
-        return div;
-        */
-
         const input = `<input type="text" class="form-control mb-3 ml-2 d-inline w-75" placeholder="${this.content}">`;
         const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
         return div;
@@ -137,8 +155,8 @@ class Exclamation extends Note {
 }
 
 class Question extends Note {
-    constructor(id, dateCreated, dateModified, content) {
-        super(id, dateCreated, dateModified, content);
+    constructor(newQuestionData) {
+        super(newQuestionData);
     }
 
     toHTML() {
@@ -146,29 +164,66 @@ class Question extends Note {
         const input = `<input type="text" class="form-control mb-3 ml-1 d-inline w-75" placeholder="${this.content}">`;
         const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
         return div;
-
-        return div;
     }
 }
 
 class Vocabulary extends Module {
-    constructor(id, dateCreated, dateModified, term, def, rating) {
-        super(id, dateCreated, dateModified);
-        this.term = term;
-        this.def = def;
-        this.rating = rating;
+    constructor(newVocabData) {
+        super(newVocabData.id, newVocabData.dateCreated, newVocabData.dateModified);
+        this.term = newVocabData.term;
+        this.def = newVocabData.def;
+        this.rating = 1;
     }
 
+    setUp() {
+        const selector = "#" + this.id + " input";
+        const thisOlThing = this;
+        $(selector).blur(function(){thisOlThing.update(thisOlThing);});
+    }
+
+    update(thisOlThing) {
+        // TODO:
+        // for each text input, store the value in this object
+        // use a post request and these new values to update this module in the backend
+
+    }
+
+    /*
+        update(thisOlThing) {
+            const selector = "#" + thisOlThing.id + " input";
+            const newNoteContent = $(selector).val();
+
+            const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
+            $.post("/noteUpdate", postParameters, responseJSON => {
+                const responseObject = JSON.parse(responseJSON);
+                if (responseObject.successful) {
+                    // TODO: check that responseObject.updatedNote matches this object
+                    console.log("new content " + responseObject.updatedNote.noteContent);
+                } else {
+                    console.log("message: " + responseObject.message);
+                }
+            });
+        }
+
+
+        */
+
     // TODO: attach this handler to onBlur
-    updateVocabularyModule() {
+    update(thisOlThing) {
 
         // if need be, id can be stored in the event target. event would be parameter to this method
 
         // TODO: store the new values in this object if that hasn't been done already
 
-        const freeNoteId = "TODO";
+        const newTerm = $("input[name='updatedTerm']").val();
+        const newDef = $("input[name='updatedDef']").val();
+        const newRating = $("input[name='updatedRating']").val();
 
-        const postParameters = {vocabId: this.id, updatedTerm: this.term, updatedDef: this.def, updatedRating: this.rating, freeNote: freeNoteId};
+        thisOlThing.term = newTerm;
+        thisOlThing.def = newDef;
+        thisOlThing.rating = newRating;
+
+        const postParameters = {vocabId: thisOlThing.id, updatedTerm: newTerm, updatedDef: newDef, updatedRating: newRating, freeNoteId: getFreeNoteId()};
         $.post("/vocabularyUpdate", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
             if (responseObject.successful) {
@@ -182,6 +237,8 @@ class Vocabulary extends Module {
     }
 
     toHTML() {
+
+        console.log("this: " + this.id);
 
         const form = `<form id="${this.id}" name="form-${this.id}" class="mb-3" action="/vocabularyUpdate" 
                         method="post">` +

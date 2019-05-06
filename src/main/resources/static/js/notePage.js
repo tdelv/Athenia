@@ -4,26 +4,46 @@ let freeNoteId = null;
 
 $( document ).ready(function() {
 
+    // can't get this working :--(
     let tt = new Tooltip($("#insertTextButton"), {
         placement: "right",
         title: "Top",
         trigger: "hover"
     });
 
+    // BUTTON HANDLERS
     $("#insertTextButton").click(insertNote);
     $("#insertVocabButton").click(insertVocab);
     $("#insertConjugationButton").click(insertConjugation);
     $("#insertExclamationButton").click(insertExclamation);
     $("#insertQuestionButton").click(insertQuestion);
 
+    $("#notePageTitle").blur(updateNoteTitle);
+
 });
 
-function getFreeNoteId() {
+function updateNoteTitle() {
 
+    const newTitle = $(this).val();
+
+    const postParameters = {freeNoteId: getFreeNoteId(), newTitle: newTitle};
+    $.post("/updateNoteTitle", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            // yay
+        } else {
+            console.log("message: " + responseObject.message);
+        }
+    });
+
+    //TODO: post request
+
+}
+
+function getFreeNoteId() {
     if (freeNoteId == null) {
         freeNoteId = $(".invisible").html();
     }
-
     return freeNoteId;
 }
 
@@ -34,13 +54,13 @@ function insertModule(module) {
 
 function insertNote() {
     console.log("inserting note");
-    const postParameters = {noteString: "content", freeNoteId: getFreeNoteId()};
+    const postParameters = {noteString: "note content", freeNoteId: getFreeNoteId()};
     $.post("noteAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newNote = responseObject.newNoteModule;
-            let newNoteModule;
-            newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            const newNoteData = responseObject.newNoteModule;
+            let newNoteModule = new Note(newNoteData);
+            // newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -54,8 +74,8 @@ function insertVocab() {
     $.post("/vocabularyAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newVocab = responseObject.newVocabModule;
-            const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def, 1);
+            const newVocabData = responseObject.newVocabModule;
+            const newVocabModule = new Vocabulary(newVocabData);
             insertModule(newVocabModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -85,8 +105,8 @@ function insertExclamation() {
     $.post("alertAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newExclamation = responseObject.newAlertModule;
-            const newExclamationModule = new Exclamation(newExclamation.id, newExclamation.dateCreated, newExclamation.dateModified, newExclamation.alertContent);
+            const newExclamationData = responseObject.newAlertModule;
+            const newExclamationModule = new Exclamation(newExclamationData);
             insertModule(newExclamationModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -100,8 +120,8 @@ function insertQuestion() {
     $.post("questionAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newQuestion = responseObject.newQuestionModule;
-            const newQuestionModule = new Question(newQuestion.id, newQuestion.dateCreated, newQuestion.dateModified, newQuestion.questionContent);
+            const newQuestionData = responseObject.newQuestionModule;
+            const newQuestionModule = new Question(newQuestionData);
             insertModule(newQuestionModule);
         } else {
             console.log("message: " + responseObject.message);

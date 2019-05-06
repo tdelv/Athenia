@@ -28,10 +28,11 @@ function getVocabList() {
                 } else {
                     console.log(currVocab);
                     console.log(currVocab.rating);
-                    newVocab = new Vocabulary(currVocab.id, currVocab.dateCreated, currVocab.dateModified, currVocab.term, currVocab.def, currVocab.rating);
+                    newVocab = new Vocabulary(currVocab);
                     moduleMap.set(currVocab.id, newVocab);
                 }
-                $("#vocabularyContainer").append(newVocab.toHTML());
+                const newVocabHTML = newVocab.toHTML();
+                $("#vocabularyContainer").append(newVocabHTML);
             }
         } else {
             console.log("message: " + responseObject.message);
@@ -48,7 +49,8 @@ function insertVocab() {
             const newVocab = responseObject.newVocabModule;
             console.log(newVocab);
             const newVocabModule = new Vocabulary(newVocab.id, newVocab.dateCreated, newVocab.dateModified, newVocab.term, newVocab.def);
-            $("#vocabularyContainer").prepend(newVocabModule.toHTML());
+            const newVocabModuleHTML = newVocabModule.toHTML();
+            $("#vocabularyContainer").prepend(newVocabModuleHTML);
             // newVocabModule.setUp();
         } else {
             console.log("message: " + responseObject.message);
