@@ -11,7 +11,6 @@ function getNoteList() {
         if (responseObject.successful) {
 
             const allNotes = responseObject.allNotes;
-
             // iterate through all recent notes
             for (let i = 0; i < allNotes.length; i++) {
                 $("#freeNoteContainer").append(noteToHTML(allNotes[i]));
@@ -24,8 +23,6 @@ function getNoteList() {
 }
 
 function noteToHTML(note) {
-
-    console.log(note);
 
     const innerHTML = `<h3 class="card-title">${note.noteTitle}</h3>`;
 
@@ -44,11 +41,4 @@ function noteToHTML(note) {
 }
 
 
-
-// TODO FOR MIA :::: : : : :: : :: CALL navToNote(id) ~U~ found in nav.js - from jsdin
-//                   click handler for note individual cards on View Notes page
-
 // TODO ALSO DELETE METHOD FOR CLICKING ON DELETE THING
-
-
-// TODO add an event
