@@ -17,9 +17,6 @@ function getNoteList() {
                 $("#freeNoteContainer").append(noteToHTML(allNotes[i]));
             }
 
-            console.log("recentNotes");
-            console.log(allNotes);
-
         } else {
             console.log("message: " + responseObject.message);
         }
@@ -28,15 +25,30 @@ function getNoteList() {
 
 function noteToHTML(note) {
 
+    console.log(note);
+
     const innerHTML = `<h3 class="card-title">${note.noteTitle}</h3>`;
-    const cardFooter = `<div class="card-footer text-muted">Date Modified: ${note.dateModified}</div>`
 
+    let tagHTML = `<p class="card-text">TAGS: `;
+    for (let i = 0; i < note.tags.length; i++) {
+        tagHTML += `${note.tags[i]}, `;
+    }
+    tagHTML += `</p>`;
 
-    return `<div class="card"><div class="card-body">${innerHTML}${cardFooter}</div></div>`;
+    const cardFooter = `<div class="card-footer text-muted">Date Modified: ${note.dateModified}</div>`;
+    const trashIcon = `<i class="fa fa-trash" style="position:absolute; top:25px; right: 25px;"></i>`;
 
-    console.log("id");
-    console.log(note.noteId);
-    console.log("name");
-    console.log(note.noteTitle);
-
+    return `<div class="card mb-3" onclick="navToNote('${note.noteId}')">
+            <div class="card-body noteCard" id="${note.noteId}">${innerHTML}
+            ${tagHTML}${trashIcon}${cardFooter}</div></div>`;
 }
+
+
+
+// TODO FOR MIA :::: : : : :: : :: CALL navToNote(id) ~U~ found in nav.js - from jsdin
+//                   click handler for note individual cards on View Notes page
+
+// TODO ALSO DELETE METHOD FOR CLICKING ON DELETE THING
+
+
+// TODO add an event
