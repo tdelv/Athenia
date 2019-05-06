@@ -2094,8 +2094,12 @@ public class GUICommand {
           // check if freenote in the language map
           if (lang.containsFreeNote(freeNoteId)) {
 
+
             FreeNote freeNote = lang.getFreeNote(freeNoteId);
+
+            System.out.println("OLD TITLE: " + freeNote.getTitle());
             freeNote.setTitle(newTitle);
+            System.out.println("NEW TITLE: " + freeNote.getTitle());
 
             successful = true;
             message = "successfully changed title of freenote";
