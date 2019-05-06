@@ -2561,7 +2561,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> alertData = new ImmutableMap.Builder<String, Object>();
     alertData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(alert, alertData);
-    alertData.put("alertContent", alert.getText());
+    alertData.put("content", alert.getText());
     return alertData.build();
   }
 
@@ -2575,7 +2575,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> questionData = new ImmutableMap.Builder<String, Object>();
     questionData.put("modtype", StorageType.ALERT_EXCLAMATION);
     toData(question, questionData);
-    questionData.put("questionContent", question.getText());
+    questionData.put("content", question.getText());
     return questionData.build();
   }
 
@@ -2589,7 +2589,7 @@ public class GUICommand {
     ImmutableMap.Builder<String, Object> noteData = new ImmutableMap.Builder<String, Object>();
     noteData.put("modtype", StorageType.NOTE);
     toData(note, noteData);
-    noteData.put("noteContent", note.getText());
+    noteData.put("content", note.getText());
     noteData.put("rating", note.getRating());
     return noteData.build();
   }

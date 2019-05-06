@@ -4,6 +4,7 @@ let freeNoteId = null;
 
 $( document ).ready(function() {
 
+    // can't get this working :--(
     let tt = new Tooltip($("#insertTextButton"), {
         placement: "right",
         title: "Top",
@@ -16,14 +17,24 @@ $( document ).ready(function() {
     $("#insertExclamationButton").click(insertExclamation);
     $("#insertQuestionButton").click(insertQuestion);
 
+    //TODO:
+    // title.onblur -> post request to update the title of this free note;a'
+    $("#notePageTitle").blur(updateNoteTitle);
+
 });
 
-function getFreeNoteId() {
+function updateNoteTitle() {
+    const newTitle = $(this).val();
+    console.log("new title: " + newTitle);
 
+    //TODO: post request
+
+}
+
+function getFreeNoteId() {
     if (freeNoteId == null) {
         freeNoteId = $(".invisible").html();
     }
-
     return freeNoteId;
 }
 
@@ -34,13 +45,13 @@ function insertModule(module) {
 
 function insertNote() {
     console.log("inserting note");
-    const postParameters = {noteString: "content", freeNoteId: getFreeNoteId()};
+    const postParameters = {noteString: "note content", freeNoteId: getFreeNoteId()};
     $.post("noteAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newNote = responseObject.newNoteModule;
-            let newNoteModule;
-            newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
+            const newNoteData = responseObject.newNoteModule;
+            let newNoteModule = new Note(newNoteData);
+            // newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -85,8 +96,8 @@ function insertExclamation() {
     $.post("alertAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newExclamation = responseObject.newAlertModule;
-            const newExclamationModule = new Exclamation(newExclamation.id, newExclamation.dateCreated, newExclamation.dateModified, newExclamation.alertContent);
+            const newExclamationData = responseObject.newAlertModule;
+            const newExclamationModule = new Exclamation(newExclamationData);
             insertModule(newExclamationModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -100,8 +111,8 @@ function insertQuestion() {
     $.post("questionAdd", postParameters, responseJSON => {
         const responseObject = JSON.parse(responseJSON);
         if (responseObject.successful) {
-            const newQuestion = responseObject.newQuestionModule;
-            const newQuestionModule = new Question(newQuestion.id, newQuestion.dateCreated, newQuestion.dateModified, newQuestion.questionContent);
+            const newQuestionData = responseObject.newQuestionModule;
+            const newQuestionModule = new Question(newQuestionData);
             insertModule(newQuestionModule);
         } else {
             console.log("message: " + responseObject.message);

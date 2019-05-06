@@ -15,11 +15,11 @@
                     <div class="card border-bottom-primary shadow">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
-                                <h1>${title}</h1>
+                                <input type="text" class="form-control-lg mb-3" id="notePageTitle" placeholder="${title}">
                             </div>
 
                             <div class="row no-gutters align-items-center">
-                                <h3>Date</h3>
+                                <#--<h3>Date</h3>-->
                             </div>
                         </div>
                     </div>
