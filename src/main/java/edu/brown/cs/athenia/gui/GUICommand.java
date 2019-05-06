@@ -2,10 +2,8 @@ package edu.brown.cs.athenia.gui;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.text.*;
+import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -2337,7 +2335,7 @@ public class GUICommand {
             tags.add(t.getTag());
           }
           tags.add("test");
-          tags.add("test2");
+          tags.add("test 2");
           tags.add("test3");
           tags.add("test4");
           tags.add("test5");
@@ -2380,13 +2378,10 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
+      // pull data from frontend
       String startDate = qm.value("startDate");
       String endDate = qm.value("endDate");
-
-      System.out.println(qm.value("startDate"));
-      System.out.println(qm.value("endDate"));
-
-      System.out.println(qm.value("tagSelection"));
+      String tagSelection = qm.value("tagSelection");
 
       boolean successful = false;
       String message = "";
@@ -2397,6 +2392,10 @@ public class GUICommand {
 
       ImmutableMap.Builder<String, Object> variables =
               new ImmutableMap.Builder<>();
+
+      variables.put("startDate", startDate);
+      variables.put("endDate", endDate);
+      variables.put("tagSelection", tagSelection);
 
       try {
         Athenia user = DatabaseParser.getUser(userId);
@@ -2422,6 +2421,111 @@ public class GUICommand {
       return new ModelAndView(variables.build(), "reviewing.ftl");
     }
 
+  }
+
+  public static class GetReviewListHandler implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      // pull information from front end
+      String startDate = qm.value("startDate");
+      String endDate = qm.value("endDate");
+      String tagsSelected = qm.value("tagSelection");
+
+      System.out.println(startDate);
+      System.out.println(endDate);
+      System.out.println(tagsSelected);
+
+      // successful variables
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      // try to get user from database
+      try {
+
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        // check if current language is not null
+        if (lang != null) {
+
+          try {
+            // parse out date objects
+            Date startDateObject = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+            Date endDateObject = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
+
+            // prepare tag selected lists to create new tag list
+            String[] tagsSplit = tagsSelected.split(",");
+            List<Tag> tagList = new ArrayList<>();
+
+            // create tag list
+            for (String t : tagsSplit) {
+              Tag tempTag = lang.getTag(t);
+              // add tag to list if not null
+              if (tempTag != null) {
+                tagList.add(tempTag);
+                System.out.println(tempTag.getTag());
+              }
+            }
+
+            // create ReviewMode object
+            ReviewMode reviewer =
+                    new ReviewMode(user, tagList, startDateObject, endDateObject);
+            // get list of reviewables
+            List<Reviewable> reviewablesList = reviewer.review();
+
+
+            // TODO THESE ARE TESTS TEST TEST TEST
+            Vocab vocabNew = new Vocab("fuck", "me");
+            Note noteNew = new Note("right now");
+
+            reviewablesList.add(vocabNew);
+            reviewablesList.add(noteNew);
+            // TODO THESE ARE TESTS TESTS TESTS
+
+
+            // prepare list of modules to review for frontend
+            List<Map<String, Object>> reviewablesListConverted = new ArrayList<>();
+            for (Reviewable r : reviewablesList) {
+              if (r instanceof Vocab) {
+                Vocab vocab = (Vocab) r;
+                reviewablesListConverted.add(toData(vocab));
+              } else if (r instanceof Conjugation) {
+                Conjugation conj = (Conjugation) r;
+                reviewablesListConverted.add(toData(conj));
+              } else if (r instanceof Note) {
+                Note note = (Note) r;
+                reviewablesListConverted.add(toData(note));
+              }
+            }
+
+            variables.put("reviewModules", reviewablesListConverted);
+
+            successful = true;
+            message = "successfully pulled reviewables";
+          } catch (ParseException e) {
+            message = "unable to correctly parse start and date strings";
+          }
+
+          // catch if current language is null
+        } else {
+          message = "current language null";
+        }
+
+        // catch if user not in database
+      } catch (DatabaseParserException e) {
+        message = "error getting user from database";
+      }
+
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
+    }
   }
 
   /*
