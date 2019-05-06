@@ -161,7 +161,6 @@ public class GUICommand {
         // try to find the user in database and send the language name to
         // the front-end
         Athenia user = DatabaseParser.getUser(userId);
-        System.out.println(user.getLanguages());
         variables.put("languages", user.getLanguages());
         successful = true;
         message = "successful";
@@ -2091,15 +2090,12 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
 
         if (lang != null) {
+
           // check if freenote in the language map
           if (lang.containsFreeNote(freeNoteId)) {
 
-
             FreeNote freeNote = lang.getFreeNote(freeNoteId);
-
-            System.out.println("OLD TITLE: " + freeNote.getTitle());
             freeNote.setTitle(newTitle);
-            System.out.println("NEW TITLE: " + freeNote.getTitle());
 
             successful = true;
             message = "successfully changed title of freenote";
@@ -2154,9 +2150,11 @@ public class GUICommand {
           currentLanguage = lang.getName();
 
           if (noteId.equals("new")) {
+
             // create a new freenote
             FreeNote newFreeNote = new FreeNote("Note Title");
             lang.addFreeNote(newFreeNote);
+
             variables.put("newFreeNote", newFreeNote);
             variables.put("freeNoteId", newFreeNote.getId());
             variables.put("title", newFreeNote.getTitle());
