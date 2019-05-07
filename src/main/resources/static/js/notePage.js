@@ -172,6 +172,8 @@ function insertVocab() {
 }
 
 function insertConjugation() {
+    alert("this feature is coming soon!");
+    /*
     console.log("inserting conjugation");
     const postParameters = {};
     $.post("/conjugationAdd", postParameters, responseJSON => {
@@ -184,6 +186,7 @@ function insertConjugation() {
             console.log("message: " + responseObject.message);
         }
     });
+    */
 
 }
 
