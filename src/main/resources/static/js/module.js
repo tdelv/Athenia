@@ -180,33 +180,6 @@ class Vocabulary extends Module {
         $(selector).blur(function(){thisOlThing.update(thisOlThing);});
     }
 
-    update(thisOlThing) {
-        // TODO:
-        // for each text input, store the value in this object
-        // use a post request and these new values to update this module in the backend
-
-    }
-
-    /*
-        update(thisOlThing) {
-            const selector = "#" + thisOlThing.id + " input";
-            const newNoteContent = $(selector).val();
-
-            const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
-            $.post("/noteUpdate", postParameters, responseJSON => {
-                const responseObject = JSON.parse(responseJSON);
-                if (responseObject.successful) {
-                    // TODO: check that responseObject.updatedNote matches this object
-                    console.log("new content " + responseObject.updatedNote.noteContent);
-                } else {
-                    console.log("message: " + responseObject.message);
-                }
-            });
-        }
-
-
-        */
-
     // TODO: attach this handler to onBlur
     update(thisOlThing) {
 
@@ -248,7 +221,7 @@ class Vocabulary extends Module {
             `<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +
 
             // TODO somehow allow for rating changes
-            `<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
+            //`<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
             `</div>` +
             `<small>Date Modified: ${this.dateModified}</small>` +
             `</form>`;
@@ -292,7 +265,7 @@ class ConjugationTable extends Module {
         }
 
         // ADD THE SUBMIT BUTTON FOR EDITS
-        form += `<button type="submit" id="sub-butt-${this.id}" class="btn conjSave btn-primary mt-2">Save</button>`;
+        //form += `<button type="submit" id="sub-butt-${this.id}" class="btn conjSave btn-primary mt-2">Save</button>`;
 
         form += `</div></form>`;
 

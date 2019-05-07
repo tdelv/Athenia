@@ -125,6 +125,7 @@ function insertVocab() {
             const newVocabData = responseObject.newVocabModule;
             const newVocabModule = new Vocabulary(newVocabData);
             insertModule(newVocabModule);
+            newVocabModule.setUp();
         } else {
             console.log("message: " + responseObject.message);
         }
