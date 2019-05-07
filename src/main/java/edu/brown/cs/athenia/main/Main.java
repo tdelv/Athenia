@@ -4,13 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.security.GeneralSecurityException;
 import java.util.Set;
 
 //import joptsimple.OptionParser;
 
 import com.google.common.collect.ImmutableSet;
-import edu.brown.cs.athenia.databaseparser.UpdaterScheduler;
+import edu.brown.cs.athenia.updaterscheduler.UpdaterScheduler;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.gui.GUICommand;
 import freemarker.template.Configuration;
