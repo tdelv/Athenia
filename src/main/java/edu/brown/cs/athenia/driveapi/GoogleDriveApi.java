@@ -257,17 +257,10 @@ public class GoogleDriveApi {
    * @return the credentials, or null if no token.
    * @throws IOException when unable to read client secrets from file.
    * @throws GeneralSecurityException when something goes wrong with creating a new Trusted Transport.
-   * @throws UnauthenticatedUserException when user is not authenticated.
    */
   private static Credential getCredential(String userId)
-          throws IOException, GeneralSecurityException, UnauthenticatedUserException {
-    Credential credential = getFlow().loadCredential(userId);
-
-    if (credential == null) {
-      throw new UnauthenticatedUserException();
-    }
-
-    return credential;
+          throws IOException, GeneralSecurityException {
+    return getFlow().loadCredential(userId);
   }
 
   /**
@@ -276,10 +269,9 @@ public class GoogleDriveApi {
    * @return the service for the user.
    * @throws IOException when unable to read client secrets from file.
    * @throws GeneralSecurityException when something goes wrong with creating a new Trusted Transport.
-   * @throws UnauthenticatedUserException when user is not authenticated.
    */
   private static Drive getService(String userId)
-          throws IOException, GeneralSecurityException, UnauthenticatedUserException {
+          throws IOException, GeneralSecurityException {
     // Build a new authorized API client service.
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport
         .newTrustedTransport();
