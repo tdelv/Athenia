@@ -8,7 +8,6 @@ import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Pair;
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.*;
-import edu.brown.cs.athenia.driveapi.UnauthenticatedUserException;
 import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
@@ -18,43 +17,74 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.time.Instant;
 import java.util.*;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 /**
- * DatabaseParser will hold our SQL parsing information.
- * @author makaylamurphy
- *
+ * A class for handling the translation between program memory and
+ * database storage. Has external interactions allowing:
+ *  - Getting the Athenia object for a given user;
+ *  - Updating the user's database with their Athenia object.
+ * @author Thomas Del Vecchio
  */
 public class DatabaseParser {
 
     private static final Map<String, Athenia> USER_MAP = new HashMap<>();
-    private static final Map<String, Date> LAST_UPDATED_MAP = new HashMap<>();
 
-    private static Connection connectToDatabase(String filePath) throws ClassNotFoundException, SQLException {
+    /**
+     * Generates the SQL Connection to a given database file.
+     * @param filePath The path to the database file.
+     * @return the Connection to the SQL database.
+     * @throws ClassNotFoundException when something goes wrong loading SQLite3.
+     * @throws SQLException when a SQL command is incorrectly executed.
+     */
+    private static Connection connectToDatabase(String filePath)
+            throws ClassNotFoundException, SQLException {
+        // Generate connection
         Class.forName("org.sqlite.JDBC");
         String url = "jdbc:sqlite:" + filePath;
         Connection conn = DriverManager.getConnection(url);
+
+        // Force foreign keys to work correctly
         try (Statement statement = conn.createStatement()) {
             statement.execute("PRAGMA foreign_keys = ON");
         }
+
         return conn;
     }
 
+    /**
+     * Gets the connection to the database for a given user.
+     * @param userId The id of the user whose database we want.
+     * @return the Connection to the database.
+     * @throws ClassNotFoundException when something goes wrong loading SQLite3.
+     * @throws SQLException when a SQL command is incorrectly executed.
+     * @throws IOException when something goes wrong on initial database setup.
+     * @throws DriveApiException when something goes wrong getting the database from Google Drive.
+     */
     private static Connection getConnection(String userId)
             throws SQLException, ClassNotFoundException, IOException, DriveApiException {
+        // Get database from Google Drive, or else set one up for user
         File file = GoogleDriveApi.getDataBase(userId);
-
         if (!file.exists()) {
             setup(file);
         }
 
+        // Connect to the database
         return connectToDatabase(file.getPath());
     }
 
-    private static void setup(File file) throws IOException, SQLException, ClassNotFoundException {
+    /**
+     * Sets up a new database file for the user if none found in Google Drive.
+     * @param file The file where we want to create the database.
+     * @throws ClassNotFoundException when something goes wrong loading SQLite3.
+     * @throws SQLException when a SQL command is incorrectly executed.
+     * @throws IOException when something goes wrong reading from database setup file or creating new database file.
+     */
+    private static void setup(File file)
+            throws IOException, SQLException, ClassNotFoundException {
+        // Read the SQL database setup commands for a new user
         File queryFile = new File("src/main/resources/SQLCommands/setup_database");
 
         String data;
@@ -64,6 +94,7 @@ public class DatabaseParser {
 
         String[] queries = data.split(";");
 
+        // Create new local file for user and execute SQL commands
         file.createNewFile();
         try (Connection conn = connectToDatabase(file.getPath());
              Statement statement = conn.createStatement()) {
@@ -75,15 +106,28 @@ public class DatabaseParser {
         }
     }
 
-    public static Athenia getUser(String userId) throws DatabaseParserException {
+    /**
+     * Generates a new Athenia object for the given user.
+     * The order of preference is:
+     *  - Read from program memory if in cache;
+     *  - Read from local server memory if in GoogleDriveApi cache;
+     *  - Read from Google Drive file;
+     *  - Create new database file for user.
+     * @param userId The id of the user.
+     * @return the Athenia object containing the user's data.
+     * @throws DatabaseParserException when something goes wrong generating the user.
+     */
+    public static Athenia getUser(String userId)
+            throws DatabaseParserException {
+        // Grab from cache if available.
         if (USER_MAP.containsKey(userId)) {
             return USER_MAP.get(userId);
         }
 
+        // Create a new Athenia for user
         Athenia user = new Athenia(userId);
-        USER_MAP.put(userId, user);
-        LAST_UPDATED_MAP.put(userId, new Date());
 
+        // Set data for the user from their database
         try (Connection conn = getConnection(userId)) {
             // Get meta data for user
             getUserData(conn, user);
@@ -96,32 +140,48 @@ public class DatabaseParser {
                 user.setCurrLang(langName);
                 Language language = user.getCurrLanguage();
 
+                // Get data for each language
                 getTags(conn, language);
                 getFreeNotes(conn, language);
                 getModules(conn, language);
                 getFreeNoteModules(conn, language);
             }
 
-        } catch (SQLException | ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-            throw new DatabaseParserException(e);
-        } catch (DriveApiException e) {
-            e.printStackTrace();
+        } catch (SQLException | ClassNotFoundException | IOException | DriveApiException e) {
+            // Wrap any exceptions from interaction with API with project exception
             throw new DatabaseParserException(e);
         }
+
+        // Add Athenia to cache if generation has succeeded
+        USER_MAP.put(userId, user);
 
         return user;
     }
 
-    private static void getUserData(Connection conn, Athenia user) throws SQLException {
+    /**
+     * Gets the metadata for the given user.
+     * Unpopulated until user metadata is added to data structures.
+     * @param conn The connection to the user's database.
+     * @param user The object holding user's data.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void getUserData(Connection conn, Athenia user)
+            throws SQLException {
         try (Statement statement = conn.createStatement();
              ResultSet rs = statement.executeQuery(
                      "SELECT * FROM user_data")) {
-
+            rs.next();
         }
     }
 
-    private static void getLanguages(Connection conn, Athenia user) throws SQLException {
+    /**
+     * Gets the languages for the given user.
+     * @param conn The connection to the user's database.
+     * @param user The object holding user's data.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void getLanguages(Connection conn, Athenia user)
+            throws SQLException {
         try (Statement statement = conn.createStatement();
              ResultSet rs = statement.executeQuery(
                      "SELECT * FROM languages")) {
@@ -131,13 +191,20 @@ public class DatabaseParser {
         }
     }
 
-    private static void getTags(Connection conn, Language language) throws SQLException {
+    /**
+     * Gets the tags for the given language.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void getTags(Connection conn, Language language)
+            throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT t.name tag_name " +
-                        "FROM languages l, language_tags lt, tags t " +
-                        "WHERE lt.tag_id = t.id " +
-                        "AND lt.language_id = l.id " +
-                        "AND l.language = ?")) {
+                "FROM languages l, language_tags lt, tags t " +
+                "WHERE lt.tag_id = t.id " +
+                "AND lt.language_id = l.id " +
+                "AND l.language = ?")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -147,56 +214,82 @@ public class DatabaseParser {
         }
     }
 
-    private static void getFreeNotes(Connection conn, Language language) throws SQLException, DatabaseParserException {
+    /**
+     * Gets the free notes for the given language.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static void getFreeNotes(Connection conn, Language language)
+            throws SQLException, DatabaseParserException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT  fn.title title, " +
                         "fn.id fn_id, " +
                         "fn.created created, " +
                         "fn.last_modified last_modified " +
-                        "FROM freenotes fn, languages l, tags t, language_tags lt " +
-                        "WHERE fn.language_id = l.id " +
-                        "AND l.language = ? " +
-                        "AND t.id = lt.tag_id " +
-                        "AND lt.language_id = l.id")) {
+                "FROM freenotes fn, languages l, tags t, language_tags lt " +
+                "WHERE fn.language_id = l.id " +
+                "AND l.language = ? " +
+                "AND t.id = lt.tag_id " +
+                "AND lt.language_id = l.id")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    FreeNote fn = new FreeNote(
+                    FreeNote freeNote = new FreeNote(
                             rs.getString("title"),
                             rs.getString("fn_id"));
 
-                    getFreeNoteTags(conn, fn, language);
-                    fn.setDateCreated(new Date(rs.getInt("created")));
-                    fn.setDateModified(new Date(rs.getInt("last_modified")));
+                    getFreeNoteTags(conn, freeNote, language);
+                    freeNote.setDateCreated(new Date(rs.getInt("created")));
+                    freeNote.setDateModified(new Date(rs.getInt("last_modified")));
                 }
             }
         }
     }
 
-    private static void getFreeNoteTags(Connection conn, FreeNote fn, Language language) throws SQLException, DatabaseParserException {
+    /**
+     * Gets the tags for the given free note.
+     * @param conn The connection to the user's database.
+     * @param freeNote The current free note.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static void getFreeNoteTags(Connection conn, FreeNote freeNote, Language language)
+            throws SQLException, DatabaseParserException {
         try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT * FROM freenote_tags WHERE module_id = ?")) {
-            statement.setString(1, fn.getId());
+                "SELECT * FROM freenote_tags WHERE freenote_id = ?")) {
+            statement.setString(1, freeNote.getId());
             try (ResultSet rs = statement.executeQuery()) {
                 String tagId = rs.getString("id");
                 if (!language.hasTag(tagId)) {
                     throw new DatabaseParserException("Bad data.");
                 }
 
-                fn.addTag(language.getTag(tagId));
+                freeNote.addTag(language.getTag(tagId));
             }
         }
     }
 
-    private static void getModules(Connection conn, Language language) throws SQLException, DatabaseParserException {
+    /**
+     * Gets the modules for the given language.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static void getModules(Connection conn, Language language)
+            throws SQLException, DatabaseParserException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT m.* " +
-                        "FROM modules m, languages l " +
-                        "WHERE m.language_id = l.id " +
-                        "AND l.language = ?")) {
+                "FROM modules m, languages l " +
+                "WHERE m.language_id = l.id " +
+                "AND l.language = ?")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
+                    // Get the module specific data
                     StorageType type = StorageType.valueOf(rs.getString("type"));
                     Module module;
                     switch (type) {
@@ -228,72 +321,97 @@ public class DatabaseParser {
         }
     }
 
-    private static Note getNoteModule(Connection conn, String id) throws SQLException, DatabaseParserException {
+    /**
+     * Create a new Note module from database.
+     * @param conn The connection to the user's database.
+     * @param moduleId The id of the module.
+     * @return the created module.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static Note getNoteModule(Connection conn, String moduleId)
+            throws SQLException, DatabaseParserException {
         Note module;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM note_modules " +
-                        "WHERE module_id = ?")) {
-            statement.setString(1, id);
+                "WHERE module_id = ?")) {
+            statement.setString(1, moduleId);
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
+                    throw new DatabaseParserException("Bad data: " +
+                            "Module with type Note not in note_modules table.");
                 }
+
                 module = new Note(rs.getString("body"));
                 module.setRating(rs.getInt("rating"));
-                if (rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
-                }
             }
         }
 
         return module;
     }
 
-    private static Vocab getVocabModule(Connection conn, String id) throws SQLException, DatabaseParserException {
+    /**
+     * Create a new Vocab module from database.
+     * @param conn The connection to the user's database.
+     * @param moduleId The id of the module.
+     * @return the created module.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static Vocab getVocabModule(Connection conn, String moduleId)
+            throws SQLException, DatabaseParserException {
         Vocab module;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM vocab_modules " +
-                        "WHERE module_id = ?")) {
-            statement.setString(1, id);
+                "WHERE module_id = ?")) {
+            statement.setString(1, moduleId);
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
+                    throw new DatabaseParserException("Bad data: " +
+                            "Module with type Vocab not in vocab_modules table.");
                 }
+
                 module = new Vocab(
                         rs.getString("term"),
                         rs.getString("definition"));
-                if (rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
-                }
             }
         }
 
         return module;
     }
 
-    private static Conjugation getConjugationModule(Connection conn, String id) throws SQLException, DatabaseParserException {
+    /**
+     * Create a new Conjugation module from database.
+     * @param conn The connection to the user's database.
+     * @param moduleId The id of the module.
+     * @return the created module.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static Conjugation getConjugationModule(Connection conn, String moduleId)
+            throws SQLException, DatabaseParserException {
         Conjugation module;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM conjugation_modules " +
-                        "WHERE module_id = ?")) {
-            statement.setString(1, id);
+                "WHERE module_id = ?")) {
+            statement.setString(1, moduleId);
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
+                    throw new DatabaseParserException("Bad data: " +
+                            "Module with type Conjugation not in conjugation_modules table.");
                 }
+
                 module = new Conjugation();
                 module.setHeight(rs.getInt("height"));
-                if (rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
-                }
             }
         }
 
+        // Get the rows of the conjugation table
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM conjugation_rows " +
                         "WHERE module_id = ? " +
                         "ORDER BY position")) {
-            statement.setString(1, id);
+            statement.setString(1, moduleId);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     module.add(rs.getString("row1"), rs.getString("row2"));
@@ -304,47 +422,73 @@ public class DatabaseParser {
         return module;
     }
 
-    private static Question getQuestionModule(Connection conn, String id) throws SQLException, DatabaseParserException {
+    /**
+     * Create a new Question module from database.
+     * @param conn The connection to the user's database.
+     * @param moduleId The id of the module.
+     * @return the created module.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static Question getQuestionModule(Connection conn, String moduleId)
+            throws SQLException, DatabaseParserException {
         Question module;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM question_modules " +
-                        "WHERE module_id = ?")) {
-            statement.setString(1, id);
+                "WHERE module_id = ?")) {
+            statement.setString(1, moduleId);
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
+                    throw new DatabaseParserException("Bad data:" +
+                            "Module with type Question not in question_modules table.");
                 }
+
                 module = new Question(rs.getString("body"));
-                if (rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
-                }
             }
         }
 
         return module;
     }
 
-    private static AlertExclamation getAlertModule(Connection conn, String id) throws SQLException, DatabaseParserException {
+
+    /**
+     * Create a new AlertExclamation module from database.
+     * @param conn The connection to the user's database.
+     * @param moduleId The id of the module.
+     * @return the created module.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static AlertExclamation getAlertModule(Connection conn, String moduleId)
+            throws SQLException, DatabaseParserException {
         AlertExclamation module;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM alert_exclamation_modules " +
-                        "WHERE module_id = ?")) {
-            statement.setString(1, id);
+                "WHERE module_id = ?")) {
+            statement.setString(1, moduleId);
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
+                    throw new DatabaseParserException("Bad data: " +
+                            "Module with type AlertExclamation not in alert_exclamation_modules table.");
                 }
+
                 module = new AlertExclamation(rs.getString("body"));
-                if (rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
-                }
             }
         }
 
         return module;
     }
 
-    private static void getModuleTags(Connection conn, Module module, Language language) throws SQLException, DatabaseParserException {
+    /**
+     * Gets the tags for the given module.
+     * @param conn The connection to the user's database.
+     * @param module The module.
+     * @param language The language the module belongs to.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static void getModuleTags(Connection conn, Module module, Language language)
+            throws SQLException, DatabaseParserException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM module_tags WHERE module_id = ?")) {
             statement.setString(1, module.getId());
@@ -352,7 +496,8 @@ public class DatabaseParser {
                 while (rs.next()) {
                     String tagId = rs.getString("id");
                     if (!language.hasTag(tagId)) {
-                        throw new DatabaseParserException("Bad data.");
+                        throw new DatabaseParserException("Bad data: " +
+                                "Tag " + tagId + " not in language " + language.getName());
                     }
 
                     module.addTag(language.getTag(tagId));
@@ -361,59 +506,98 @@ public class DatabaseParser {
         }
     }
 
-    private static void getFreeNoteModules(Connection conn, Language language) throws SQLException {
-        for (FreeNote fn : language.getFreeNotes()) {
+    /**
+     * Gets the relationships between the free notes and the modules.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void getFreeNoteModules(Connection conn, Language language)
+            throws SQLException {
+        for (FreeNote freeNote : language.getFreeNotes()) {
             try (PreparedStatement statement = conn.prepareStatement(
                     "SELECT m.* FROM modules m, freenote_modules fm " +
                     "WHERE fm.freenote_id = ? " +
                     "AND fm.module_id = m.id " +
                     "ORDER BY fm.position")) {
-                statement.setString(1, fn.getId());
+                statement.setString(1, freeNote.getId());
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
+                        // Get the module
                         StorageType type = StorageType.valueOf(rs.getString("type"));
                         String moduleId = rs.getString("id");
                         Module module = language.getModule(type, moduleId);
-                        fn.addModule(module);
+
+                        // Add it to the free note
+                        freeNote.addModule(module);
                     }
                 }
             }
         }
     }
 
-    public static void updateUser(String userId) throws DatabaseParserException, DriveApiException {
+    /**
+     * Update the user's database with their current Athenia data, and
+     * attempts to write it to their Google Drive file.
+     * Does not recreate database, but instead applies updates based on
+     * differences between database and program memory.
+     * @param userId The id of the user.
+     * @throws DatabaseParserException when something goes wrong updating the database.
+     */
+    public static void updateUser(String userId)
+            throws DatabaseParserException {
         if (!USER_MAP.containsKey(userId)) {
             throw new DatabaseParserException("No such user.");
         }
 
+        // Get the user
         Athenia user = USER_MAP.get(userId);
 
+        // Update (or create) the user's database file
         try (Connection conn = getConnection(userId)) {
+            // Update the user's metadata
             updateUserData(conn, user);
+
+            // Update the user's languages
             updateLanguages(conn, user);
 
             for (String langName : user.getLanguages()) {
                 user.setCurrLang(langName);
                 Language language = user.getCurrLanguage();
 
+                // Update the data for each language
                 updateTags(conn, language);
                 updateFreeNotes(conn, language);
                 updateModules(conn, language);
                 updateFreeNoteModules(conn, language);
             }
 
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (DriveApiException e) {
-            e.printStackTrace();
+        } catch (IOException | SQLException | ClassNotFoundException | DriveApiException e) {
+            // Wrap any exceptions from interaction with API with project exception
+            throw new DatabaseParserException(e);
         }
 
-        File file = new java.io.File(
-                "src/main/resources/userData/" + userId + ".sqlite3");
-        GoogleDriveApi.setDataBase(userId, file);
+        // Write to the user's Google Drive
+        try {
+            File file = new java.io.File(
+                    "src/main/resources/userData/" + userId + ".sqlite3");
+            GoogleDriveApi.setDataBase(userId, file);
+        } catch (DriveApiException e) {
+            // Wrap any exceptions from interaction with API with project exception
+            throw new DatabaseParserException(e);
+        }
     }
 
-    private static void updateUserData(Connection conn, Athenia user) throws SQLException {
+    /**
+     * Updates the metadata for the given user.
+     * Unpopulated until user metadata is added to data structures.
+     * @param conn The connection to the user's database.
+     * @param user The object holding user's data.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateUserData(Connection conn, Athenia user)
+            throws SQLException {
+        //noinspection SqlWithoutWhere
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE user_data " +
                 "SET username = ?, joined = ?, last_update = ?")) {
@@ -425,7 +609,15 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateLanguages(Connection conn, Athenia user) throws SQLException {
+    /**
+     * Updates the languages for the given user.
+     * @param conn The connection to the user's database.
+     * @param user The object holding user's data.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateLanguages(Connection conn, Athenia user)
+            throws SQLException {
+        // Keep track of what languages need to be removed/added
         Set<String> oldLanguages = new HashSet<>();
         Collection<String> newLanguages = user.getLanguages();
 
@@ -442,6 +634,7 @@ public class DatabaseParser {
             }
         }
 
+        // Add new languages to database
         try (PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO languages " +
                 "(id, language) VALUES " +
@@ -455,6 +648,7 @@ public class DatabaseParser {
             statement.executeBatch();
         }
 
+        // Remove old languages from database
         try (PreparedStatement statement = conn.prepareStatement(
                 "DELETE FROM languages " +
                 "WHERE id = ?")) {
@@ -467,7 +661,15 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateTags(Connection conn, Language language) throws SQLException {
+    /**
+     * Updates the tags for the given language.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateTags(Connection conn, Language language)
+            throws SQLException {
+        // Keep track of what tags need to be removed/added
         Set<String> oldTags = new HashSet<>();
         Collection<Tag> newTags = language.getTags();
 
@@ -490,10 +692,11 @@ public class DatabaseParser {
             }
         }
 
+        // Add new tags to database
         try (PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO tags " +
-                        "(id, name) VALUES " +
-                        "(?, ?)")) {
+                "(id, name) VALUES " +
+                "(?, ?)")) {
             for (Tag tag : newTags) {
                 statement.setString(1, tag.getTag());
                 statement.setString(2, tag.getTag());
@@ -503,6 +706,7 @@ public class DatabaseParser {
             statement.executeBatch();
         }
 
+        // Add new tags to language
         try (PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO language_tags " +
                 "(language_id, tag_id) VALUES " +
@@ -516,9 +720,10 @@ public class DatabaseParser {
             statement.executeBatch();
         }
 
+        // Remove old tags from database
         try (PreparedStatement statement = conn.prepareStatement(
                 "DELETE FROM tags " +
-                        "WHERE id = ?")) {
+                "WHERE id = ?")) {
             for (String tagName : oldTags) {
                 statement.setString(1, tagName);
                 statement.addBatch();
@@ -528,11 +733,18 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateFreeNotes(Connection conn, Language language) throws SQLException {
+    /**
+     * Updates the free notes for the given language.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateFreeNotes(Connection conn, Language language)
+            throws SQLException {
+        // Keep track of what free notes need to be removed/added
         Set<String> oldFreeNotes = new HashSet<>();
         Collection<FreeNote> newFreeNotes = language.getFreeNotes();
 
-        // Find old and new freenotes
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT  fn.id fn_id " +
                 "FROM freenotes fn, languages l " +
@@ -581,7 +793,7 @@ public class DatabaseParser {
             statement.executeBatch();
         }
 
-        // Update all current freenotes in database
+        // Update all current freenotes metadata in database
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE freenotes " +
                 "SET title = ?, last_modified = ? " +
@@ -602,16 +814,25 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateFreeNoteTags(Connection conn, FreeNote freeNote, Language language) throws SQLException {
+    /**
+     * Updates the tags for the given free note.
+     * @param conn The connection to the user's database.
+     * @param freeNote The current free note.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateFreeNoteTags(Connection conn, FreeNote freeNote, Language language)
+            throws SQLException {
+        // Keep track of what tags need to be removed/added
         Set<String> oldTags = new HashSet<>();
         Collection<Tag> newTags = language.getTags();
 
         // Get old and new tags
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT t.name tag_name " +
-                        "FROM freenote_tags ft, tags t " +
-                        "WHERE ft.tag_id = t.id " +
-                        "AND ft.freenote_id = ?")) {
+                "FROM freenote_tags ft, tags t " +
+                "WHERE ft.tag_id = t.id " +
+                "AND ft.freenote_id = ?")) {
             statement.setString(1, freeNote.getId());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -654,7 +875,16 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateModules(Connection conn, Language language) throws SQLException, DatabaseParserException {
+    /**
+     * Gets the modules for the given language.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     * @throws DatabaseParserException when user is improperly formatted.
+     */
+    private static void updateModules(Connection conn, Language language)
+            throws SQLException, DatabaseParserException {
+        // Keep track of what modules need to be removed/added
         Collection<Module> newModules = language.getModules();
         Set<String> oldModules = new HashSet<>();
 
@@ -662,6 +892,7 @@ public class DatabaseParser {
             throw new DatabaseParserException("Null module.");
         }
 
+        // Get old and new modules
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT m.id m_id, m.type m_type " +
                 "FROM modules m, languages l " +
@@ -682,6 +913,7 @@ public class DatabaseParser {
             }
         }
 
+        // Add new modules to database
         try (PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO modules " +
                 "(id, type, language_id, created, last_modified) VALUES " +
@@ -691,17 +923,20 @@ public class DatabaseParser {
                 statement.setString(2, module.getType().toString());
                 statement.setString(3, language.getName());
                 statement.setLong(4, module.getDateCreated().getTime());
+                // Set date to 0 so updated immediately
                 statement.setLong(5, 0);
                 statement.addBatch();
             }
 
             statement.executeBatch();
 
+            // Create the module in the database with empty data
             for (Module module : newModules) {
-                createModule(conn, module, language);
+                createModule(conn, module);
             }
         }
 
+        // Remove old modules from database
         try (PreparedStatement statement = conn.prepareStatement(
                 "DELETE FROM modules WHERE id = ?")) {
             for (String moduleId : oldModules) {
@@ -712,68 +947,92 @@ public class DatabaseParser {
             statement.executeBatch();
         }
 
+        // Update each module and its tags
         for (Module module : language.getModules()) {
-            updateModule(conn, module, language);
+            updateModule(conn, module);
             updateModuleTags(conn, module, language);
         }
     }
 
-    private static void createModule(Connection conn, Module module, Language language) throws DatabaseParserException, SQLException {
+    /**
+     * Creates the specific given module in the database
+     * with empty data to be filled in with update.
+     * @param conn The connection to the database.
+     * @param module The current module.
+     * @throws DatabaseParserException when module is not one of specified storage types.
+     * @throws SQLException when a SQL command is improperly formatted.
+     */
+    private static void createModule(Connection conn, Module module)
+            throws DatabaseParserException, SQLException {
+        // Create query
         String query;
         switch (module.getType()) {
             case NOTE:
                 query = "INSERT INTO note_modules " +
                         "(module_id, body, rating) VALUES " +
-                        "(?, '', 0)";
+                        "(?, NULL, NULL)";
                 break;
             case VOCAB:
                 query = "INSERT INTO vocab_modules " +
                         "(module_id, term, definition, rating) VALUES " +
-                        "(?, '', '', 0)";
+                        "(?, NULL, NULL, NULL)";
                 break;
             case CONJUGATION:
                 query = "INSERT INTO conjugation_modules " +
                         "(module_id, header, rating, height) VALUES " +
-                        "(?, '', 0, 0)";
+                        "(?, NULL, NULL, NULL)";
                 break;
             case QUESTION:
                 query = "INSERT INTO question_modules " +
                         "(module_id, body) VALUES " +
-                        "(?, '')";
+                        "(?, NULL)";
                 break;
             case ALERT_EXCLAMATION:
                 query = "INSERT INTO alert_exclamation_modules " +
                         "(module_id, body) VALUES " +
-                        "(?, '')";
+                        "(?, NULL)";
                 break;
             default:
-                throw new DatabaseParserException("Bad data.");
+                throw new DatabaseParserException("Bad data: " +
+                        "Module does not match any of set types.");
         }
 
+        // Create module
         try (PreparedStatement statement = conn.prepareStatement(query)) {
             statement.setString(1, module.getId());
             statement.execute();
         }
     }
 
-    private static void updateModule(Connection conn, Module module, Language language)
+    /**
+     * Updates the specific module if changes have been made.
+     * @param conn The connection to the user's database.
+     * @param module The module being updated.
+     * @throws SQLException when a SQL command is improperly formatted.
+     * @throws DatabaseParserException when database is improperly formatted.
+     */
+    private static void updateModule(Connection conn, Module module)
             throws SQLException, DatabaseParserException {
+        // Check if module has been updated since last database update
         Date lastUpdated;
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT last_modified FROM modules WHERE id = ?")) {
             statement.setString(1, module.getId());
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new DatabaseParserException("Bad data.");
+                    throw new DatabaseParserException("Bad data: " +
+                            "Module not in database.");
                 }
                 lastUpdated = new Date(rs.getInt("last_modified"));
             }
         }
 
+        // No update if no changes
         if (lastUpdated.equals(module.getDateModified())) {
             return;
         }
 
+        // Update module metadata
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE modules " +
                 "SET last_modified = ? " +
@@ -783,28 +1042,36 @@ public class DatabaseParser {
             statement.execute();
         }
 
+        // Update module data
         switch (module.getType()) {
             case NOTE:
-                updateNoteModule(conn, (Note) module, language);
+                updateNoteModule(conn, (Note) module);
                 break;
             case VOCAB:
-                updateVocabModule(conn, (Vocab) module, language);
+                updateVocabModule(conn, (Vocab) module);
                 break;
             case CONJUGATION:
-                updateConjugationModule(conn, (Conjugation) module, language);
+                updateConjugationModule(conn, (Conjugation) module);
                 break;
             case QUESTION:
-                updateQuestionModule(conn, (Question) module, language);
+                updateQuestionModule(conn, (Question) module);
                 break;
             case ALERT_EXCLAMATION:
-                updateAlertModule(conn, (AlertExclamation) module, language);
+                updateAlertModule(conn, (AlertExclamation) module);
                 break;
             default:
                 throw new DatabaseParserException("Bad data.");
         }
     }
 
-    private static void updateNoteModule(Connection conn, Note module, Language language) throws SQLException {
+    /**
+     * Updates the data for a Note module.
+     * @param conn The connection to the user's database.
+     * @param module The module being updated.
+     * @throws SQLException when a SQL command is improperly formatted.
+     */
+    private static void updateNoteModule(Connection conn, Note module)
+            throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE note_modules " +
                 "SET body = ?, rating = ? " +
@@ -816,7 +1083,14 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateVocabModule(Connection conn, Vocab module, Language language) throws SQLException {
+    /**
+     * Updates the data for a Vocab module.
+     * @param conn The connection to the user's database.
+     * @param module The module being updated.
+     * @throws SQLException when a SQL command is improperly formatted.
+     */
+    private static void updateVocabModule(Connection conn, Vocab module)
+            throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE vocab_modules " +
                 "SET term = ?, definition = ?, rating = ? " +
@@ -829,7 +1103,15 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateConjugationModule(Connection conn, Conjugation module, Language language) throws SQLException {
+    /**
+     * Updates the data for a Conjugation module.
+     * @param conn The connection to the user's database.
+     * @param module The module being updated.
+     * @throws SQLException when a SQL command is improperly formatted.
+     */
+    private static void updateConjugationModule(Connection conn, Conjugation module)
+            throws SQLException {
+        // Update module metadata
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE conjugation_modules " +
                         "SET header = ?, rating = ?, height = ? " +
@@ -841,11 +1123,13 @@ public class DatabaseParser {
             statement.execute();
         }
 
+        // Delete all rows of conjugation table
         try (PreparedStatement statement = conn.prepareStatement(
                 "DELETE FROM conjugation_rows WHERE module_id = ?")) {
             statement.setString(1, module.getId());
         }
 
+        // Add current rows into database
         try (PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO conjugation_rows " +
                 "(module_id, col1, col2, position) VALUES " +
@@ -862,7 +1146,14 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateQuestionModule(Connection conn, Question module, Language language) throws SQLException {
+    /**
+     * Updates the data for a Question module.
+     * @param conn The connection to the user's database.
+     * @param module The module being updated.
+     * @throws SQLException when a SQL command is improperly formatted.
+     */
+    private static void updateQuestionModule(Connection conn, Question module)
+            throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE question_modules " +
                         "SET body = ? " +
@@ -873,7 +1164,14 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateAlertModule(Connection conn, AlertExclamation module, Language language) throws SQLException {
+    /**
+     * Updates the data for an AlertExclamation module.
+     * @param conn The connection to the user's database.
+     * @param module The module being updated.
+     * @throws SQLException when a SQL command is improperly formatted.
+     */
+    private static void updateAlertModule(Connection conn, AlertExclamation module)
+            throws SQLException {
         try (PreparedStatement statement = conn.prepareStatement(
                 "UPDATE alert_exclamation_modules " +
                         "SET body = ? " +
@@ -884,7 +1182,16 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateModuleTags(Connection conn, Module module, Language language) throws SQLException {
+    /**
+     * Updates the tags for the given module.
+     * @param conn The connection to the user's database.
+     * @param module The module.
+     * @param language The language the module belongs to.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateModuleTags(Connection conn, Module module, Language language)
+            throws SQLException {
+        // Keep track of old and new tags
         Set<String> oldTags = new HashSet<>();
         Collection<Tag> newTags = module.getTags();
 
@@ -936,8 +1243,16 @@ public class DatabaseParser {
         }
     }
 
-    private static void updateFreeNoteModules(Connection conn, Language language) throws SQLException {
+    /**
+     * Updates the relationships between the free notes and the modules.
+     * @param conn The connection to the user's database.
+     * @param language The current language.
+     * @throws SQLException when a SQL command is improperly executed.
+     */
+    private static void updateFreeNoteModules(Connection conn, Language language)
+            throws SQLException {
         for (FreeNote freeNote : language.getFreeNotes()) {
+            // Get the order of modules in the database
             List<String> moduleOrder = new ArrayList<>();
 
             try (PreparedStatement statement = conn.prepareStatement(
@@ -954,16 +1269,19 @@ public class DatabaseParser {
                 }
             }
 
+            // Get the order of modules in the free note
             List<String> currentModuleIds =
                     freeNote.getModules()
                             .stream()
                             .map(Module::getId)
                             .collect(Collectors.toList());
 
+            // If they match, no update
             if (moduleOrder.equals(currentModuleIds)) {
                 continue;
             }
 
+            // Delete old module order from free note in database
             try (PreparedStatement statement = conn.prepareStatement(
                     "DELETE FROM freenote_modules " +
                     "WHERE freenote_id = ?")) {
@@ -971,6 +1289,7 @@ public class DatabaseParser {
                 statement.execute();
             }
 
+            // Add new module order for free note into database
             try (PreparedStatement statement = conn.prepareStatement(
                     "INSERT INTO freenote_modules " +
                     "(freenote_id, module_id, position) VALUES " +

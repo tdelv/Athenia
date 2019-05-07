@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="SQLite - identifier.sqlite">
+  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.15">
+    <root id="1">
+      <ServerVersion>3.25.1</ServerVersion>
+    </root>
+    <schema id="2" parent="1" name="main">
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <collation id="3" parent="1" name="BINARY"/>
+    <collation id="4" parent="1" name="NOCASE"/>
+    <collation id="5" parent="1" name="RTRIM"/>
+    <table id="6" parent="2" name="alert_exclamation_modules"/>
+    <table id="7" parent="2" name="conjugation_modules"/>
+    <table id="8" parent="2" name="conjugation_rows"/>
+    <table id="9" parent="2" name="freenote_modules"/>
+    <table id="10" parent="2" name="freenote_tags"/>
+    <table id="11" parent="2" name="freenotes"/>
+    <table id="12" parent="2" name="language_tags"/>
+    <table id="13" parent="2" name="languages"/>
+    <table id="14" parent="2" name="module_tags"/>
+    <table id="15" parent="2" name="modules"/>
+    <table id="16" parent="2" name="note_modules"/>
+    <table id="17" parent="2" name="question_modules"/>
+    <table id="18" parent="2" name="sqlite_master">
+      <System>1</System>
+    </table>
+    <table id="19" parent="2" name="tags"/>
+    <table id="20" parent="2" name="user_data"/>
+    <table id="21" parent="2" name="vocab_modules"/>
+    <column id="22" parent="6" name="module_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="23" parent="6" name="body">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <index id="24" parent="6" name="sqlite_autoindex_alert_exclamation_modules_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>module_id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="25" parent="6">
+      <ColNames>module_id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_alert_exclamation_modules_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="26" parent="6">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="27" parent="7" name="module_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="28" parent="7" name="header">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="29" parent="7" name="rating">
+      <Position>3</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <column id="30" parent="7" name="height">
+      <Position>4</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <index id="31" parent="7" name="sqlite_autoindex_conjugation_modules_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>module_id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="32" parent="7">
+      <ColNames>module_id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_conjugation_modules_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="33" parent="7">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="34" parent="8" name="id">
+      <Position>1</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <column id="35" parent="8" name="module_id">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="36" parent="8" name="col1">
+      <Position>3</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="37" parent="8" name="col2">
+      <Position>4</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="38" parent="8" name="position">
+      <Position>5</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <key id="39" parent="8">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="40" parent="8">
+      <ColNames>module_id</ColNames>
+      <RefTableName>conjugation_modules</RefTableName>
+      <RefColNames>module_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="41" parent="9" name="freenote_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="42" parent="9" name="module_id">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="43" parent="9" name="position">
+      <Position>3</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <foreign-key id="44" parent="9">
+      <ColNames>freenote_id</ColNames>
+      <RefTableName>freenotes</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="45" parent="9">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="46" parent="10" name="freenote_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="47" parent="10" name="tag_id">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <foreign-key id="48" parent="10">
+      <ColNames>freenote_id</ColNames>
+      <RefTableName>freenotes</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="49" parent="10">
+      <ColNames>tag_id</ColNames>
+      <RefTableName>tags</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="50" parent="11" name="id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="51" parent="11" name="language_id">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="52" parent="11" name="title">
+      <Position>3</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="53" parent="11" name="created">
+      <Position>4</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <column id="54" parent="11" name="last_modified">
+      <Position>5</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <index id="55" parent="11" name="sqlite_autoindex_freenotes_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="56" parent="11">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_freenotes_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="57" parent="11">
+      <ColNames>language_id</ColNames>
+      <RefTableName>languages</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="58" parent="12" name="language_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="59" parent="12" name="tag_id">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <foreign-key id="60" parent="12">
+      <ColNames>language_id</ColNames>
+      <RefTableName>languages</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="61" parent="12">
+      <ColNames>tag_id</ColNames>
+      <RefTableName>tags</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="62" parent="13" name="id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="63" parent="13" name="language">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <index id="64" parent="13" name="sqlite_autoindex_languages_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="65" parent="13">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_languages_1</UnderlyingIndexName>
+    </key>
+    <column id="66" parent="14" name="module_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="67" parent="14" name="tag_id">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <foreign-key id="68" parent="14">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="69" parent="14">
+      <ColNames>tag_id</ColNames>
+      <RefTableName>tags</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="70" parent="15" name="id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="71" parent="15" name="type">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="72" parent="15" name="language_id">
+      <Position>3</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="73" parent="15" name="created">
+      <Position>4</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <column id="74" parent="15" name="last_modified">
+      <Position>5</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <index id="75" parent="15" name="sqlite_autoindex_modules_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="76" parent="15">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_modules_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="77" parent="15">
+      <ColNames>language_id</ColNames>
+      <RefTableName>languages</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="78" parent="16" name="module_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="79" parent="16" name="body">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="80" parent="16" name="rating">
+      <Position>3</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <index id="81" parent="16" name="sqlite_autoindex_note_modules_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>module_id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="82" parent="16">
+      <ColNames>module_id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_note_modules_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="83" parent="16">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="84" parent="17" name="module_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="85" parent="17" name="body">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <index id="86" parent="17" name="sqlite_autoindex_question_modules_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>module_id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="87" parent="17">
+      <ColNames>module_id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_question_modules_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="88" parent="17">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="89" parent="18" name="type">
+      <Position>1</Position>
+      <DataType>text|0s</DataType>
+    </column>
+    <column id="90" parent="18" name="name">
+      <Position>2</Position>
+      <DataType>text|0s</DataType>
+    </column>
+    <column id="91" parent="18" name="tbl_name">
+      <Position>3</Position>
+      <DataType>text|0s</DataType>
+    </column>
+    <column id="92" parent="18" name="rootpage">
+      <Position>4</Position>
+      <DataType>int|0s</DataType>
+    </column>
+    <column id="93" parent="18" name="sql">
+      <Position>5</Position>
+      <DataType>text|0s</DataType>
+    </column>
+    <column id="94" parent="19" name="id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="95" parent="19" name="name">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <index id="96" parent="19" name="sqlite_autoindex_tags_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="97" parent="19">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_tags_1</UnderlyingIndexName>
+    </key>
+    <column id="98" parent="20" name="username">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="99" parent="20" name="joined">
+      <Position>2</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <column id="100" parent="20" name="last_update">
+      <Position>3</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <column id="101" parent="21" name="module_id">
+      <Position>1</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="102" parent="21" name="term">
+      <Position>2</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="103" parent="21" name="definition">
+      <Position>3</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <column id="104" parent="21" name="rating">
+      <Position>4</Position>
+      <DataType>INTEGER|0s</DataType>
+    </column>
+    <index id="105" parent="21" name="sqlite_autoindex_vocab_modules_1">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>module_id</ColNames>
+      <ColumnCollations></ColumnCollations>
+      <Unique>1</Unique>
+    </index>
+    <key id="106" parent="21">
+      <ColNames>module_id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_vocab_modules_1</UnderlyingIndexName>
+    </key>
+    <foreign-key id="107" parent="21">
+      <ColNames>module_id</ColNames>
+      <RefTableName>modules</RefTableName>
+      <RefColNames>id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+  </database-model>
+</dataSource>
