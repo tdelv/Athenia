@@ -1170,7 +1170,7 @@ public class GUICommand {
     public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
-      String noteId = qm.value("noteId");
+      String noteId = qm.value("idToRemove");
 
       // get FreeNote id
       String freeNoteId = qm.value("freeNoteId");
@@ -1187,6 +1187,7 @@ public class GUICommand {
         Language lang = user.getCurrLanguage();
         // check if current lang is not null
         if (lang != null) {
+
           // check if module is in user map
           if (lang.getModule(StorageType.NOTE, noteId) != null) {
             Note noteToRemove = (Note) lang.getModule(StorageType.NOTE, noteId);
@@ -2213,6 +2214,54 @@ public class GUICommand {
       variables.put("message", message);
 
       return new ModelAndView(variables.build(), "notePageEdit.ftl");
+    }
+  }
+
+  public static class RemoveFreeNote implements Route {
+    @Override
+    public String handle(Request req, Response res) throws DriveApiException {
+      String userId = req.session().attribute("user_id");
+      QueryParamsMap qm = req.queryMap();
+
+      String idToRemove = qm.value("noteId");
+
+      boolean successful = false;
+      String message = "";
+
+      ImmutableMap.Builder<String, Object> variables =
+              new ImmutableMap.Builder<>();
+
+      try {
+        Athenia user = DatabaseParser.getUser(userId);
+        Language lang = user.getCurrLanguage();
+
+        // check if current lang is not null
+        if (lang != null) {
+
+          // check if lang has the freenote in it
+          if (lang.containsFreeNote(idToRemove)) {
+            lang.removeFreeNote(idToRemove);
+
+            successful = true;
+            message = "successfully removed freenote";
+
+            // catch if language does not have freenote in it
+          } else {
+            message = "freenote id not in current language";
+          }
+          // catch if current language is null
+        } else {
+          message = "current language is null";
+        }
+        // catch if user not in database
+      } catch (DatabaseParserException e) {
+        message = "user not found in database";
+      }
+
+      // prepare message for front-end
+      variables.put("successful", successful);
+      variables.put("message", message);
+      return GSON.toJson(variables.build());
     }
   }
 

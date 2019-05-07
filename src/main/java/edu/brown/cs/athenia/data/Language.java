@@ -8,7 +8,6 @@ public class Language extends Modularized {
   private String name;
   private Map<String, Tag> tags;
   private Map<String, FreeNote> freeNotesMap;
-  private List<FreeNote> freeNotes;
 
   // TODO: some sort of recent list storing the most recent
   // free notes according to some date value
@@ -21,7 +20,6 @@ public class Language extends Modularized {
     this.name = name;
     this.tags = new HashMap<String, Tag>();
     this.freeNotesMap = new HashMap<>();
-    this.freeNotes = new ArrayList<FreeNote>();
   }
 
   /**
@@ -54,7 +52,6 @@ public class Language extends Modularized {
 
   public void addFreeNote(FreeNote note) {
     freeNotesMap.put(note.getId(), note);
-    freeNotes.add(note);
   }
 
   public boolean containsFreeNote(String id) {
@@ -65,23 +62,20 @@ public class Language extends Modularized {
     return freeNotesMap.get(id);
   }
 
+  public void removeFreeNote(String id) {
+    freeNotesMap.remove(id);
+  }
+
   public List<FreeNote> getFreeNotes() {
-    return new ArrayList<FreeNote>(this.freeNotes);
+    return new ArrayList<FreeNote>(this.freeNotesMap.values());
   }
 
   public List<FreeNote> getRecentFreeNotes() {
-    /*
-     * List<FreeNote> returnable = new ArrayList<FreeNote>();
-     * 
-     * int i = 1; while (i <= 3) { FreeNote note =
-     * freenotes.get(freenotes.size() - i); if (note != null) {
-     * returnable.add(note); } }
-     * 
-     * return returnable;
-     */
 
     // a list of the users recent notes
     List<FreeNote> recentNotes = new ArrayList<>();
+
+    List<FreeNote> freeNotes = new ArrayList<>(freeNotesMap.values());
 
     // the max number of notes to return
     int NUMBER_OF_NOTES = 3;
