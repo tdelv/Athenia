@@ -21,6 +21,7 @@ import edu.brown.cs.athenia.data.modules.module.StorageType;
 import edu.brown.cs.athenia.data.modules.module.Vocab;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
+import edu.brown.cs.athenia.updaterscheduler.UpdaterScheduler;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
@@ -146,6 +147,9 @@ public class GUICommand {
 
       // Update user's database
       DatabaseParser.updateUser(userId);
+
+      // Remove scheduler for updating user's database
+      UpdaterScheduler.delete(userId);
 
       // Invalidate previous session and create a new one
       req.session().invalidate();
