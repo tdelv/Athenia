@@ -32,6 +32,117 @@ public class DatabaseParser {
 
     private static final Map<String, Athenia> USER_MAP = new HashMap<>();
 
+    // External interactions with other parts of project.
+
+    /**
+     * Generates a new Athenia object for the given user.
+     * The order of preference is:
+     *  - Read from program memory if in cache;
+     *  - Read from local server memory if in GoogleDriveApi cache;
+     *  - Read from Google Drive file;
+     *  - Create new database file for user.
+     * @param userId The id of the user.
+     * @return the Athenia object containing the user's data.
+     * @throws DatabaseParserException when something goes wrong generating the user.
+     */
+    public static Athenia getUser(String userId)
+            throws DatabaseParserException {
+        // Grab from cache if available.
+        if (USER_MAP.containsKey(userId)) {
+            return USER_MAP.get(userId);
+        }
+
+        // Create a new Athenia for user
+        Athenia user = new Athenia(userId);
+
+        // Set data for the user from their database
+        try (Connection conn = getConnection(userId)) {
+            // Get meta data for user
+            getUserData(conn, user);
+
+            // Get languages
+            getLanguages(conn, user);
+
+            // Fill in languages
+            for (String langName : user.getLanguages()) {
+                user.setCurrLang(langName);
+                Language language = user.getCurrLanguage();
+
+                // Get data for each language
+                getTags(conn, language);
+                getFreeNotes(conn, language);
+                getModules(conn, language);
+                getFreeNoteModules(conn, language);
+            }
+
+        } catch (SQLException | ClassNotFoundException | IOException | DriveApiException e) {
+            // Wrap any exceptions from interaction with API with project exception
+            throw new DatabaseParserException(e);
+        }
+
+        // Add Athenia to cache if generation has succeeded
+        USER_MAP.put(userId, user);
+
+        return user;
+    }
+
+    /**
+     * Update the user's database with their current Athenia data, and
+     * attempts to write it to their Google Drive file.
+     * Does not recreate database, but instead applies updates based on
+     * differences between database and program memory.
+     * @param userId The id of the user.
+     * @throws DatabaseParserException when something goes wrong updating the database.
+     */
+    public static void updateUser(String userId)
+            throws DatabaseParserException {
+        if (!USER_MAP.containsKey(userId)) {
+            throw new DatabaseParserException("No such user.");
+        }
+
+        // Get the user
+        Athenia user = USER_MAP.get(userId);
+
+        // Update (or create) the user's database file
+        try (Connection conn = getConnection(userId)) {
+            // Update the user's metadata
+            updateUserData(conn, user);
+
+            // Update the user's languages
+            updateLanguages(conn, user);
+
+            for (String langName : user.getLanguages()) {
+                user.setCurrLang(langName);
+                Language language = user.getCurrLanguage();
+
+                // Update the data for each language
+                updateTags(conn, language);
+                updateFreeNotes(conn, language);
+                updateModules(conn, language);
+                updateFreeNoteModules(conn, language);
+            }
+
+        } catch (IOException | SQLException | ClassNotFoundException | DriveApiException e) {
+            // Wrap any exceptions from interaction with API with project exception
+            throw new DatabaseParserException(e);
+        }
+
+        // Write to the user's Google Drive
+        try {
+            File file = new java.io.File(
+                    "src/main/resources/userData/" + userId + ".sqlite3");
+            GoogleDriveApi.setDataBase(userId, file);
+        } catch (DriveApiException e) {
+            // Wrap any exceptions from interaction with API with project exception
+            throw new DatabaseParserException(e);
+        }
+    }
+
+
+    // Internal helper methods
+
+    // Generating connection to database
+
     /**
      * Generates the SQL Connection to a given database file.
      * @param filePath The path to the database file.
@@ -106,57 +217,7 @@ public class DatabaseParser {
         }
     }
 
-    /**
-     * Generates a new Athenia object for the given user.
-     * The order of preference is:
-     *  - Read from program memory if in cache;
-     *  - Read from local server memory if in GoogleDriveApi cache;
-     *  - Read from Google Drive file;
-     *  - Create new database file for user.
-     * @param userId The id of the user.
-     * @return the Athenia object containing the user's data.
-     * @throws DatabaseParserException when something goes wrong generating the user.
-     */
-    public static Athenia getUser(String userId)
-            throws DatabaseParserException {
-        // Grab from cache if available.
-        if (USER_MAP.containsKey(userId)) {
-            return USER_MAP.get(userId);
-        }
-
-        // Create a new Athenia for user
-        Athenia user = new Athenia(userId);
-
-        // Set data for the user from their database
-        try (Connection conn = getConnection(userId)) {
-            // Get meta data for user
-            getUserData(conn, user);
-
-            // Get languages
-            getLanguages(conn, user);
-
-            // Fill in languages
-            for (String langName : user.getLanguages()) {
-                user.setCurrLang(langName);
-                Language language = user.getCurrLanguage();
-
-                // Get data for each language
-                getTags(conn, language);
-                getFreeNotes(conn, language);
-                getModules(conn, language);
-                getFreeNoteModules(conn, language);
-            }
-
-        } catch (SQLException | ClassNotFoundException | IOException | DriveApiException e) {
-            // Wrap any exceptions from interaction with API with project exception
-            throw new DatabaseParserException(e);
-        }
-
-        // Add Athenia to cache if generation has succeeded
-        USER_MAP.put(userId, user);
-
-        return user;
-    }
+    // Helpers for getting user data
 
     /**
      * Gets the metadata for the given user.
@@ -536,57 +597,7 @@ public class DatabaseParser {
         }
     }
 
-    /**
-     * Update the user's database with their current Athenia data, and
-     * attempts to write it to their Google Drive file.
-     * Does not recreate database, but instead applies updates based on
-     * differences between database and program memory.
-     * @param userId The id of the user.
-     * @throws DatabaseParserException when something goes wrong updating the database.
-     */
-    public static void updateUser(String userId)
-            throws DatabaseParserException {
-        if (!USER_MAP.containsKey(userId)) {
-            throw new DatabaseParserException("No such user.");
-        }
-
-        // Get the user
-        Athenia user = USER_MAP.get(userId);
-
-        // Update (or create) the user's database file
-        try (Connection conn = getConnection(userId)) {
-            // Update the user's metadata
-            updateUserData(conn, user);
-
-            // Update the user's languages
-            updateLanguages(conn, user);
-
-            for (String langName : user.getLanguages()) {
-                user.setCurrLang(langName);
-                Language language = user.getCurrLanguage();
-
-                // Update the data for each language
-                updateTags(conn, language);
-                updateFreeNotes(conn, language);
-                updateModules(conn, language);
-                updateFreeNoteModules(conn, language);
-            }
-
-        } catch (IOException | SQLException | ClassNotFoundException | DriveApiException e) {
-            // Wrap any exceptions from interaction with API with project exception
-            throw new DatabaseParserException(e);
-        }
-
-        // Write to the user's Google Drive
-        try {
-            File file = new java.io.File(
-                    "src/main/resources/userData/" + userId + ".sqlite3");
-            GoogleDriveApi.setDataBase(userId, file);
-        } catch (DriveApiException e) {
-            // Wrap any exceptions from interaction with API with project exception
-            throw new DatabaseParserException(e);
-        }
-    }
+    // Helpers for updating user data
 
     /**
      * Updates the metadata for the given user.
