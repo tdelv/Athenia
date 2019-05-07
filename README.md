@@ -6,6 +6,34 @@
 
 Athenia is a supplementary learning tool designed to help users who are studying a foreign languages. The application provides note taking functionality with built in "modules" and tagging system. The modules, including vocabulary, conjugation, general text, and so on, are automatically compiled from all of your notes into easy to study formats. As well, the application provides a review mode, which uses an algorithm that takes into account various factors, such as date last reviewed and difficulty rating, in order to provide the most important notes for you to review. Through Google Drive, the application allows a user's data to be stored between sessions, automatically backing it up to the user's own Google Drive. The application is currently in development, but most of its prominent features are functional and being improved.
 
+## Running and Testing
+
+ - To run:
+   - In the directory for the project, run `gradle run`. Then, go to `localhost:4569`.
+   - Heroku is having issues at the moment, but when it is running properly, an online version will be available at `athenia.herokuapp.com`.
+ - To run unit tests:
+   - Currently, we are having major issues with JUnit (specifically that it won't even import). 
+ - For system testing:
+   - Since our project is primarily user interface interaction, and there is no REPL interaction, our system testing consists of manual tests only.
+   - Before all tests:
+     - Run `gradle run` in project directory.
+   - Test 1: Basic logging in an logging out.
+     - Go to `localhost:4569`.
+       - User will be brough to page with a button available that says "Sign in with Google."
+     - Click the sign in button.
+       - User will be brought to a Google Authentication screen.
+     - Authenticate with some Google Account.
+       - User will be redirected to the language selection screen (`/languages').
+     - Log out
+       - .
+   - Test 2: Redirect to log in if not authenticated.
+   - Test 3: Adding and removing languages.
+   - Test 4: Adding and updating freenotes.
+   
+## Overall bugs
+ - Heroku is having issues with the dependencies for jetty servers, so currently deployed version is unavailable.
+ - Gradle is having issues with the dependency for JUnit testing, so currently unit tests are unavailable.
+ - Tagging is having some general issues throughout the code (front-end to back-end).
 
 ## Section Overviews
 
