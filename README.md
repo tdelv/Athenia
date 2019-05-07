@@ -40,6 +40,18 @@ Athenia is a supplementary learning tool designed to help users who are studying
 
 ### Front End
 
+##### Mia's Tasks
+
+##### Jason's Tasks
+
+The main component of Jason's work included working on the GUICommand GET and POST
+request spark handlers. This involved creating stubs for most things and communicating with both
+the back-end and front-end mechanisms to create somewhat of a communication channel. On top
+of that, Jason worked on front-end specific details, such as finalizing the functionality
+of Note, Question, and Alert modules, and the View Notes and Review pages. Other work included 
+the removal features of FreeNotes from the View Notes page and Note, Question, and Alert 
+module removal from a FreeNotes editor page as well as the displaying of modules for reviewing.
+
 #### Overview of Process
 
 The user interface of this app was built by incrementally deciding what the controller and view needed from eachother in order to function. We developed the interface feature by feature, communicating the logistics of each post and get request. 
@@ -134,6 +146,8 @@ After implementing the basic scheduler, I went on to add in some purging. At the
 
 ## Who's working on what files?
 - Jason
+  - GUICommand
+  - Here and there front-end files
 - Makayla
 - Mia
   - resources folder files

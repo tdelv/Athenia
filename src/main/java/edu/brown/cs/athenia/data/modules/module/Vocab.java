@@ -40,11 +40,17 @@ public class Vocab extends Module implements Reviewable {
     return this.rating;
   }
 
+  /**
+   * Setter for rating.
+   */
   public void setRating(int r) {
     this.rating = r;
   }
 
-  public StorageType getType(){
+  /**
+   * Getter for type.
+   */
+  public StorageType getType() {
     return StorageType.VOCAB;
   }
 }

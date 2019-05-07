@@ -20,6 +20,12 @@ public class ModuleRanker {
   public ModuleRanker() {
   }
 
+  /**
+   * Ranks the modules given a list based on rating and dateLastReviewed.
+   * @param toRank
+   *          : List<Reviewable> of Reviewable Modules to review.
+   * @return : ranked list of Reviewable objects.
+   */
   public List<Reviewable> rank(List<Reviewable> toRank) {
 
     rankedModules = new ArrayList<Reviewable>();
