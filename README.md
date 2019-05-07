@@ -29,6 +29,7 @@ Athenia is a supplementary learning tool designed to help users who are studying
    - Test 2: Redirect to log in if not authenticated.
    - Test 3: Adding and removing languages.
    - Test 4: Adding and updating freenotes.
+   - There are more, I just don't have time to type them out :(
    
 ## Overall bugs
  - Heroku is having issues with the dependencies for jetty servers, so currently deployed version is unavailable.
@@ -38,6 +39,18 @@ Athenia is a supplementary learning tool designed to help users who are studying
 ## Section Overviews
 
 ### Front End
+
+##### Mia's Tasks
+
+##### Jason's Tasks
+
+The main component of Jason's work included working on the GUICommand GET and POST
+request spark handlers. This involved creating stubs for most things and communicating with both
+the back-end and front-end mechanisms to create somewhat of a communication channel. On top
+of that, Jason worked on front-end specific details, such as finalizing the functionality
+of Note, Question, and Alert modules, and the View Notes and Review pages. Other work included 
+the removal features of FreeNotes from the View Notes page and Note, Question, and Alert 
+module removal from a FreeNotes editor page as well as the displaying of modules for reviewing.
 
 #### Overview of Process
 
@@ -133,6 +146,8 @@ After implementing the basic scheduler, I went on to add in some purging. At the
 
 ## Who's working on what files?
 - Jason
+  - GUICommand
+  - Here and there front-end files
 - Makayla
 - Mia
   - resources folder files
