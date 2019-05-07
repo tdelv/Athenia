@@ -28,6 +28,11 @@ public class FreeNote {
   private String title;
   private String id;
 
+  /**
+   * FreeNote constructor to take in String title.
+   * @param t
+   *          : String title
+   */
   public FreeNote(String t) {
     this.id = new BigInteger(130, new SecureRandom()).toString(32);
     this.modules = new ArrayList<Module>();
@@ -37,6 +42,13 @@ public class FreeNote {
     this.title = t;
   }
 
+  /**
+   * FreeNote to takes in a given title and id.
+   * @param t
+   *          : String title
+   * @param id
+   *          : String id
+   */
   public FreeNote(String t, String id) {
     this.id = id;
     this.modules = new ArrayList<Module>();
@@ -46,24 +58,47 @@ public class FreeNote {
     this.title = t;
   }
 
+  /**
+   * Setter for title.
+   * @param newTitle
+   *          : String new title.
+   */
   public void setTitle(String newTitle) {
     this.title = newTitle;
   }
 
+  /**
+   * Getter for id.
+   * @return : String id.
+   */
   public String getId() {
     return this.id;
   }
 
+  /**
+   * Getter for list of modules.
+   * @return : List of Modules
+   */
   public List<Module> getModules() {
     return this.modules;
   }
 
+  /**
+   * Remover for Modules.
+   * @param m
+   *          : Module m
+   * @return : boolean if Modules are found.
+   */
   public boolean removeModule(Module m) {
     this.dateModified = new Date();
     m.removeFreeNote();
     return this.modules.remove(m);
   }
 
+  /**
+   * Adds Module to FreeNote.
+   * @param m
+   */
   public void addModule(Module m) {
     if (m == null) {
       throw new NullPointerException();
@@ -72,15 +107,29 @@ public class FreeNote {
     this.modules.add(m);
   }
 
+  /**
+   * Getter for Tags.
+   * @return : Collection of Tags.
+   */
   public Collection<Tag> getTags() {
     return tags.values();
   }
 
+  /**
+   * Getter for Tags.
+   * @param t
+   *          : Tag t.
+   */
   public void addTag(Tag t) {
     this.dateModified = new Date();
     tags.put(t.getTag(), t);
   }
 
+  /**
+   * Remover for Tag.
+   * @param t
+   * @return
+   */
   public Tag removeTag(String t) {
     return tags.remove(t);
   }
