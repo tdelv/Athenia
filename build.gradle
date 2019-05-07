@@ -37,6 +37,9 @@ dependencies {
 
     // SQLite3
     compile group:'org.xerial', name:'sqlite-jdbc', version:'3.8.11.2'
+
+    // javax
+    compile 'javax.servlet:javax.servlet-api:4.0.1'
 }
 
 defaultTasks = ['clean']
