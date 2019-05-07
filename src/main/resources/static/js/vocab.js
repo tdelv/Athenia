@@ -33,6 +33,7 @@ function getVocabList() {
                 }
                 const newVocabHTML = newVocab.toHTML();
                 $("#vocabularyContainer").append(newVocabHTML);
+                newVocab.setUp();
             }
         } else {
             console.log("message: " + responseObject.message);
