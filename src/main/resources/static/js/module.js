@@ -122,7 +122,7 @@ class Note extends Module {
                         <i class="fa fa-trash" onclick="removeNote('${this.id}')"></i></div>`;
 
         const tags = `<div class="col"><input type="text" id='tags-${this.id}' class="form-control" 
-                placeholder="Insert tags separated by a comma (,)"></div>`;
+                placeholder="Type in tags separated by comma (,)"></div>`;
 
         const rating = `<div class="col">
                 <select class="form-control" id='rating-${this.id}' name="ratingSelect-${this.id}">
