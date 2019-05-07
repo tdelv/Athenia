@@ -9,9 +9,19 @@ Athenia is a supplementary learning tool designed to help users who are studying
 
 ## Section Overviews
 
-### Front End (Mia and Jason)
+### Front End (Mia and Jason) (you can break this up if you want i wasn't 100% sure how the work was split.
+
+#### Overview of Process
+#### Design Decisions
+#### Current Bugs
+#### Put whatever else you want up to you
 
 ### Data Structures (Makayla)
+
+#### Overview of Process
+#### Design Decisions
+#### Current Bugs
+#### Put whatever else you want up to you
 
 ### Data Storage (Thomas)
 
