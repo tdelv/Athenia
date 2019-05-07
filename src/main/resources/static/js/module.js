@@ -101,10 +101,17 @@ class Note extends Module {
     }
 
     toHTML() {
+
         const input = `<input type="text" class="form-control mb-3" placeholder="${this.content}">`;
-        const div = `<div class="noteModule" id="${this.id}">${input}</div>`;
-        return div;
+        const div = `<div class="noteModule col">${input}</div>`;
+        const remover = `<div class="col-sm-auto p-2 d-flex justify-content-end">
+                        <i class="fa fa-trash" onclick="removeNote('${this.id}')"></i></div>`;
+
+        const container = `<div class="container-fluid" id="${this.id}">
+                        <div class="row">${div}${remover}</div></div>`;
+        return container;
     }
+
 }
 
 class Exclamation extends Note {
@@ -131,8 +138,13 @@ class Exclamation extends Note {
     toHTML() {
         const icon = "<i class=\"fa fa-exclamation\"></i>";
         const input = `<input type="text" class="form-control mb-3 ml-2 d-inline w-75" placeholder="${this.content}">`;
-        const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
-        return div;
+        const div = `<div class="noteModule col">${icon} ${input}</div>`;
+        const remover = `<div class="col-sm-auto p-2 d-flex justify-content-end">
+                        <i class="fa fa-trash" onclick="removeExclamation('${this.id}')"></i></div>`;
+        const container = `<div class="container-fluid" id="${this.id}">
+                        <div class="row">${div}${remover}</div></div>`;
+
+        return container;
     }
 
 }
@@ -161,8 +173,12 @@ class Question extends Note {
     toHTML() {
         const icon = `<i class="fa fa-question"></i>`;
         const input = `<input type="text" class="form-control mb-3 ml-1 d-inline w-75" placeholder="${this.content}">`;
-        const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
-        return div;
+        const div = `<div class="noteModule col">${icon} ${input}</div>`;
+        const remover = `<div class="col-sm-auto p-2 d-flex justify-content-end">
+                        <i class="fa fa-trash" onclick="removeQuestion('${this.id}')"></i></div>`;
+        const container = `<div class="container-fluid" id="${this.id}">
+                        <div class="row">${div}${remover}</div></div>`;
+        return container;
     }
 }
 
@@ -179,33 +195,6 @@ class Vocabulary extends Module {
         const thisOlThing = this;
         $(selector).blur(function(){thisOlThing.update(thisOlThing);});
     }
-
-    update(thisOlThing) {
-        // TODO:
-        // for each text input, store the value in this object
-        // use a post request and these new values to update this module in the backend
-
-    }
-
-    /*
-        update(thisOlThing) {
-            const selector = "#" + thisOlThing.id + " input";
-            const newNoteContent = $(selector).val();
-
-            const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
-            $.post("/noteUpdate", postParameters, responseJSON => {
-                const responseObject = JSON.parse(responseJSON);
-                if (responseObject.successful) {
-                    // TODO: check that responseObject.updatedNote matches this object
-                    console.log("new content " + responseObject.updatedNote.noteContent);
-                } else {
-                    console.log("message: " + responseObject.message);
-                }
-            });
-        }
-
-
-        */
 
     // TODO: attach this handler to onBlur
     update(thisOlThing) {
@@ -248,7 +237,7 @@ class Vocabulary extends Module {
             `<input type="text" name="updatedRating" class="form-control" placeholder="${this.rating}">` +
 
             // TODO somehow allow for rating changes
-            `<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
+            //`<input type="submit" id="" class="btn btn-primary vocabSubmit" value="Save"/>` +
             `</div>` +
             `<small>Date Modified: ${this.dateModified}</small>` +
             `</form>`;
@@ -292,7 +281,7 @@ class ConjugationTable extends Module {
         }
 
         // ADD THE SUBMIT BUTTON FOR EDITS
-        form += `<button type="submit" id="sub-butt-${this.id}" class="btn conjSave btn-primary mt-2">Save</button>`;
+        //form += `<button type="submit" id="sub-butt-${this.id}" class="btn conjSave btn-primary mt-2">Save</button>`;
 
         form += `</div></form>`;
 

@@ -49,6 +49,8 @@ function renderModules() {
 
             let newMod;
 
+            console.log(currentModule.modtype);
+
             switch(currentModule.modtype) {
                 case "NOTE":
                     newMod = new Note(currentModule);
@@ -116,6 +118,45 @@ function insertNote() {
     });
 }
 
+function removeNote(id) {
+    const noteIdStr = "#" + id;
+    const postParameters = {idToRemove : id, freeNoteId: getFreeNoteId()};
+    $.post("noteRemover", postParameters, responseJSON => {
+       const responseObject = JSON.parse(responseJSON);
+       if (responseObject.successful) {
+           $(noteIdStr).remove();
+       } else {
+           console.log(responseObject.message);
+       }
+    });
+}
+
+function removeExclamation(id) {
+    const exclamationIdStr = "#" + id;
+    const postParameters = {alertId : id, freeNoteId : getFreeNoteId()};
+    $.post("alertRemove", postParameters, responseJSON => {
+       const responseObject = JSON.parse(responseJSON);
+       if (responseObject.successful) {
+           $(exclamationIdStr).remove();
+       } else {
+           console.log(responseObject.message);
+       }
+    });
+}
+
+function removeQuestion(id) {
+    const questionIdStr = "#" + id;
+    const postParameters = {questionId : id, freeNoteId : getFreeNoteId()};
+    $.post("questionRemove", postParameters, responseJSON => {
+       const responseObject = JSON.parse(responseJSON);
+       if (responseObject.successful) {
+           $(questionIdStr).remove();
+       } else {
+           console.log(responseObject.message);
+       }
+    });
+}
+
 function insertVocab() {
     console.log("inserting vocab");
     const postParameters = {newTerm: "term", newDef: "definition", freeNoteId: getFreeNoteId()};
@@ -125,6 +166,7 @@ function insertVocab() {
             const newVocabData = responseObject.newVocabModule;
             const newVocabModule = new Vocabulary(newVocabData);
             insertModule(newVocabModule);
+            newVocabModule.setUp();
         } else {
             console.log("message: " + responseObject.message);
         }

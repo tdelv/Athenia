@@ -15,11 +15,25 @@ function getNoteList() {
             for (let i = 0; i < allNotes.length; i++) {
                 $("#freeNoteContainer").append(noteToHTML(allNotes[i]));
             }
-
         } else {
             console.log("message: " + responseObject.message);
         }
     }) ;
+}
+
+
+function removeFreeNote(id) {
+    const idStr = "#" + id;
+    console.log(idStr);
+    const postParameters = {noteId : id};
+    $.post("removeFreeNote", postParameters, responseJSON => {
+        const responseObject = JSON.parse(responseJSON);
+        if (responseObject.successful) {
+            $(idStr).remove();
+        } else {
+            console.log(responseObject.message);
+        }
+    });
 }
 
 function noteToHTML(note) {
@@ -33,12 +47,12 @@ function noteToHTML(note) {
     tagHTML += `</p>`;
 
     const cardFooter = `<div class="card-footer text-muted">Date Modified: ${note.dateModified}</div>`;
-    const trashIcon = `<i class="fa fa-trash" style="position:absolute; top:25px; right: 25px;"></i>`;
+    const trashIcon = `<i class="fa fa-trash" onclick="removeFreeNote('${note.noteId}')"></i>`;
 
-    return `<div class="card mb-3" onclick="navToNote('${note.noteId}')">
-            <div class="card-body noteCard" id="${note.noteId}">${innerHTML}
-            ${tagHTML}${trashIcon}${cardFooter}</div></div>`;
+    return `<div id="${note.noteId}" class="container-fluid"><div class="row">
+            <div class="card col mb-3" onclick="navToNote('${note.noteId}')">
+            <div class="card-body noteCard">${innerHTML}
+            ${tagHTML}${cardFooter}</div></div>
+            <div class="col-sm-auto pt-1 d-flex justify-content-end">${trashIcon}</div></div></div>`;
 }
 
-
-// TODO ALSO DELETE METHOD FOR CLICKING ON DELETE THING
