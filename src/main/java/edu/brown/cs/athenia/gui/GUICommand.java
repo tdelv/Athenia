@@ -35,13 +35,12 @@ import spark.TemplateViewRoute;
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
  * dynamic URLs to account for arbitrary number of "pages".
- * @author makaylamurphy
- *
  */
 public class GUICommand {
 
   private static final Gson GSON = new Gson();
 
+  // Prevent creation of instances of private class.
   private GUICommand() {
   }
 
@@ -54,11 +53,17 @@ public class GUICommand {
         throws GoogleDriveApiException {
       // String userId = checkLoggedIn(req, res);
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
-          .put("title", "landing page").build();
+          .put("title", "Welcome to Athenia!").build();
 
       return new ModelAndView(variables, "landing.ftl");
     }
   }
+
+  /*
+   * -------------------------------------------------------------------------
+   * -- LOGIN/LOGOUT HANDLERS ------------------------------------------------
+   * -------------------------------------------------------------------------
+   */
 
   /**
    * Handles initial login request, redirecting user to Google Authenication
@@ -71,9 +76,6 @@ public class GUICommand {
         throws GoogleDriveApiException {
       // Set destination to go after login
       if (req.session().attribute("loginDestination") == null) {
-
-        // WAS: req.session().attribute("loginDestination", "/home");
-        // I changed it to go to languages instead of home (Mia)
         req.session().attribute("loginDestination", "/languages");
       }
 
@@ -142,6 +144,7 @@ public class GUICommand {
             throws GoogleDriveApiException, DatabaseParserException {
       String userId = req.session().attribute("user_id");
 
+      // Update user's database
       DatabaseParser.updateUser(userId);
 
       // Invalidate previous session and create a new one
