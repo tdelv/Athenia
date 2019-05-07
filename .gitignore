@@ -1,0 +1,14 @@
+/.gradle/*
+/build/*
+/tokens/*
+.gradle/*
+build/*
+tokens/*
+/.gradle/
+/build/
+/tokens/
+.gradle/
+build/
+tokens/
+*/userData/*
+.gradle/buildOutputCleanup/buildOutputCleanup.lock
