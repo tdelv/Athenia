@@ -173,7 +173,7 @@ public class Main {
 
     // general tag spark handlers
     Spark.post("/addGlobalTag", new GUICommand.TagAddHandler());
-    Spark.post("/removeGlobalTag", new GUICommand.TagRemoveHandler());
+    //Spark.post("/removeGlobalTag", new GUICommand.TagRemoveHandler());
 
     // adding / removing tags from modules specific spark handlers
     Spark.post("/addTagToModule", new GUICommand.AddTagToModule());

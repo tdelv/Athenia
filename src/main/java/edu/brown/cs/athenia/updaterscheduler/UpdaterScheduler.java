@@ -41,9 +41,11 @@ public class UpdaterScheduler extends TimerTask {
         }
 
         // Create a new scheduler
-        UpdaterScheduler task = new UpdaterScheduler(userId);
-        schedulers.put(userId, task);
-        timer.schedule(task, 30 * 1000, 30 * 1000);
+        if (DatabaseParser.hasUser(userId)) {
+            UpdaterScheduler task = new UpdaterScheduler(userId);
+            schedulers.put(userId, task);
+            timer.schedule(task, 30 * 1000, 30 * 1000);
+        }
     }
 
     /**

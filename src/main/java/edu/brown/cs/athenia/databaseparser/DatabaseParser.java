@@ -76,6 +76,7 @@ public class DatabaseParser {
             }
 
         } catch (SQLException | ClassNotFoundException | IOException | GoogleDriveApiException e) {
+            e.printStackTrace();
             // Wrap any exceptions from interaction with API with project exception
             throw new DatabaseParserException(e);
         }
@@ -139,12 +140,22 @@ public class DatabaseParser {
     }
 
     /**
+     * Checks whether the given user has a locally stored Athenia.
+     * @param userId The id of the user.
+     * @return whether they have a locally stored Athenia.
+     */
+    public static boolean hasUser(String userId) {
+        return USER_MAP.containsKey(userId);
+    }
+
+    /**
      * Deletes user from local memory cache.
      * @param userId The id of the user.
      */
     public static void deleteUser(String userId) {
         USER_MAP.remove(userId);
     }
+
 
     // Internal helper methods
 
@@ -307,6 +318,7 @@ public class DatabaseParser {
                     FreeNote freeNote = new FreeNote(
                             rs.getString("title"),
                             rs.getString("fn_id"));
+                    language.addFreeNote(freeNote);
 
                     getFreeNoteTags(conn, freeNote, language);
                     freeNote.setDateCreated(new Date(rs.getInt("created")));
@@ -330,12 +342,14 @@ public class DatabaseParser {
                 "SELECT * FROM freenote_tags WHERE freenote_id = ?")) {
             statement.setString(1, freeNote.getId());
             try (ResultSet rs = statement.executeQuery()) {
-                String tagId = rs.getString("id");
-                if (!language.hasTag(tagId)) {
-                    throw new DatabaseParserException("Bad data.");
-                }
+                while (rs.next()) {
+                    String tagId = rs.getString("tag_id");
+                    if (!language.hasTag(tagId)) {
+                        throw new DatabaseParserException("Bad data.");
+                    }
 
-                freeNote.addTag(language.getTag(tagId));
+                    freeNote.addTag(language.getTag(tagId));
+                }
             }
         }
     }
@@ -380,6 +394,7 @@ public class DatabaseParser {
                             throw new DatabaseParserException("Bad data.");
                     }
 
+                    module.setId(rs.getString("id"));
                     language.addModule(type, module);
 
                     getModuleTags(conn, module, language);
@@ -562,7 +577,7 @@ public class DatabaseParser {
             statement.setString(1, module.getId());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    String tagId = rs.getString("id");
+                    String tagId = rs.getString("tag_id");
                     if (!language.hasTag(tagId)) {
                         throw new DatabaseParserException("Bad data: " +
                                 "Tag " + tagId + " not in language " + language.getName());
@@ -702,11 +717,20 @@ public class DatabaseParser {
                 while (rs.next()) {
                     String tagName = rs.getString("tag_name");
                     if (language.hasTag(tagName)) {
-                        newTags.remove(language.getTag(tagName));
                     } else {
                         oldTags.add(tagName);
                     }
                 }
+            }
+        }
+
+        // Get current tags in database
+        Set<String> allTags = new HashSet<>();
+        try (Statement statement = conn.createStatement();
+                ResultSet rs = statement.executeQuery(
+                        "SELECT id FROM tags")) {
+            while (rs.next()) {
+                allTags.add(rs.getString(1));
             }
         }
 
@@ -716,9 +740,11 @@ public class DatabaseParser {
                 "(id, name) VALUES " +
                 "(?, ?)")) {
             for (Tag tag : newTags) {
-                statement.setString(1, tag.getTag());
-                statement.setString(2, tag.getTag());
-                statement.addBatch();
+                if (!allTags.contains(tag.getTag())) {
+                    statement.setString(1, tag.getTag());
+                    statement.setString(2, tag.getTag());
+                    statement.addBatch();
+                }
             }
 
             statement.executeBatch();
@@ -1316,7 +1342,9 @@ public class DatabaseParser {
                     statement.setString(1, freeNote.getId());
                     statement.setString(2, module.getId());
                     statement.setInt(3, freeNote.getModules().indexOf(module));
+                    statement.addBatch();
                 }
+                statement.executeBatch();
             }
         }
     }

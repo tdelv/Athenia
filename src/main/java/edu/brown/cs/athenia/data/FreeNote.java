@@ -65,6 +65,9 @@ public class FreeNote {
   }
 
   public void addModule(Module m) {
+    if (m == null) {
+      throw new NullPointerException();
+    }
     this.dateModified = new Date();
     this.modules.add(m);
   }
