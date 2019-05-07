@@ -2219,7 +2219,8 @@ public class GUICommand {
 
   public static class RemoveFreeNote implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res)
+            throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 

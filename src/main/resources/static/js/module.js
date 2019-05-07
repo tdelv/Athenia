@@ -138,8 +138,13 @@ class Exclamation extends Note {
     toHTML() {
         const icon = "<i class=\"fa fa-exclamation\"></i>";
         const input = `<input type="text" class="form-control mb-3 ml-2 d-inline w-75" placeholder="${this.content}">`;
-        const div = `<div class="noteModule" id="${this.id}">${icon} ${input}</div>`;
-        return div;
+        const div = `<div class="noteModule col">${icon} ${input}</div>`;
+        const remover = `<div class="col-sm-auto p-2 d-flex justify-content-end">
+                        <i class="fa fa-trash" onclick="removeExclamation('${this.id}')"></i></div>`;
+        const container = `<div class="container-fluid" id="${this.id}">
+                        <div class="row">${div}${remover}</div></div>`;
+
+        return container;
     }
 
 }

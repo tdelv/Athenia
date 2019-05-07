@@ -118,7 +118,6 @@ function insertNote() {
 
 function removeNote(id) {
     const noteIdStr = "#" + id;
-    console.log($(noteIdStr));
     const postParameters = {idToRemove : id, freeNoteId: getFreeNoteId()};
     $.post("noteRemover", postParameters, responseJSON => {
        const responseObject = JSON.parse(responseJSON);
@@ -128,6 +127,20 @@ function removeNote(id) {
            console.log(responseObject.message);
        }
     });
+}
+
+function removeExclamation(id) {
+    const exclamationIdStr = "#" + id;
+    const postParameters = {alertId : id, freeNoteId : getFreeNoteId()};
+    $.post("alertRemove", postParameters, responseJSON => {
+       const responseObject = JSON.parse(responseJSON);
+       if (responseObject.successful) {
+           $(exclamationIdStr).remove();
+       } else {
+           console.log(responseObject.message);
+       }
+    });
+
 }
 
 function insertVocab() {
