@@ -37,12 +37,19 @@ Athenia is a supplementary learning tool designed to help users who are studying
 
 ## Section Overviews
 
-### Front End (Mia and Jason) (you can break this up if you want i wasn't 100% sure how the work was split.
+### Front End
 
 #### Overview of Process
+
+The user interface of this app was built by incrementally deciding what the controller and view needed from eachother in order to function. We developed the interface feature by feature, communicating the logistics of each post and get request. 
+
 #### Design Decisions
+
+We decided to use a bootstrap to steamline our visual design of components.
+
 #### Current Bugs
-#### Put whatever else you want up to you
+
+Modules do not update properly regarding tagging and rating.
 
 ### Data Structures (Makayla)
 
