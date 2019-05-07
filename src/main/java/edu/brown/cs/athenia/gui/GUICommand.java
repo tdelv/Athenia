@@ -1120,6 +1120,9 @@ public class GUICommand {
       String noteId = qm.value("noteId");
       String noteChange = qm.value("noteUpdate");
 
+      String tagUpdate = qm.value("tagUpdate");
+      String ratingUpdate = qm.value("ratingUpdate");
+
       // success variables
       boolean successful = false;
       String message = "";
@@ -1136,7 +1139,34 @@ public class GUICommand {
           if (lang.getModule(StorageType.NOTE, noteId) != null) {
             // update the actual node
             Note noteToUpdate = (Note) lang.getModule(StorageType.NOTE, noteId);
+
+            // update text of note
             noteToUpdate.update(noteChange);
+
+            // try to update rating
+            try {
+              int newRating = Integer.parseInt(ratingUpdate);
+              noteToUpdate.setRating(newRating);
+            } catch (NumberFormatException e) {
+              message = "rating not a number";
+            }
+
+            // update tags
+            List<Tag> tagsToReplace = new ArrayList<>();
+            String[] tagsSplit = tagUpdate.split(",");
+            for (String t : tagsSplit) {
+              String tTrim = t.trim();
+              if (lang.hasTag(t)) {
+                Tag temp = lang.getTag(t);
+                tagsToReplace.add(temp);
+              } else {
+                Tag temp = new Tag(t);
+                lang.addTag(temp);
+                tagsToReplace.add(temp);
+              }
+            }
+            noteToUpdate.replaceAllTags(tagsToReplace);
+
             variables.put("updatedNote", toData(noteToUpdate));
             // update successful messages
             successful = true;
@@ -2406,14 +2436,6 @@ public class GUICommand {
           for (Tag t : lang.getTags()) {
             tags.add(t.getTag());
           }
-          tags.add("test");
-          tags.add("test 2");
-          tags.add("test3");
-          tags.add("test4");
-          tags.add("test5");
-          tags.add("test6");
-          tags.add("test7");
-          tags.add("test8");
 
           variables.put("allTags", tags);
 
@@ -2501,6 +2523,8 @@ public class GUICommand {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
+      System.out.println("GETTING LIST");
+
       // pull information from front end
       String startDate = qm.value("startDate");
       String endDate = qm.value("endDate");
@@ -2519,13 +2543,19 @@ public class GUICommand {
         Athenia user = DatabaseParser.getUser(userId);
         Language lang = user.getCurrLanguage();
 
+        System.out.println("GOT USER");
+
         // check if current language is not null
         if (lang != null) {
+
+          System.out.println("GOT LANG");
 
           try {
             // parse out date objects
             Date startDateObject = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
             Date endDateObject = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
+
+            System.out.println("PARSED DATES");
 
             // prepare tag selected lists to create new tag list
             String[] tagsSplit = tagsSelected.split(",");
@@ -2537,20 +2567,29 @@ public class GUICommand {
               // add tag to list if not null
               if (tempTag != null) {
                 tagList.add(tempTag);
+                System.out.println(tempTag.getTag());
               }
             }
 
+            // TODO IDK HOW TO FIX THIS
             // create ReviewMode object
-            ReviewMode reviewer =
-                    new ReviewMode(user, tagList, startDateObject, endDateObject);
-            // get list of reviewables
-            List<Reviewable> reviewablesList = reviewer.review();
-
+//            ReviewMode reviewer =
+//                    new ReviewMode(user, tagList, startDateObject, endDateObject);
+//            // get list of reviewables
+//
+//            List<Reviewable> reviewablesList = reviewer.review();
+//
+//            System.out.println(reviewablesList.isEmpty());
+//
+//            for (Reviewable r : reviewablesList) {
+//              System.out.println(r.getRating());
+//            }
 
             // TODO THESE ARE TESTS TEST TEST TEST
-            Vocab vocabNew = new Vocab("fuck", "me");
-            Note noteNew = new Note("right now");
+            Vocab vocabNew = new Vocab("uwu", "owo");
+            Note noteNew = new Note("uwuwuwuwuwuw wwowowow");
 
+            List<Reviewable> reviewablesList = new ArrayList<>();
             reviewablesList.add(vocabNew);
             reviewablesList.add(noteNew);
             // TODO THESE ARE TESTS TESTS TESTS

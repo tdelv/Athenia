@@ -2,10 +2,7 @@ package edu.brown.cs.athenia.data.modules;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.modules.module.StorageType;
@@ -58,6 +55,13 @@ public abstract class Module {
 
   public void removeFreeNote() {
     this.freeNote = null;
+  }
+
+  public void replaceAllTags(List<Tag> tags) {
+    this.tags.clear();
+    for (Tag t : tags) {
+      this.tags.put(t.getTag(), t);
+    }
   }
 
   // TODO: an id field and getters / setters for it? DONE

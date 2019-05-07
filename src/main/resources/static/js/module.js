@@ -88,7 +88,21 @@ class Note extends Module {
         const selector = "#" + thisOlThing.id + " input";
         const newNoteContent = $(selector).val();
 
-        const postParameters = {noteId: thisOlThing.id, noteUpdate: newNoteContent};
+        const tagSelect = "#tags-" + thisOlThing.id;
+        const newTagContent = $(tagSelect).val();
+        console.log(newTagContent);
+
+        const ratingSelect = "#rating-" + thisOlThing.id;
+        const newRatingContent = $(ratingSelect).val();
+        console.log(newRatingContent);
+
+        this.tags = newTagContent;
+        this.rating = newRatingContent;
+
+        const postParameters = {noteId: thisOlThing.id,
+                                noteUpdate: newNoteContent,
+                                tagUpdate: newTagContent,
+                                ratingUpdate: newRatingContent};
         $.post("/noteUpdate", postParameters, responseJSON => {
             const responseObject = JSON.parse(responseJSON);
             if (responseObject.successful) {
@@ -107,8 +121,18 @@ class Note extends Module {
         const remover = `<div class="col-sm-auto p-2 d-flex justify-content-end">
                         <i class="fa fa-trash" onclick="removeNote('${this.id}')"></i></div>`;
 
+        const tags = `<div class="col"><input type="text" id='tags-${this.id}' class="form-control" 
+                placeholder="Insert tags separated by a comma (,)"></div>`;
+
+        const rating = `<div class="col">
+                <select class="form-control" id='rating-${this.id}' name="ratingSelect-${this.id}">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select></div>`;
+
         const container = `<div class="container-fluid" id="${this.id}">
-                        <div class="row">${div}${remover}</div></div>`;
+                        <div class="row">${div}${tags}${rating}${remover}</div></div>`;
         return container;
     }
 

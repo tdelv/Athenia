@@ -49,8 +49,6 @@ function renderModules() {
 
             let newMod;
 
-            console.log(currentModule.modtype);
-
             switch(currentModule.modtype) {
                 case "NOTE":
                     newMod = new Note(currentModule);

@@ -44,6 +44,11 @@ public class ReviewMode {
 
     for (Tag tag : tags) {
       List<Module> modulesFromTag = currLang.getModuleListFromTag(tag);
+
+      for(Module m : modulesFromTag) {
+        System.out.println(m.getType());
+      }
+
       for (Module mod : modulesFromTag) {
         // is module to review if is reviewable and is either equal to start or
         // end date created or between those two dates
