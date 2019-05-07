@@ -101,10 +101,17 @@ class Note extends Module {
     }
 
     toHTML() {
+
         const input = `<input type="text" class="form-control mb-3" placeholder="${this.content}">`;
-        const div = `<div class="noteModule" id="${this.id}">${input}</div>`;
-        return div;
+        const div = `<div class="noteModule col">${input}</div>`;
+        const remover = `<div class="col-sm-auto p-2 d-flex justify-content-end">
+                        <i class="fa fa-trash" onclick="removeNote('${this.id}')"></i></div>`;
+
+        const container = `<div class="container-fluid" id="${this.id}">
+                        <div class="row">${div}${remover}</div></div>`;
+        return container;
     }
+
 }
 
 class Exclamation extends Note {

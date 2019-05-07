@@ -116,6 +116,20 @@ function insertNote() {
     });
 }
 
+function removeNote(id) {
+    const noteIdStr = "#" + id;
+    console.log($(noteIdStr));
+    const postParameters = {idToRemove : id, freeNoteId: getFreeNoteId()};
+    $.post("noteRemover", postParameters, responseJSON => {
+       const responseObject = JSON.parse(responseJSON);
+       if (responseObject.successful) {
+           $(noteIdStr).remove();
+       } else {
+           console.log(responseObject.message);
+       }
+    });
+}
+
 function insertVocab() {
     console.log("inserting vocab");
     const postParameters = {newTerm: "term", newDef: "definition", freeNoteId: getFreeNoteId()};
