@@ -27,7 +27,7 @@ public class Tag {
    */
   @Override
   public boolean equals(Object o) {
-    return tag.equals((String) o);
+    return tag.equals(((Tag) o).getTag());
   }
 
   /**
