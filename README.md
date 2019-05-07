@@ -29,6 +29,7 @@ Athenia is a supplementary learning tool designed to help users who are studying
    - Test 2: Redirect to log in if not authenticated.
    - Test 3: Adding and removing languages.
    - Test 4: Adding and updating freenotes.
+   - There are more, I just don't have time to type them out :(
    
 ## Overall bugs
  - Heroku is having issues with the dependencies for jetty servers, so currently deployed version is unavailable.
