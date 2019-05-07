@@ -344,7 +344,7 @@ public class GUICommand {
 
           // get information about lang to present on home
           int vocabCount = lang.getModuleCount(StorageType.VOCAB);
-          int noteCount = lang.getModuleCount(StorageType.FREE_NOTE);
+          int noteCount = lang.getModuleCount(StorageType.FREE_NOTE); // this should work but thomas says it is getting the number of note modules instead?
           int conjugationCount = lang.getModuleCount(StorageType.CONJUGATION);
 
           List<String> recentList = new ArrayList<>();
@@ -2577,26 +2577,26 @@ public class GUICommand {
 
             // TODO IDK HOW TO FIX THIS
             // create ReviewMode object
-//            ReviewMode reviewer =
-//                    new ReviewMode(user, tagList, startDateObject, endDateObject);
-//            // get list of reviewables
-//
-//            List<Reviewable> reviewablesList = reviewer.review();
-//
-//            System.out.println(reviewablesList.isEmpty());
-//
-//            for (Reviewable r : reviewablesList) {
-//              System.out.println(r.getRating());
-//            }
+            ReviewMode reviewer =
+                    new ReviewMode(user, tagList, startDateObject, endDateObject);
+            // get list of reviewables
 
-            // TODO THESE ARE TESTS TEST TEST TEST
-            Vocab vocabNew = new Vocab("uwu", "owo");
-            Note noteNew = new Note("uwuwuwuwuwuw wwowowow");
+            List<Reviewable> reviewablesList = reviewer.review();
 
-            List<Reviewable> reviewablesList = new ArrayList<>();
-            reviewablesList.add(vocabNew);
-            reviewablesList.add(noteNew);
-            // TODO THESE ARE TESTS TESTS TESTS
+            System.out.println(reviewablesList.isEmpty());
+
+            for (Reviewable r : reviewablesList) {
+              System.out.println(r.getRating());
+            }
+
+//            // TODO THESE ARE TESTS TEST TEST TEST
+//            Vocab vocabNew = new Vocab("uwu", "owo");
+//            Note noteNew = new Note("uwuwuwuwuwuw wwowowow");
+//
+//            List<Reviewable> reviewablesList = new ArrayList<>();
+//            reviewablesList.add(vocabNew);
+//            reviewablesList.add(noteNew);
+//            // TODO THESE ARE TESTS TESTS TESTS
 
 
             // prepare list of modules to review for frontend
