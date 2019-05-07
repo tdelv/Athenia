@@ -8,8 +8,8 @@ import edu.brown.cs.athenia.data.modules.Module;
 import edu.brown.cs.athenia.data.modules.Pair;
 import edu.brown.cs.athenia.data.modules.Tag;
 import edu.brown.cs.athenia.data.modules.module.*;
+import edu.brown.cs.athenia.driveapi.GoogleDriveApiException;
 import edu.brown.cs.athenia.main.Athenia;
-import edu.brown.cs.athenia.driveapi.DriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 
 import java.io.BufferedReader;
@@ -75,7 +75,7 @@ public class DatabaseParser {
                 getFreeNoteModules(conn, language);
             }
 
-        } catch (SQLException | ClassNotFoundException | IOException | DriveApiException e) {
+        } catch (SQLException | ClassNotFoundException | IOException | GoogleDriveApiException e) {
             // Wrap any exceptions from interaction with API with project exception
             throw new DatabaseParserException(e);
         }
@@ -122,7 +122,7 @@ public class DatabaseParser {
                 updateFreeNoteModules(conn, language);
             }
 
-        } catch (IOException | SQLException | ClassNotFoundException | DriveApiException e) {
+        } catch (IOException | SQLException | ClassNotFoundException | GoogleDriveApiException e) {
             // Wrap any exceptions from interaction with API with project exception
             throw new DatabaseParserException(e);
         }
@@ -132,7 +132,7 @@ public class DatabaseParser {
             File file = new java.io.File(
                     "src/main/resources/userData/" + userId + ".sqlite3");
             GoogleDriveApi.setDataBase(userId, file);
-        } catch (DriveApiException e) {
+        } catch (GoogleDriveApiException e) {
             // Wrap any exceptions from interaction with API with project exception
             throw new DatabaseParserException(e);
         }
@@ -172,10 +172,10 @@ public class DatabaseParser {
      * @throws ClassNotFoundException when something goes wrong loading SQLite3.
      * @throws SQLException when a SQL command is incorrectly executed.
      * @throws IOException when something goes wrong on initial database setup.
-     * @throws DriveApiException when something goes wrong getting the database from Google Drive.
+     * @throws GoogleDriveApiException when something goes wrong getting the database from Google Drive.
      */
     private static Connection getConnection(String userId)
-            throws SQLException, ClassNotFoundException, IOException, DriveApiException {
+            throws SQLException, ClassNotFoundException, IOException, GoogleDriveApiException {
         // Get database from Google Drive, or else set one up for user
         File file = GoogleDriveApi.getDataBase(userId);
         if (!file.exists()) {

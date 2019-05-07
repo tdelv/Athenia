@@ -4,42 +4,42 @@ package edu.brown.cs.athenia.driveapi;
  * Exceptions for use with DriveApi.
  * @author Thomas Del Vecchio
  */
-public class DriveApiException extends Exception {
+public class GoogleDriveApiException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new DriveApiException.
+     * Creates a new GoogleDriveApiException.
      */
-    public DriveApiException() {
+    public GoogleDriveApiException() {
         super();
     }
 
     /**
-     * Creates a new DriveApiException.
+     * Creates a new GoogleDriveApiException.
      * @param message
      *          The message to be passed with the exception.
      */
-    public DriveApiException(String message) {
+    public GoogleDriveApiException(String message) {
         super(message);
     }
 
     /**
-     * Creates a new DriveApiException.
+     * Creates a new GoogleDriveApiException.
      * @param message
      *          The message to be passed with the exception.
      * @param cause
      *          The cause of the exception.
      */
-    public DriveApiException(String message, Throwable cause) {
+    public GoogleDriveApiException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Creates a new DriveApiException.
+     * Creates a new GoogleDriveApiException.
      * @param cause
      *          The cause of the exception.
      */
-    public DriveApiException(Throwable cause) {
+    public GoogleDriveApiException(Throwable cause) {
         super(cause);
     }
 }

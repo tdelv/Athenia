@@ -21,7 +21,7 @@ import edu.brown.cs.athenia.data.modules.module.StorageType;
 import edu.brown.cs.athenia.data.modules.module.Vocab;
 import edu.brown.cs.athenia.databaseparser.DatabaseParser;
 import edu.brown.cs.athenia.databaseparser.DatabaseParserException;
-import edu.brown.cs.athenia.driveapi.DriveApiException;
+import edu.brown.cs.athenia.driveapi.GoogleDriveApiException;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.main.Athenia;
 import edu.brown.cs.athenia.review.*;
@@ -31,9 +31,6 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import spark.TemplateViewRoute;
-
-import javax.management.*;
-import javax.xml.crypto.*;
 
 /**
  * GUICommand will handle GUI commands, FreeMarker methods (gets and posts), and
@@ -54,7 +51,7 @@ public class GUICommand {
   public static class LandingPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       // String userId = checkLoggedIn(req, res);
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
           .put("title", "landing page").build();
@@ -71,7 +68,7 @@ public class GUICommand {
 
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       // Set destination to go after login
       if (req.session().attribute("loginDestination") == null) {
 
@@ -142,7 +139,7 @@ public class GUICommand {
 
     @Override
     public ModelAndView handle(Request req, Response res)
-            throws DriveApiException, DatabaseParserException {
+            throws GoogleDriveApiException, DatabaseParserException {
       String userId = req.session().attribute("user_id");
 
       DatabaseParser.updateUser(userId);
@@ -171,7 +168,7 @@ public class GUICommand {
   public static class LanguagePromptHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       boolean successful = false;
       String message = "";
@@ -204,7 +201,7 @@ public class GUICommand {
    */
   public static class LanguageAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String lang = qm.value("newLanguage");
@@ -239,7 +236,7 @@ public class GUICommand {
    */
   public static class LanguageChangeHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String language = qm.value("language");
@@ -277,7 +274,7 @@ public class GUICommand {
    */
   public static class LanguageRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String lang = qm.value("language");
@@ -324,7 +321,7 @@ public class GUICommand {
   public static class HomePageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
 
       boolean successful = false;
@@ -390,7 +387,7 @@ public class GUICommand {
   public static class VocabularyPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
 
       boolean successful = false;
@@ -430,7 +427,7 @@ public class GUICommand {
    */
   public static class getVocabularyModulesHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       // QueryParamsMap qm = req.queryMap();
 
@@ -482,7 +479,7 @@ public class GUICommand {
    */
   public static class VocabularyAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String newTerm = qm.value("newTerm");
@@ -538,7 +535,7 @@ public class GUICommand {
    */
   public static class VocabularyUpdateHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String vocabId = qm.value("vocabId");
@@ -593,7 +590,7 @@ public class GUICommand {
    */
   public static class VocabularyRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String vocabId = qm.value("vocabId");
@@ -653,7 +650,7 @@ public class GUICommand {
   public static class ConjugationPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       // successful messages
       boolean successful = false;
@@ -689,7 +686,7 @@ public class GUICommand {
 
   public static class GetConjugationContentHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -739,7 +736,7 @@ public class GUICommand {
    */
   public static class ConjugationAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -791,7 +788,7 @@ public class GUICommand {
    */
   public static class ConjugationAddEntryHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       // conjugation add information
@@ -861,7 +858,7 @@ public class GUICommand {
    */
   public static class ConjugationEntryUpdateHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       // information pulled from front-end
@@ -931,7 +928,7 @@ public class GUICommand {
    */
   public static class ConjugationRemoveEntryHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -997,7 +994,7 @@ public class GUICommand {
    */
   public static class ConjugationRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String conjId = qm.value("conjId");
@@ -1056,7 +1053,7 @@ public class GUICommand {
    */
   public static class NoteAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String noteStr = qm.value("noteString");
@@ -1114,7 +1111,7 @@ public class GUICommand {
    */
   public static class NoteUpdateHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
@@ -1167,7 +1164,7 @@ public class GUICommand {
    */
   public static class NoteRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String noteId = qm.value("noteId");
@@ -1234,7 +1231,7 @@ public class GUICommand {
    */
   public static class AlertAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String alertStr = qm.value("alertString");
@@ -1291,7 +1288,7 @@ public class GUICommand {
    */
   public static class AlertUpdateHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
@@ -1345,7 +1342,7 @@ public class GUICommand {
    */
   public static class AlertRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String alertId = qm.value("alertId");
@@ -1414,7 +1411,7 @@ public class GUICommand {
    */
   public static class QuestionAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String questionStr = qm.value("questionString");
@@ -1471,7 +1468,7 @@ public class GUICommand {
    */
   public static class QuestionUpdateHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String questionID = qm.value("questionId");
@@ -1525,7 +1522,7 @@ public class GUICommand {
    */
   public static class QuestionRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String questionId = qm.value("questionId");
@@ -1598,7 +1595,7 @@ public class GUICommand {
   public static class TagPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String tagName = qm.value("tag");
@@ -1643,7 +1640,7 @@ public class GUICommand {
    */
   public static class TagAddHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String tagVal = qm.value("tagValue");
@@ -1690,7 +1687,7 @@ public class GUICommand {
    */
   public static class TagRemoveHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
       String tagValue = qm.value("tagValue");
@@ -1746,7 +1743,7 @@ public class GUICommand {
    */
   public static class AddTagToModule implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -1875,7 +1872,7 @@ public class GUICommand {
    */
   public static class RemoveTagFromModule implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -2004,7 +2001,7 @@ public class GUICommand {
   public static class FreeNotesPageHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-            throws DriveApiException {
+            throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
 
       boolean successful = false;
@@ -2045,7 +2042,7 @@ public class GUICommand {
   public static class GetFreeNotesList implements Route {
     @Override
     public String handle(Request req, Response res)
-            throws DriveApiException {
+            throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
 
       boolean successful = false;
@@ -2092,7 +2089,7 @@ public class GUICommand {
   public static class FreeNotesTitleEditorHandler implements Route {
     @Override
     public String handle(Request req, Response res)
-            throws DriveApiException {
+            throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -2146,7 +2143,7 @@ public class GUICommand {
   public static class FreeNotesEditorHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-        throws DriveApiException {
+        throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
 
       QueryParamsMap qm = req.queryMap();
@@ -2227,7 +2224,7 @@ public class GUICommand {
    */
   public static class SetRatingHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -2329,7 +2326,7 @@ public class GUICommand {
   public static class ReviewModeHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-            throws DriveApiException {
+            throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
 
       // success variables
@@ -2396,7 +2393,7 @@ public class GUICommand {
   public static class ReviewingHandler implements TemplateViewRoute {
     @Override
     public ModelAndView handle(Request req, Response res)
-      throws DriveApiException {
+      throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
@@ -2447,7 +2444,7 @@ public class GUICommand {
 
   public static class GetReviewListHandler implements Route {
     @Override
-    public String handle(Request req, Response res) throws DriveApiException {
+    public String handle(Request req, Response res) throws GoogleDriveApiException {
       String userId = req.session().attribute("user_id");
       QueryParamsMap qm = req.queryMap();
 
