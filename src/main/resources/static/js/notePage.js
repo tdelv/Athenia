@@ -49,6 +49,8 @@ function renderModules() {
 
             let newMod;
 
+            console.log(currentModule.modtype);
+
             switch(currentModule.modtype) {
                 case "NOTE":
                     newMod = new Note(currentModule);
@@ -140,7 +142,19 @@ function removeExclamation(id) {
            console.log(responseObject.message);
        }
     });
+}
 
+function removeQuestion(id) {
+    const questionIdStr = "#" + id;
+    const postParameters = {questionId : id, freeNoteId : getFreeNoteId()};
+    $.post("questionRemove", postParameters, responseJSON => {
+       const responseObject = JSON.parse(responseJSON);
+       if (responseObject.successful) {
+           $(questionIdStr).remove();
+       } else {
+           console.log(responseObject.message);
+       }
+    });
 }
 
 function insertVocab() {

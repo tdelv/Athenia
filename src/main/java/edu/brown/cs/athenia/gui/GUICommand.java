@@ -1496,7 +1496,7 @@ public class GUICommand {
             Question questionToUpdate = (Question) lang
                 .getModule(StorageType.QUESTION, questionID);
             questionToUpdate.update(questionUpdate);
-            variables.put("updatedQuestion", questionToUpdate);
+            variables.put("updatedQuestion", toData(questionToUpdate));
             // update successful variables
             successful = true;
             message = "successfully updated question module";
@@ -2755,7 +2755,7 @@ public class GUICommand {
    */
   private static Map<String, Object> toData(Question question) {
     ImmutableMap.Builder<String, Object> questionData = new ImmutableMap.Builder<String, Object>();
-    questionData.put("modtype", StorageType.ALERT_EXCLAMATION);
+    questionData.put("modtype", StorageType.QUESTION);
     toData(question, questionData);
     questionData.put("content", question.getText());
     return questionData.build();
