@@ -28,19 +28,33 @@ public class Conjugation extends Table implements Reviewable {
     return this.rating;
   }
 
+  /**
+   * Setter for rating.
+   */
   public void setRating(int r) {
     this.rating = r;
   }
 
+  /**
+   * Setter for header of a tag.
+   * @param head
+   */
   public void setHeader(String head) {
     this.header = head;
   }
 
+  /**
+   * Getter for header.
+   * @return
+   */
   public String getHeader() {
     return this.header;
   }
 
-  public StorageType getType(){
+  /**
+   * Getter for type.
+   */
+  public StorageType getType() {
     return StorageType.CONJUGATION;
   }
 }

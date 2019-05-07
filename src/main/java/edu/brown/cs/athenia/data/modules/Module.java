@@ -2,7 +2,12 @@ package edu.brown.cs.athenia.data.modules;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import edu.brown.cs.athenia.data.FreeNote;
 import edu.brown.cs.athenia.data.modules.module.StorageType;
@@ -23,6 +28,9 @@ public abstract class Module {
   private Date dateLastReviewed;
   private StorageType type;
 
+  /**
+   * If this Module is made without being in a FreeNote.
+   */
   public Module() {
     this.freeNote = null;
     this.id = new BigInteger(130, new SecureRandom()).toString(32);
@@ -32,6 +40,10 @@ public abstract class Module {
     this.tags = new HashMap<String, Tag>();
   }
 
+  /**
+   * if a Module is made with being in a FreeNote.
+   * @param f
+   */
   public Module(FreeNote f) {
     this.freeNote = f;
     this.id = new BigInteger(130, new SecureRandom()).toString(32);
@@ -41,22 +53,41 @@ public abstract class Module {
     this.tags = new HashMap<String, Tag>();
   }
 
+  /**
+   * Sets this Module's FreeNote.
+   * @param note
+   */
   public void setFreeNote(FreeNote note) {
     this.freeNote = note;
   }
 
+  /**
+   * Getter for FreeNote.
+   * @return
+   */
   public FreeNote getFreeNote() {
     return this.freeNote;
   }
 
+  /**
+   * Check if a Module is in a FreeNote.
+   * @return
+   */
   public boolean hasFreeNote() {
     return this.freeNote != null;
   }
 
+  /**
+   * Remove a Module's FreeNote.
+   */
   public void removeFreeNote() {
     this.freeNote = null;
   }
 
+  /**
+   * Replace all of the Tags wihtin a Module with the given Tags.
+   * @param tags
+   */
   public void replaceAllTags(List<Tag> tags) {
     this.tags.clear();
     for (Tag t : tags) {
@@ -65,30 +96,61 @@ public abstract class Module {
   }
 
   // TODO: an id field and getters / setters for it? DONE
+  /**
+   * Setter for id.
+   * @param id
+   */
   public void setId(String id) {
     this.id = id;
   }
 
+  /**
+   * Gettter for id.
+   * @return
+   */
   public String getId() {
     return this.id;
   }
 
+  /***
+   * Getter for tags.
+   * @return
+   */
   public Collection<Tag> getTags() {
     return new HashSet<>(tags.values());
   }
 
+  /**
+   * Adds a Tag to a Module.
+   * @param t
+   */
   public void addTag(Tag t) {
     tags.put(t.getTag(), t);
   }
 
+  /**
+   * Remover for a tag.
+   * @param t
+   * @return
+   */
   public Tag removeTag(String t) {
     return tags.remove(t);
   }
 
+  /**
+   * Check if has a tag.
+   * @param tag
+   * @return
+   */
   public boolean hasTag(String tag) {
     return tags.containsKey(tag);
   }
 
+  /**
+   * Getter for a tag by String tag meaning.
+   * @param tag
+   * @return
+   */
   public Tag getTag(String tag) {
     return tags.get(tag);
   }
@@ -137,6 +199,10 @@ public abstract class Module {
     return this.dateLastReviewed;
   }
 
+  /**
+   * Abstract getter for the StorageType of an object.
+   * @return
+   */
   public abstract StorageType getType();
 
 }

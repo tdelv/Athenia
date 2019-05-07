@@ -18,7 +18,10 @@ public class Question extends Text {
     super(q, f);
   }
 
-  public StorageType getType(){
+  /**
+   * Getter for type of Module.
+   */
+  public StorageType getType() {
     return StorageType.QUESTION;
   }
 }
