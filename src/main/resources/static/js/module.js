@@ -215,6 +215,9 @@ class Vocabulary extends Module {
     }
 
     setUp() {
+
+        console.log("setting up " + this.id);
+
         const selector = "#" + this.id + " input";
         const thisOlThing = this;
         $(selector).blur(function(){thisOlThing.update(thisOlThing);});
