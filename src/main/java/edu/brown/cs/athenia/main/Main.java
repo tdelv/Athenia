@@ -56,6 +56,15 @@ public class Main {
       port = DEFAULT_PORT;
     }
 
+    // Delete all locally stored user data
+    File userDataDir = new File("src/main/resources/userData/");
+    if (!userDataDir.exists()) {
+      userDataDir.mkdir();
+    }
+    for (File file : userDataDir.listFiles()) {
+      file.delete();
+    }
+
     runSparkServer(port);
   }
 
