@@ -138,6 +138,13 @@ public class DatabaseParser {
         }
     }
 
+    /**
+     * Deletes user from local memory cache.
+     * @param userId The id of the user.
+     */
+    public static void deleteUser(String userId) {
+        USER_MAP.remove(userId);
+    }
 
     // Internal helper methods
 
@@ -1209,9 +1216,9 @@ public class DatabaseParser {
         // Get old and new tags
         try (PreparedStatement statement = conn.prepareStatement(
                 "SELECT t.name tag_name " +
-                        "FROM module_tags mt, tags t " +
-                        "WHERE mt.tag_id = t.id " +
-                        "AND mt.module_id = ?")) {
+                "FROM module_tags mt, tags t " +
+                "WHERE mt.tag_id = t.id " +
+                "AND mt.module_id = ?")) {
             statement.setString(1, module.getId());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {

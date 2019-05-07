@@ -10,6 +10,7 @@ import java.util.Set;
 //import joptsimple.OptionParser;
 
 import com.google.common.collect.ImmutableSet;
+import edu.brown.cs.athenia.databaseparser.UpdaterScheduler;
 import edu.brown.cs.athenia.driveapi.GoogleDriveApi;
 import edu.brown.cs.athenia.gui.GUICommand;
 import freemarker.template.Configuration;
@@ -102,6 +103,9 @@ public class Main {
         req.session().attribute("loginDestination", req.pathInfo());
         res.redirect("/login");
       }
+
+      // Create a scheduler for updating user's database
+      UpdaterScheduler.create(userId);
     });
 
     try {

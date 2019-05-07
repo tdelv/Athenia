@@ -184,6 +184,16 @@ public class GoogleDriveApi {
 
   }
 
+  /**
+   * Deletes a user's database file from server memory and removes it from local cache.
+   * @param userId The id of the user.
+   */
+  public static void deleteDataBaseFile(String userId) {
+    java.io.File file = FILE_MAP.remove(userId);
+    if (file != null && file.exists()) {
+      file.delete();
+    }
+  }
 
   // Helper methods for interaction with Google Drive files
 
