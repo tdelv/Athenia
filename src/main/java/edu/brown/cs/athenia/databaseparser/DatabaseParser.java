@@ -307,11 +307,9 @@ public class DatabaseParser {
                         "fn.id fn_id, " +
                         "fn.created created, " +
                         "fn.last_modified last_modified " +
-                "FROM freenotes fn, languages l, tags t, language_tags lt " +
+                "FROM freenotes fn, languages l " +
                 "WHERE fn.language_id = l.id " +
-                "AND l.language = ? " +
-                "AND t.id = lt.tag_id " +
-                "AND lt.language_id = l.id")) {
+                "AND l.language = ?")) {
             statement.setString(1, language.getName());
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -717,6 +715,7 @@ public class DatabaseParser {
                 while (rs.next()) {
                     String tagName = rs.getString("tag_name");
                     if (language.hasTag(tagName)) {
+                        newTags.remove(language.getTag(tagName));
                     } else {
                         oldTags.add(tagName);
                     }
