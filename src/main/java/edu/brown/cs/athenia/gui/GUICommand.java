@@ -344,7 +344,7 @@ public class GUICommand {
 
           // get information about lang to present on home
           int vocabCount = lang.getModuleCount(StorageType.VOCAB);
-          int noteCount = lang.getModuleCount(StorageType.NOTE);
+          int noteCount = lang.getModuleCount(StorageType.FREE_NOTE);
           int conjugationCount = lang.getModuleCount(StorageType.CONJUGATION);
 
           List<String> recentList = new ArrayList<>();

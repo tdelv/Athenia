@@ -31,7 +31,7 @@ public class Language extends Modularized {
   }
 
   public Collection<Tag> getTags() {
-    return tags.values();
+    return new HashSet<>(tags.values());
   }
 
   public void addTag(Tag t) {
