@@ -43,8 +43,9 @@ function renderModules() {
         let html;
         if (moduleMap.has(id)) {
             // it wont for right now
+            console.log("rendering");
             let mod = moduleMap.get(id);
-            html = mod.toHTML();
+            insertModule(mod);
         } else {
 
             let newMod;
@@ -63,12 +64,12 @@ function renderModules() {
                     newMod = new Question(currentModule);
                     break;
                 default:
-                    console.log("uhhh");
+                    console.log("not a valid mod type");
             }
 
-            html = newMod.toHTML();
+            insertModule(newMod);
+
         }
-        $("#noteBody").append(html);
 
     }
 }
@@ -87,8 +88,6 @@ function updateNoteTitle() {
         }
     });
 
-    //TODO: post request
-
 }
 
 function getFreeNoteId() {
@@ -96,7 +95,8 @@ function getFreeNoteId() {
 }
 
 function insertModule(module) {
-    $("#noteBody").append(module.toHTML());
+    const html = module.toHTML();
+    $("#noteBody").append(html);
     module.setUp();
 }
 
@@ -108,7 +108,6 @@ function insertNote() {
         if (responseObject.successful) {
             const newNoteData = responseObject.newNoteModule;
             let newNoteModule = new Note(newNoteData);
-            // newNoteModule = new Note(newNote.id, newNote.dateCreated, newNote.dateModified, newNote.noteContent);
             insertModule(newNoteModule);
         } else {
             console.log("message: " + responseObject.message);
@@ -164,7 +163,6 @@ function insertVocab() {
             const newVocabData = responseObject.newVocabModule;
             const newVocabModule = new Vocabulary(newVocabData);
             insertModule(newVocabModule);
-            newVocabModule.setUp();
         } else {
             console.log("message: " + responseObject.message);
         }
@@ -172,6 +170,8 @@ function insertVocab() {
 }
 
 function insertConjugation() {
+    alert("this feature is coming soon!");
+    /*
     console.log("inserting conjugation");
     const postParameters = {};
     $.post("/conjugationAdd", postParameters, responseJSON => {
@@ -184,6 +184,7 @@ function insertConjugation() {
             console.log("message: " + responseObject.message);
         }
     });
+    */
 
 }
 
